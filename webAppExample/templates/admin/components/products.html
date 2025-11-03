@@ -1,0 +1,118 @@
+<!-- Card de Producto -->
+
+<style>
+    .card-section {
+        padding: 10px;
+        overflow: hidden;
+        /* evita scrolls innecesarios */
+    }
+
+    .card-body {
+        padding: 10px;
+        overflow-x: auto;
+        /* solo si la tabla se desborda horizontalmente */
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    body {
+        overflow: hidden;
+        /* opcional si el scroll general no se necesita */
+    }
+
+    .table td:last-child {
+        white-space: nowrap;
+    }
+
+    .modal .form-label {
+        font-weight: 500;
+    }
+
+    .modal .form-control,
+    .modal .form-select {
+        border-radius: 6px;
+    }
+
+    #productPreview {
+        max-height: 100px;
+        border-radius: 6px;
+        margin-top: 5px;
+        object-fit: cover;
+    }
+</style>
+
+{% import 'macros/loadingMacro.html' as loadingComponent %}
+{{ loadingComponent.loading_modal('loadingProducts', 'Cargando productos...') }}
+
+{% include 'admin/components/editProductModal.html' %}
+
+
+
+
+<section id="section-productos" class="content-section">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="fas fa-box me-2"></i>Listado de Productos</h5>
+                        <button class="btn btn-primary" onclick="openProductForm()">
+                            <i class="fas fa-plus me-1"></i> Agregar Producto
+                        </button>
+                    </div>
+                    <div class="card-body" style="padding: 1.25rem;">
+                        <!-- Filters -->
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <input type="text" id="filterProductoNombre" class="form-control" placeholder="Buscar por nombre...">
+                                <input type="hidden" id="filterProductoStock" value="">
+                            </div>
+                            <div class="col-md-4">
+                                <select id="filterProductoCategoria" class="form-select">
+                                    <option value="">Todas las categorías</option>
+                                    <!-- Categories will be loaded here -->
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <select id="filterProductoActivo" class="form-select">
+                                    <option value="">Todos</option>
+                                    <option value="1">Activos</option>
+                                    <option value="0">Inactivos</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <button class="btn btn-secondary" id="applyProductoFiltersBtn" onclick="applyProductoFilters()">
+                                    <i class="fas fa-filter me-1"></i> Filtrar
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Products Table -->
+                        <div class="table-responsive" style="max-height: calc(100vh - 450px); overflow-y: auto;">
+                            <table class="table table-striped">
+                                <thead class="table-dark" style="position: sticky; top: 0; z-index: 10;">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Nombre</th>
+                                        <th>Descripción</th>
+                                        <th>Categoría</th>
+                                        <th>Precio</th>
+                                        <th>Inventario</th>
+                                        <th>Activo</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="productTableBody">
+                                    <!-- Products will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,17 +1,72 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-title>
-      Tab 1
+      Inicio
     </ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Tab 1</ion-title>
-    </ion-toolbar>
-  </ion-header>
 
-  <app-explore-container name="Tab 1 page"></app-explore-container>
+  <!-- Promotional Slider -->
+  <div class="promo-slider">
+    <div class="slider-container">
+      <div class="slide active" style="background: linear-gradient(135deg, var(--ion-color-primary), var(--ion-color-secondary));">
+        <div class="slide-content">
+          <h2>¡2x1 en Cafés!</h2>
+          <p>Todos los días de la semana</p>
+        </div>
+      </div>
+
+      <div class="slide" style="background: linear-gradient(135deg, var(--ion-color-tertiary), var(--color-golden));">
+        <div class="slide-content">
+          <h2>Postres Artesanales</h2>
+          <p>50% de descuento en tartas</p>
+        </div>
+      </div>
+
+      <div class="slide" style="background: linear-gradient(135deg, var(--color-dark-brown), var(--ion-color-primary));">
+        <div class="slide-content">
+          <h2>Membresía Premium</h2>
+          <p>Acumula puntos y ahorra</p>
+        </div>
+      </div>
+
+      <div class="slider-dots">
+        <span class="dot active" data-slide="0"></span>
+        <span class="dot" data-slide="1"></span>
+        <span class="dot" data-slide="2"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Favoritos Section -->
+  <div class="favoritos-section">
+    <div class="container">
+      <h2 class="section-title">Los Favoritos y Consentidos</h2>
+      <p class="section-description">Contamos con una gran variedad de ricos dulces y chocolates que encantan a chicos y grandes desde hace más de 92 años</p>
+
+      <div class="favoritos-grid">
+        <div class="product-card" *ngFor="let product of favoriteProducts">
+          <div class="product-image">
+            <img *ngIf="product.imagen_base64" [src]="'data:image/jpeg;base64,' + product.imagen_base64" alt="{{ product.nombre }}">
+            <div class="product-placeholder" *ngIf="!product.imagen_base64">
+              <ion-icon [name]="getProductIcon(product.nombre)"></ion-icon>
+            </div>
+            <div class="product-overlay">
+              <button class="btn-icon add-to-cart" (click)="addToCart(product)">
+                <ion-icon name="cart"></ion-icon>
+              </button>
+            </div>
+          </div>
+          <div class="product-info">
+            <h3>{{ product.nombre }}</h3>
+            <p>{{ product.descripcion }}</p>
+            <div class="product-price">${{ product.precio_unitario.toFixed(2) }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </ion-content>

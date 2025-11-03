@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Chocolates Costanzo - Tradición artesanal desde 1932. Caramelos, chocolates y dulces mexicanos de calidad premium.">
+    <meta name="keywords" content="chocolates costanzo, caramelos mexicanos, dulces artesanales, chocolates premium, golosinas mexicanas, chocolates tradicionales, dulces costanzo, caramelos duros, chocolates envueltos, dulces mexicanos autenticos, golosinas tradicionales, chocolates mexicanos, caramelos costanzo, dulces artesanales mexico">
+    <meta name="author" content="Chocolates Costanzo">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Chocolates Costanzo - Tradición y Sabor desde 1932">
+    <meta property="og:description" content="Descubre la tradición artesanal de Chocolates Costanzo desde 1932. Caramelos, chocolates y dulces mexicanos de calidad premium.">
+    <meta property="og:image" content="{{ url_for('static', filename='assets/costanzo.png') }}">
+    <meta property="og:url" content="{{ request.url_root }}">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Chocolates Costanzo">
+    <meta name="twitter:description" content="Tradición artesanal desde 1932">
+    <meta name="twitter:image" content="{{ url_for('static', filename='assets/costanzo.png') }}">
+    <title>Chocolates Costanzo - Tradición y Sabor desde 1932</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    {% include 'components/navbar.html' %}
+
+    <!-- Slider -->
+    {% include 'components/slider.html' %}
+
+    <!-- Categorias  -->
+    {% include 'components/categories.html' %}
+
+    <!-- Favoritos  -->
+    {% include 'components/favorites.html' %}
+     
+    <!-- Productos  -->
+    {% include 'components/products.html' %}
+
+    <!-- Historia  -->
+    {% include 'components/history.html' %}
+
+    <!-- Sobre Nosotros  -->
+    {% include 'components/aboutUs.html' %}
+
+    <!-- FAQ  -->
+    {% include 'components/faq.html' %}
+
+    <!-- Contact  -->
+    {% include 'components/contact.html' %}
+
+    <!-- Footer  -->
+    {% include 'components/footer.html' %}
+
+    <!-- Policy Modals -->
+    {% include 'components/terms-modal.html' %}
+    {% include 'components/privacy-modal.html' %}
+    {% include 'components/returns-modal.html' %}
+
+    <!-- Overlay -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Carrito de Compras  -->
+    {% include 'components/cart.html' %}
+
+    <!-- Loading  -->
+    <div id="loader-logo-path" data-src="{{ url_for('static', filename='assets/costanzo.png') }}"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/cart.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/products.js') }}"></script>
+
+    <script src="{{ url_for('static', filename='js/video.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/chatbot.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/promociones.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/historia.js') }}"></script>
+    
+</body>
+
+</html>

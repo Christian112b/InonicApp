@@ -1,0 +1,156 @@
+<!-- Reportes Section -->
+<section id="section-reportes" class="content-section">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Reportes y Estadísticas</h5>
+                        <div>
+                            <button class="btn btn-primary" onclick="generarReportes()">
+                                <i class="fas fa-sync-alt me-1"></i> Generar Reportes
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body" style="padding: 1.25rem;">
+                        <!-- Summary Cards -->
+                        <div class="row mb-2 g-2">
+                            <div class="col-lg-3 col-md-6">
+                                <div class="card text-center border-primary">
+                                    <div class="card-body py-1 px-2">
+                                        <div class="text-primary fw-bold small mb-1">Ventas</div>
+                                        <div id="reporteVentasTotales" class="h5 mb-0">$0.00</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6">
+                                <div class="card text-center border-success">
+                                    <div class="card-body py-1 px-2">
+                                        <div class="text-success fw-bold small mb-1">Pedidos</div>
+                                        <div id="reportePedidosCompletados" class="h5 mb-0">0</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6">
+                                <div class="card text-center border-warning">
+                                    <div class="card-body py-1 px-2">
+                                        <div class="text-warning fw-bold small mb-1">Productos</div>
+                                        <div id="reporteProductosVendidos" class="h5 mb-0">0</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Charts and Table Section -->
+                        <div class="row mb-2 g-2">
+                            <!-- Charts Column -->
+                            <div class="col-lg-6">
+                                <div class="row g-1 mb-2">
+                                    <div class="col-6">
+                                        <div class="card">
+                                            <div class="card-header py-1 px-2">
+                                                <small class="mb-0 fw-bold">Ventas por Método</small>
+                                            </div>
+                                            <div class="card-body py-1 px-2">
+                                                <canvas id="chartMetodosPago" style="max-width: 100%; height: 60px;"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="card">
+                                            <div class="card-header py-1 px-2">
+                                                <small class="mb-0 fw-bold">Tendencia de Ventas</small>
+                                            </div>
+                                            <div class="card-body py-1 px-2">
+                                                <canvas id="chartVentasTendencia" style="max-width: 100%; height: 60px;"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row g-1">
+                                    <div class="col-6">
+                                        <div class="card">
+                                            <div class="card-header py-1 px-2">
+                                                <small class="mb-0 fw-bold">Estado de Pedidos</small>
+                                            </div>
+                                            <div class="card-body py-2 px-3 d-flex align-items-center justify-content-center">
+                                                <canvas id="chartEstadoPedidos" style="max-width: 100%; max-height: 800px;"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="card">
+                                            <div class="card-header py-1 px-2">
+                                                <small class="mb-0 fw-bold">Productos Top</small>
+                                            </div>
+                                            <div class="card-body py-1 px-2">
+                                                <canvas id="chartProductosTop" style="max-width: 100%; height: 290px;"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Table Column -->
+                            <div class="col-lg-6">
+                                <div class="card" style="height: 500px;">
+                                    <div class="card-header py-1 px-2">
+                                        <small class="fw-bold">Ventas Detalladas</small>
+                                    </div>
+                                    <div class="card-body p-1" style="overflow: hidden;">
+                                        <div class="table-responsive h-100" style="overflow-y: auto;">
+                                            <table class="table table-striped table-sm mb-0">
+                                                <thead class="table-dark" style="position: sticky; top: 0; z-index: 10;">
+                                                    <tr>
+                                                        <th style="width: 25%; font-size: 0.75rem;">Fecha</th>
+                                                        <th style="width: 20%; font-size: 0.75rem;">ID</th>
+                                                        <th style="width: 25%; font-size: 0.75rem;">Método</th>
+                                                        <th style="width: 15%; font-size: 0.75rem;">Monto</th>
+                                                        <th style="width: 15%; font-size: 0.75rem;">Estado</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="reporteVentasTableBody">
+                                                    <tr>
+                                                        <td colspan="5" class="text-center text-muted py-4">
+                                                            <small>No hay datos disponibles</small>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Export Options -->
+                        <div class="row mt-1">
+                            <div class="col-12 text-center">
+                                <button class="btn btn-success btn-sm me-1" onclick="exportarReporte('pdf')">
+                                    <i class="fas fa-file-pdf"></i>
+                                </button>
+                                <button class="btn btn-success btn-sm" onclick="exportarReporte('excel')">
+                                    <i class="fas fa-file-excel"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Loading Modal for Reportes -->
+<div class="modal fade" id="loadingReportes" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-body text-center">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Cargando...</span>
+                </div>
+                <p class="mt-2">Generando reportes...</p>
+            </div>
+        </div>
+    </div>
+</div>

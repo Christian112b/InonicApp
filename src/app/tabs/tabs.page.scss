@@ -1,1 +1,272 @@
+.central-button {
+  --background: transparent;
+  --color: var(--ion-color-medium);
+  --color-selected: var(--ion-color-primary);
+  --background-focused: transparent;
+  --background-hover: transparent;
+  --padding-start: 8px;
+  --padding-end: 8px;
+  --padding-top: 4px;
+  --padding-bottom: 4px;
+  flex: 1;
+  border-radius: 12px;
+  transition: all var(--transition-normal);
+  position: relative;
+  overflow: visible;
+  max-width: 80px;
+}
 
+.central-button.tab-selected {
+  --color: var(--ion-color-primary);
+  --background: transparent;
+  transform: translateY(-2px);
+}
+
+.central-button.tab-selected ion-icon {
+  color: var(--ion-color-primary) !important;
+  transform: scale(1.1);
+}
+
+.central-button.tab-selected ion-label {
+  color: var(--ion-color-primary) !important;
+  font-weight: 700;
+}
+
+/* Tab transition animations */
+ion-tab {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Tab button animations */
+ion-tab-button {
+  transition: background-color 0.2s ease, color 0.2s ease;
+  position: relative;
+}
+
+.cart-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: var(--ion-color-danger);
+  color: var(--ion-color-danger-contrast);
+  font-size: 0.7rem;
+  font-weight: 700;
+  min-width: 20px;
+  height: 20px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  z-index: 10;
+}
+
+ion-tab-button:hover {
+  --background: rgba(var(--ion-color-primary-rgb), 0.1);
+}
+
+ion-tab-button:not(.central-button)::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1px;
+  height: 60%;
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+ion-tab-button:last-child::after {
+  display: none;
+}
+
+/* Tab bar styling */
+ion-tab-bar {
+  --background: var(--color-white);
+  --border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 -4px 20px rgba(139, 69, 19, 0.1);
+  padding: 12px 0;
+  border-radius: 20px 20px 0 0;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  position: relative;
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-end;
+}
+
+/* Animated background for selected tab */
+ion-tab-bar::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--ion-color-primary), var(--ion-color-secondary));
+  border-radius: 2px;
+  transform: translateX(-50%);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 6px rgba(139, 69, 19, 0.4);
+  opacity: 0;
+}
+
+/* Tab button styling */
+ion-tab-button {
+  --color: var(--ion-color-medium);
+  --color-selected: var(--ion-color-primary);
+  --background-focused: transparent;
+  --background-hover: transparent;
+  --padding-start: 8px;
+  --padding-end: 8px;
+  --padding-top: 4px;
+  --padding-bottom: 4px;
+  flex: 1;
+  border-radius: 12px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: visible;
+  max-width: 80px;
+  animation: tabEnter 0.4s ease-out;
+}
+
+ion-tab-button:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1px;
+  height: 60%;
+  background-color: rgba(0, 0, 0, 0.08);
+}
+
+@keyframes tabEnter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+ion-tab-button.tab-selected {
+  --color: var(--ion-color-primary);
+  --background: transparent;
+  transform: translateY(-2px) scale(1.02);
+  animation: tabSelected 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+ion-tab-button.tab-selected ion-icon {
+  color: var(--ion-color-primary) !important;
+  transform: scale(1.15);
+  animation: iconPulse 0.4s ease-out;
+}
+
+ion-tab-button.tab-selected ion-label {
+  color: var(--ion-color-primary) !important;
+  font-weight: 700;
+  animation: textGlow 0.3s ease-out;
+}
+
+@keyframes tabSelected {
+  0% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-4px) scale(1.05);
+  }
+  100% {
+    transform: translateY(-2px) scale(1.02);
+  }
+}
+
+@keyframes iconPulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1.15);
+  }
+}
+
+@keyframes textGlow {
+  0% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Position the indicator based on selected tab */
+ion-tab-button:nth-child(1).tab-selected ~ ion-tab-bar::before {
+  left: 12.5%;
+  opacity: 1;
+}
+
+ion-tab-button:nth-child(2).tab-selected ~ ion-tab-bar::before {
+  left: 37.5%;
+  opacity: 1;
+}
+
+ion-tab-button:nth-child(3).tab-selected ~ ion-tab-bar::before {
+  left: 50%;
+  opacity: 1;
+}
+
+ion-tab-button:nth-child(4).tab-selected ~ ion-tab-bar::before {
+  left: 62.5%;
+  opacity: 1;
+}
+
+ion-tab-button:nth-child(5).tab-selected ~ ion-tab-bar::before {
+  left: 87.5%;
+  opacity: 1;
+}
+
+/* Tab icon styling */
+ion-tab-button ion-icon {
+  font-size: 20px;
+  margin-bottom: 2px;
+  transition: transform var(--transition-normal);
+}
+
+ion-tab-button:hover ion-icon {
+  transform: scale(1.1);
+}
+
+ion-tab-button.tab-selected ion-icon {
+  transform: scale(1.1);
+  color: var(--ion-color-primary);
+}
+
+/* Tab label styling */
+ion-tab-button ion-label {
+  font-family: var(--font-primary);
+  font-size: 8px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  text-transform: capitalize;
+  line-height: 1;
+  margin-top: 1px;
+  overflow: visible;
+  white-space: nowrap;
+  max-width: none;
+}

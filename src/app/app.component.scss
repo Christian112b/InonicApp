@@ -1,0 +1,31 @@
+.small-header {
+  --min-height: 64px;
+}
+
+.small-toolbar {
+  --min-height: 64px;
+  padding-left: 2px;
+  display: flex;
+  align-items: center;
+  --background: var(--color-white);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-normal);
+}
+
+.white-toolbar {
+  --background: var(--color-white);
+  --color: var(--ion-color-primary);
+}
+
+.logo {
+  height: 70px !important;
+  width: auto;
+  object-fit: contain;
+}
+
+.header-logo {
+  height: 40px !important;
+  width: auto;
+  object-fit: contain;
+  margin-left: 16px;
+}

@@ -1,0 +1,219 @@
+<!-- Cart Sidebar -->
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/cart.css') }}">
+
+<div class="cart-sidebar" id="cartSidebar">
+    <div class="cart-header">
+        <h3>Carrito de Compras</h3>
+        <button class="close-cart" id="closeCart"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="cart-items" id="cartItems">
+        <!-- Los items del carrito se cargarán dinámicamente -->
+        <div id="cartLoading" class="cart-loading" style="display:none; text-align:center; padding:1rem; color:#5c3a21;"><i class="fas fa-spinner fa-spin"></i> Cargando carrito...</div>
+    </div>
+    <div class="cart-footer">
+        <div class="cart-summary">
+            <div class="cart-summary-row">
+                <span>Subtotal:</span>
+                <span id="cartSubtotal">$0.00</span>
+            </div>
+            <div class="cart-summary-row">
+                <span>IVA (16%):</span>
+                <span id="cartIVA">$0.00</span>
+            </div>
+
+    <div class="cart-total">
+        <span>Total:</span>
+        <span id="cartTotal">$0.00</span>
+    </div>
+    <button class="btn btn-primary btn-block" id="checkoutBtn">Proceder al Pago</button>
+
+    <!-- Modal de confirmación -->
+    <div id="checkoutModal" class="modal-overlay">
+        <div class="modal-box">
+            <!-- Tabs -->
+            <div class="tab-header">
+                <button class="tab-btn active" onclick="showTab(0)">Resumen</button>
+                <button class="tab-btn" onclick="showTab(1)">Dirección</button>
+                <button class="tab-btn" onclick="showTab(2)">Método de Pago</button>
+                <button class="tab-btn" onclick="showTab(3)">Confirmar</button>
+                <button class="close-modal" onclick="closeCheckoutModal()"><i class="fas fa-times"></i></button>
+            </div>
+
+            <!-- Contenido de Tabs -->
+            <div class="tab-content">
+                <!-- Tab 0: Resumen -->
+                <div class="tab-panel active" id="tabResumen">
+                    <div class="modal-body" id="checkoutItems"></div>
+                    <div class="modal-summary">
+                        <div class="summary-row"><span>Subtotal:</span><span id="checkoutSubtotalResumen">560.00</span>
+                        </div>
+                        <div class="summary-row"><span>IVA (16%):</span><span id="checkoutIVAResumen">89.60</span></div>
+                        <div class="summary-row total"><span>Total:</span><span id="checkoutTotalResumen">649.60</span>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- TYab 1: Dirección -->
+                <div class="tab-panel" id="tabAddress">
+                    <div class="address-list" id="addressList">
+                        <!-- Ejemplo de direcciones guardadas -->
+
+                        <hr>
+
+                        <!-- Card para agregar nueva dirección -->
+                        <div class="address-card add" onclick="selectAddress(this)">
+                            <p><strong>Agregar nueva dirección</strong></p>
+                        </div>
+
+                        <!-- Formulario para nueva dirección (acepta ambos ids para compatibilidad JS) -->
+                        <div id="addAddressForm" style="display: none;">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="alias">Alias</label>
+                                    <input type="text" id="alias" name="alias" maxlength="50" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="postalCode">Código Postal</label>
+                                    <input type="text" id="postalCode" name="postalCode" maxlength="10" required>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="street">Calle</label>
+                                    <input type="text" id="street" name="street" maxlength="100" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="neighborhood">Colonia</label>
+                                    <input type="text" id="neighborhood" name="neighborhood" maxlength="100" required>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="city">Ciudad</label>
+                                    <input type="text" id="city" name="city" maxlength="100" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="state">Estado</label>
+                                    <input type="text" id="state" name="state" maxlength="100" required>
+                                </div>
+                            </div>
+
+                            <button type="button" onclick="submitNewAddress()" class="btn-confirm">Guardar dirección</button>
+                        </div>
+                        <!-- Alias id for older JS expectations -->
+
+                    </div>
+
+                </div>
+
+                <!-- Tab 2: Metodos de pago -->
+                <div class="tab-panel" id="tabMetodosPago">
+                    <div class="payment-methods">
+                        <h3>Método de pago</h3>
+                        <div class="payment-option">
+                            <input type="radio" id="payCard" name="paymentMethod" value="card">
+                            <label for="payCard">Tarjeta de Crédito/Débito</label>
+                        </div>
+                        <div class="payment-option">
+                            <input type="radio" id="payTransfer" name="paymentMethod" value="transfer">
+                            <label for="payTransfer">Transferencia Bancaria</label>
+                        </div>
+                        <div class="payment-option">
+                            <input type="radio" id="payCash" name="paymentMethod" value="cash">
+                            <label for="payCash">Pago en Efectivo (contra entrega)</label>
+                        </div>
+                    </div>
+
+                    <div class="checkout-summary">
+                        <div class="summary-row"><span>Subtotal:</span><span id="checkoutSubtotalPago">$0.00</span>
+                        </div>
+                        <div class="summary-row"><span>IVA (16%):</span><span id="checkoutIVAPago">$0.00</span></div>
+                        <div class="summary-row" id="checkoutDiscountRow" style="display:none;"><span>Descuento:</span><span id="checkoutDiscountPago">-$0.00</span></div>
+                        <div class="summary-row"><span>Envío:</span><span id="checkoutEnvioPago">$50.00</span></div>
+                        <div class="summary-row total"><span>Total:</span><span id="checkoutTotalPago">$0.00</span>
+                        </div>
+
+                    </div>
+
+                    <div style="margin-top: 1.5rem;"></div>
+
+                    <div id="cardFormContainer" style="display: none; margin-top: 1rem;">
+                        <h4>Datos de la tarjeta</h4>
+                        <div id="card-element" style="padding: 1rem; border: 1px solid #ccc; border-radius: 6px;"></div>
+                        <div id="card-errors" style="color: red; margin-top: 0.5rem;"></div>
+                    </div>
+
+                    <div style="margin-top:1rem; display:flex; gap:0.5rem; align-items:center;">
+                        <input type="text" id="couponInput" placeholder="Ingresa código de cupón" style="flex:1; padding:0.5rem; border-radius:6px; border:1px solid #ccc;">
+                        <button id="applyCouponBtn" class="btn btn-secondary">Aplicar</button>
+                    </div>
+                    <div id="couponMessage" style="margin-top:0.5rem;color:#5c3a21; font-weight:600;"></div>
+
+                    <!-- Coupon loading box (hidden) - uses independent class to avoid modal conflicts -->
+                    <div id="couponLoadingModal" class="coupon-loading-overlay" style="display:none;">
+                        <div class="coupon-loading-box" style="max-width:220px; min-height:80px; align-items:center; justify-content:center; text-align:center;">
+                            <div style="font-size:1.1rem; color:#5c3a21;"><i class="fas fa-spinner fa-spin"></i> Verificando...</div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Tab 3: Confirmación -->
+                <div class="tab-panel" id="tabConfirmar">
+                    <div class="confirm-summary">
+                        <h4>Resumen del pedido</h4>
+                        <div class="confirm-details">
+                            <div class="confirm-row">
+                                <span>Subtotal:</span>
+                                <span id="confirmSubtotal">$0.00</span>
+                            </div>
+                            <div class="confirm-row">
+                                <span>IVA (16%):</span>
+                                <span id="confirmIVA">$0.00</span>
+                            </div>
+                            <div class="confirm-row" id="confirmDiscountRow" style="display:none;">
+                                <span>Descuento:</span>
+                                <span id="confirmDiscount">-$0.00</span>
+                            </div>
+                            <div class="confirm-row">
+                                <span>Envío:</span>
+                                <span id="confirmEnvio">$50.00</span>
+                            </div>
+                            <div class="confirm-row">
+                                <span>Total:</span>
+                                <span id="confirmTotal">$0.00</span>
+                            </div>
+                            <div class="confirm-row">
+                                <span>Dirección:</span>
+                                <span id="confirmAddress">-</span>
+                            </div>
+                            <div class="confirm-row">
+                                <span>Método:</span>
+                                <span id="confirmMethod">-</span>
+                            </div>
+                            <div class="confirm-row" id="cardRow" style="display:none;">
+                                <span>Tarjeta:</span>
+                                <span id="confirmCardLast4">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="modal-footer">
+                <button id="nextCheckoutBtn" class="btn btn-primary">Siguiente</button>
+                <button id="finalCheckoutBtn" class="btn-confirm" style="display:none;">Finalizar compra</button>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="https://js.stripe.com/v3/"></script>
+
+
+    </div>

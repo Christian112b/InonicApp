@@ -1,0 +1,6 @@
+{
+  "appId": "com.costanzo.costanzoApp",
+  "appName": "costanzoApp",
+  "webDir": "www",
+  "bundledWebRuntime": false
+}

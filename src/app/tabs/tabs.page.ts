@@ -1,18 +1,34 @@
 import { Component, EnvironmentInjector, inject } from '@angular/core';
 import { IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel } from '@ionic/angular/standalone';
+import { CommonModule } from '@angular/common';
 import { addIcons } from 'ionicons';
-import { triangle, ellipse, square } from 'ionicons/icons';
+import { home, storefront, cart, person, reorderFour } from 'ionicons/icons';
 
 @Component({
   selector: 'app-tabs',
   templateUrl: 'tabs.page.html',
   styleUrls: ['tabs.page.scss'],
-  imports: [IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel],
+  imports: [IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel, CommonModule],
 })
 export class TabsPage {
   public environmentInjector = inject(EnvironmentInjector);
 
   constructor() {
-    addIcons({ triangle, ellipse, square });
+    addIcons({ home, storefront, cart, person, reorderFour });
+  }
+
+  openCartFromTab() {
+    // Emit event to open cart modal in the active tab
+    const cartEvent = new CustomEvent('openCartModal');
+    window.dispatchEvent(cartEvent);
+  }
+
+  getCartItemCount(): number {
+    const savedCart = localStorage.getItem('cartItems');
+    if (savedCart) {
+      const cartItems = JSON.parse(savedCart);
+      return cartItems.reduce((count: number, item: any) => count + item.cantidad, 0);
+    }
+    return 0;
   }
 }
