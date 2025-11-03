@@ -5,6 +5,9 @@ import { cube, gift, restaurant, leaf, star, snow, cart } from 'ionicons/icons';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 
+// Environment configuration
+const API_BASE_URL = 'http://localhost:5000';
+
 interface Product {
   id_producto: number;
   nombre: string;
@@ -156,11 +159,27 @@ export class Tab1Page implements AfterViewInit, OnDestroy {
   }
 
   private loadFavoriteProducts() {
+    // Check if products are already cached
+    const cachedProducts = localStorage.getItem('cachedProducts');
+    const cachedCategories = localStorage.getItem('cachedCategories');
+
+    if (cachedProducts && cachedCategories) {
+      const products = JSON.parse(cachedProducts);
+      // Get first 6 products as favorites (you can modify this logic)
+      this.favoriteProducts = products.slice(0, 6);
+      console.log('Productos cargados desde cache:', this.favoriteProducts);
+      return;
+    }
+
     // Replace with your actual backend URL - check if your Flask server is running
-    const apiUrl = 'http://localhost:5000/getProducts'; // Adjust this to your Flask server URL
+    const apiUrl = `${API_BASE_URL}/getProducts`; // Adjust this to your Flask server URL
 
     this.http.get<{productos: Product[], categorias: string[]}>(apiUrl).subscribe({
       next: (response) => {
+        // Cache the products and categories
+        localStorage.setItem('cachedProducts', JSON.stringify(response.productos));
+        localStorage.setItem('cachedCategories', JSON.stringify(response.categorias));
+
         // Get first 6 products as favorites (you can modify this logic)
         this.favoriteProducts = response.productos.slice(0, 6);
         console.log('Productos cargados desde API:', this.favoriteProducts);

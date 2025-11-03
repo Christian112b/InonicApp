@@ -21,6 +21,10 @@ export class TabsPage {
     // Emit event to open cart modal in the active tab
     const cartEvent = new CustomEvent('openCartModal');
     window.dispatchEvent(cartEvent);
+
+    // Also refresh cart data when opening from tab bar
+    const refreshEvent = new CustomEvent('refreshCartData');
+    window.dispatchEvent(refreshEvent);
   }
 
   getCartItemCount(): number {

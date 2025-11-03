@@ -1,0 +1,291 @@
+/* Account Page Styles */
+.account-content {
+  --background: var(--color-light-cream);
+  padding: 1rem;
+}
+
+/* Account Menu */
+.account-menu {
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.account-section {
+  background: var(--color-white);
+  border-radius: 15px;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.account-header {
+  margin-bottom: 2rem;
+}
+
+.account-header ion-icon {
+  color: var(--ion-color-primary);
+  margin-bottom: 1rem;
+}
+
+.account-header h2 {
+  color: var(--ion-color-primary);
+  margin: 0 0 0.5rem 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.account-header p {
+  color: var(--ion-color-medium);
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.account-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.account-actions ion-button {
+  --border-radius: 10px;
+  font-weight: 600;
+  height: 50px;
+}
+
+.login-btn {
+  --border-color: var(--ion-color-primary);
+  --color: var(--ion-color-primary);
+}
+
+.register-btn {
+  --background: linear-gradient(135deg, #8B4513, #D2691E);
+  --color: white;
+}
+
+.profile-btn,
+.orders-btn,
+.logout-btn {
+  --border-color: var(--ion-color-medium);
+  --color: var(--ion-color-dark);
+}
+
+.logout-btn {
+  --border-color: var(--ion-color-danger);
+  --color: var(--ion-color-danger);
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.modal-box {
+  background: var(--color-white);
+  border-radius: 15px;
+  width: 100%;
+  max-width: 400px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--color-light);
+}
+
+.modal-header h3 {
+  margin: 0;
+  color: var(--ion-color-primary);
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.close-modal {
+  background: none;
+  border: none;
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ion-color-medium);
+  font-size: 1.2rem;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.close-modal:hover {
+  background: var(--color-light);
+  color: var(--ion-color-dark);
+}
+
+.modal-body {
+  padding: 1.5rem;
+}
+
+/* Form Styles */
+.login-form,
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  color: var(--ion-color-dark);
+  font-size: 0.9rem;
+}
+
+.form-group label ion-icon {
+  color: var(--ion-color-primary);
+  font-size: 1rem;
+}
+
+.form-group ion-input {
+  --border-radius: 8px;
+  --border-color: var(--color-light);
+  --background: var(--color-light-cream);
+  --padding-start: 1rem;
+  --padding-end: 1rem;
+  --padding-top: 0.75rem;
+  --padding-bottom: 0.75rem;
+}
+
+.form-group ion-input.item-has-focus {
+  --border-color: var(--ion-color-primary);
+  --background: white;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--ion-color-medium);
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 5px;
+}
+
+.form-options {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.form-options ion-checkbox {
+  --border-radius: 4px;
+  --border-color: var(--ion-color-primary);
+  --background-checked: var(--ion-color-primary);
+}
+
+.login-submit-btn,
+.register-submit-btn {
+  --border-radius: 10px;
+  font-weight: 600;
+  height: 50px;
+  margin-top: 1rem;
+}
+
+.login-submit-btn {
+  --background: linear-gradient(135deg, #8B4513, #D2691E);
+  --color: white;
+}
+
+.register-submit-btn {
+  --background: var(--ion-color-success);
+  --color: white;
+}
+
+.login-footer {
+  margin-top: 2rem;
+  padding: 1rem;
+  background: var(--color-light-cream);
+  border-radius: 8px;
+  text-align: center;
+}
+
+.login-footer p {
+  margin: 0.25rem 0;
+  font-size: 0.8rem;
+  color: var(--ion-color-medium);
+}
+
+.login-footer p:first-child {
+  font-weight: 600;
+  color: var(--ion-color-primary);
+}
+
+/* Password input wrapper */
+.form-group {
+  position: relative;
+}
+
+.form-group:has(.toggle-password) ion-input {
+  --padding-end: 3rem;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .account-content {
+    padding: 0.5rem;
+  }
+
+  .account-section {
+    padding: 1.5rem 1rem;
+  }
+
+  .modal-box {
+    margin: 0.5rem;
+    max-height: 95vh;
+  }
+
+  .modal-header,
+  .modal-body {
+    padding: 1rem;
+  }
+}
+
+/* Toast styles */
+.toast-success {
+  --background: var(--ion-color-success);
+  --color: white;
+}
+
+.toast-error {
+  --background: var(--ion-color-danger);
+  --color: white;
+}
+
+.toast-warning {
+  --background: var(--ion-color-warning);
+  --color: var(--ion-color-dark);
+}

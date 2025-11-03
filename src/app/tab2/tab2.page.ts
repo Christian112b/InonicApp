@@ -5,6 +5,9 @@ import { cube, gift, restaurant, leaf, star, snow, cart, addCircle } from 'ionic
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 
+// Environment configuration
+const API_BASE_URL = 'http://localhost:5000';
+
 interface CartItem {
   id: number;
   nombre: string;
@@ -61,15 +64,33 @@ export class Tab2Page implements OnInit {
   }
 
   private loadProducts() {
-    const apiUrl = 'http://localhost:5000/getProducts';
+    // Check if products are already cached
+    const cachedProducts = localStorage.getItem('cachedProducts');
+    const cachedCategories = localStorage.getItem('cachedCategories');
+
+    if (cachedProducts && cachedCategories) {
+      this.allProducts = JSON.parse(cachedProducts);
+      this.categories = JSON.parse(cachedCategories);
+      this.applyFilters();
+      this.checkForMoreProducts();
+      console.log('Productos cargados desde cache:', this.allProducts);
+      return;
+    }
+
+    const apiUrl = `${API_BASE_URL}/getProducts`;
 
     this.http.get<{productos: Product[], categorias: string[]}>(apiUrl).subscribe({
       next: (response) => {
         this.allProducts = response.productos;
         this.categories = response.categorias;
+
+        // Cache the products and categories
+        localStorage.setItem('cachedProducts', JSON.stringify(response.productos));
+        localStorage.setItem('cachedCategories', JSON.stringify(response.categorias));
+
         this.applyFilters();
         this.checkForMoreProducts();
-        console.log('Productos cargados en página de productos:', this.allProducts);
+        console.log('Productos cargados desde API:', this.allProducts);
       },
       error: (error) => {
         console.error('Error loading products:', error);

@@ -1,0 +1,228 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Cuenta</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="account-content">
+
+
+  <!-- Account Menu -->
+  <div class="account-menu">
+    <!-- Not Logged In State -->
+    <div class="account-section" *ngIf="!isLoggedIn">
+      <div class="account-header">
+        <ion-icon name="person-circle-outline" size="large"></ion-icon>
+        <h2>Bienvenido</h2>
+        <p>Inicia sesión para acceder a todas las funciones</p>
+      </div>
+
+      <div class="account-actions">
+        <ion-button expand="block" fill="outline" class="login-btn" (click)="openLoginModal()">
+          <ion-icon name="log-in-outline" slot="start"></ion-icon>
+          Iniciar Sesión
+        </ion-button>
+
+        <ion-button expand="block" fill="solid" class="register-btn" (click)="openRegisterModal()">
+          <ion-icon name="person-add-outline" slot="start"></ion-icon>
+          Registrarse
+        </ion-button>
+      </div>
+    </div>
+
+    <!-- Logged In State -->
+    <div class="account-section" *ngIf="isLoggedIn">
+      <div class="account-header">
+        <ion-icon name="person-circle" size="large"></ion-icon>
+        <h2>{{ userName || 'Usuario' }}</h2>
+        <p>{{ userEmail }}</p>
+      </div>
+
+      <div class="account-actions">
+        <ion-button expand="block" fill="outline" class="profile-btn">
+          <ion-icon name="person-outline" slot="start"></ion-icon>
+          Mi Perfil
+        </ion-button>
+
+        <ion-button expand="block" fill="outline" class="orders-btn">
+          <ion-icon name="receipt-outline" slot="start"></ion-icon>
+          Mis Pedidos
+        </ion-button>
+
+        <ion-button expand="block" fill="outline" class="logout-btn" (click)="logout()">
+          <ion-icon name="log-out-outline" slot="start"></ion-icon>
+          Cerrar Sesión
+        </ion-button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Login Modal -->
+  <div class="modal-overlay" *ngIf="showLoginModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Iniciar Sesión</h3>
+        <button class="close-modal" (click)="closeLoginModal()">
+          <ion-icon name="close"></ion-icon>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <form class="login-form" (ngSubmit)="login()" #loginForm="ngForm">
+          <div class="form-group">
+            <label for="email">
+              <ion-icon name="mail-outline"></ion-icon> Correo electrónico
+            </label>
+            <ion-input
+              type="email"
+              id="email"
+              [(ngModel)]="loginData.email"
+              name="email"
+              placeholder="Ingresa tu correo"
+              required>
+            </ion-input>
+          </div>
+
+          <div class="form-group">
+            <label for="password">
+              <ion-icon name="lock-closed-outline"></ion-icon> Contraseña
+            </label>
+            <ion-input
+              [type]="showPassword ? 'text' : 'password'"
+              id="password"
+              [(ngModel)]="loginData.password"
+              name="password"
+              placeholder="Ingresa tu contraseña"
+              required>
+            </ion-input>
+            <button type="button" class="toggle-password" (click)="togglePasswordVisibility()">
+              <ion-icon [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+            </button>
+          </div>
+
+          <div class="form-options">
+            <ion-checkbox [(ngModel)]="loginData.remember" name="remember"></ion-checkbox>
+            <ion-label>Recordar sesión</ion-label>
+          </div>
+
+          <ion-button
+            expand="block"
+            type="submit"
+            [disabled]="!loginForm.valid || isLoading"
+            class="login-submit-btn">
+            <ion-icon name="log-in-outline" slot="start" *ngIf="!isLoading"></ion-icon>
+            <ion-spinner name="crescent" *ngIf="isLoading"></ion-spinner>
+            {{ isLoading ? 'Iniciando...' : 'Iniciar Sesión' }}
+          </ion-button>
+        </form>
+
+        <div class="login-footer" *ngIf="!isLoading">
+          <p><strong>Credenciales de prueba:</strong></p>
+          <p>Usuario: user@test.com | Contraseña: 123456</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Register Modal -->
+  <div class="modal-overlay" *ngIf="showRegisterModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Registrarse</h3>
+        <button class="close-modal" (click)="closeRegisterModal()">
+          <ion-icon name="close"></ion-icon>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <form class="register-form" (ngSubmit)="register()" #registerForm="ngForm">
+          <div class="form-group">
+            <label for="registerName">
+              <ion-icon name="person-outline"></ion-icon> Nombre completo
+            </label>
+            <ion-input
+              type="text"
+              id="registerName"
+              [(ngModel)]="registerData.name"
+              name="name"
+              placeholder="Ingresa tu nombre completo"
+              required>
+            </ion-input>
+          </div>
+
+          <div class="form-group">
+            <label for="registerEmail">
+              <ion-icon name="mail-outline"></ion-icon> Correo electrónico
+            </label>
+            <ion-input
+              type="email"
+              id="registerEmail"
+              [(ngModel)]="registerData.email"
+              name="email"
+              placeholder="Ingresa tu correo"
+              required>
+            </ion-input>
+          </div>
+
+          <div class="form-group">
+            <label for="registerPhone">
+              <ion-icon name="call-outline"></ion-icon> Teléfono
+            </label>
+            <ion-input
+              type="tel"
+              id="registerPhone"
+              [(ngModel)]="registerData.phone"
+              name="phone"
+              placeholder="Ingresa tu teléfono"
+              required>
+            </ion-input>
+          </div>
+
+          <div class="form-group">
+            <label for="registerPassword">
+              <ion-icon name="lock-closed-outline"></ion-icon> Contraseña
+            </label>
+            <ion-input
+              [type]="showRegisterPassword ? 'text' : 'password'"
+              id="registerPassword"
+              [(ngModel)]="registerData.password"
+              name="password"
+              placeholder="Mínimo 8 caracteres, mayúscula, minúscula, número y símbolo"
+              required>
+            </ion-input>
+            <button type="button" class="toggle-password" (click)="toggleRegisterPasswordVisibility()">
+              <ion-icon [name]="showRegisterPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+            </button>
+          </div>
+
+          <div class="form-group">
+            <label for="confirmPassword">
+              <ion-icon name="lock-closed-outline"></ion-icon> Confirmar contraseña
+            </label>
+            <ion-input
+              [type]="showConfirmPassword ? 'text' : 'password'"
+              id="confirmPassword"
+              [(ngModel)]="registerData.confirmPassword"
+              name="confirmPassword"
+              placeholder="Confirma tu contraseña"
+              required>
+            </ion-input>
+            <button type="button" class="toggle-password" (click)="toggleConfirmPasswordVisibility()">
+              <ion-icon [name]="showConfirmPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+            </button>
+          </div>
+
+          <ion-button
+            expand="block"
+            type="submit"
+            [disabled]="!registerForm.valid || isRegisterLoading"
+            class="register-submit-btn">
+            <ion-icon name="person-add-outline" slot="start" *ngIf="!isRegisterLoading"></ion-icon>
+            <ion-spinner name="crescent" *ngIf="isRegisterLoading"></ion-spinner>
+            {{ isRegisterLoading ? 'Registrando...' : 'Registrarse' }}
+          </ion-button>
+        </form>
+      </div>
+    </div>
+  </div>
+</ion-content>

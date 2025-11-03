@@ -1,20 +1,69 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-title>
-      Carrito
+      Mi Carrito
     </ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Carrito</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content [fullscreen]="true" class="cart-content">
+    <div class="cart-loading-overlay" *ngIf="isLoadingCart">
+      <div class="cart-loading-spinner">
+        <ion-spinner name="crescent" color="primary"></ion-spinner>
+        <p>Cargando carrito...</p>
+      </div>
+    </div>
 
-  <div class="container">
-    <strong>Ready to create an app?</strong>
-    <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
-  </div>
+    <div class="cart-items" id="cartItems" *ngIf="!isLoadingCart && cartItems.length > 0; else emptyCart">
+      <div class="cart-item" *ngFor="let item of cartItems">
+        <div class="cart-item-image">
+          <img *ngIf="item.image" [src]="item.image.startsWith('data:image') ? item.image : '/static/img/' + item.image" alt="{{ item.name }}">
+          <div class="cart-item-placeholder" *ngIf="!item.image">
+            <ion-icon [name]="getProductIcon(item.name)"></ion-icon>
+          </div>
+        </div>
+       <div class="cart-item-info">
+         <h4>{{ item.name }}</h4>
+         <div class="cart-item-price">${{ item.price.toFixed(2) }}</div>
+          <div class="cart-item-controls">
+            <button class="quantity-btn" (click)="updateCartItemQuantity(item.id, item.quantity - 1)">-</button>
+            <span class="quantity">{{ item.quantity }}</span>
+            <button class="quantity-btn" (click)="updateCartItemQuantity(item.id, item.quantity + 1)">+</button>
+          </div>
+        </div>
+        <button class="remove-item" (click)="removeFromCart(item.id)">
+          <ion-icon name="trash"></ion-icon>
+        </button>
+      </div>
+    </div>
+
+    <ng-template #emptyCart>
+      <div class="cart-empty">
+        <ion-icon name="cart-outline" size="large"></ion-icon>
+        <p>Tu carrito está vacío</p>
+      </div>
+    </ng-template>
+
+    <div class="cart-footer" *ngIf="cartItems.length > 0">
+      <div class="cart-summary">
+        <div class="cart-summary-row">
+          <span>Subtotal:</span>
+          <span>${{ cartTotal.toFixed(2) }}</span>
+        </div>
+        <div class="cart-summary-row">
+          <span>IVA (16%):</span>
+          <span>${{ (cartTotal * 0.16).toFixed(2) }}</span>
+        </div>
+
+      <div class="cart-total">
+        <span>Total:</span>
+        <span>${{ (cartTotal * 1.16).toFixed(2) }}</span>
+      </div>
+      <!-- <button class="btn btn-primary btn-block" id="checkoutBtn" (click)="proceedToCheckout()">
+        Proceder al Pago
+      </button> -->
+
+
+      </div>
+    </div>
 </ion-content>
