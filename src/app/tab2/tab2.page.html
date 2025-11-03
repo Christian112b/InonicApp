@@ -8,68 +8,6 @@
 
 <ion-content [fullscreen]="true" class="productos-content">
 
-  <!-- Cart Modal -->
-  <div class="cart-modal-overlay" id="cartModal" *ngIf="showCartModal">
-    <div class="cart-modal">
-      <div class="cart-header">
-        <h3>Carrito de Compras</h3>
-        <button class="close-cart" id="closeCart" (click)="closeCartModal()">
-          <ion-icon name="close"></ion-icon>
-        </button>
-      </div>
-
-      <div class="cart-items" id="cartItems" *ngIf="cartItems.length > 0; else emptyCart">
-        <div id="cartLoading" class="cart-loading" style="display:none; text-align:center; padding:1rem; color:#5c3a21;"><i class="fas fa-spinner fa-spin"></i> Cargando carrito...</div>
-        <div class="cart-item" *ngFor="let item of cartItems">
-          <div class="cart-item-image">
-            <img *ngIf="item.imagen_base64" [src]="'data:image/jpeg;base64,' + item.imagen_base64" alt="{{ item.nombre }}">
-            <div class="cart-item-placeholder" *ngIf="!item.imagen_base64">
-              <ion-icon [name]="getProductIcon(item.nombre)"></ion-icon>
-            </div>
-          </div>
-          <div class="cart-item-info">
-            <h4>{{ item.nombre }}</h4>
-            <div class="cart-item-price">${{ item.precio_unitario.toFixed(2) }}</div>
-            <div class="cart-item-controls">
-              <button class="quantity-btn" (click)="updateCartItemQuantity(item.id, item.cantidad - 1)">-</button>
-              <span class="quantity">{{ item.cantidad }}</span>
-              <button class="quantity-btn" (click)="updateCartItemQuantity(item.id, item.cantidad + 1)">+</button>
-            </div>
-          </div>
-          <button class="remove-item" (click)="removeFromCart(item.id)">
-            <ion-icon name="trash"></ion-icon>
-          </button>
-        </div>
-      </div>
-
-      <ng-template #emptyCart>
-        <div class="cart-empty">
-          <ion-icon name="cart-outline" size="large"></ion-icon>
-          <p>Tu carrito está vacío</p>
-        </div>
-      </ng-template>
-
-      <div class="cart-footer" *ngIf="cartItems.length > 0">
-        <div class="cart-summary">
-          <div class="cart-summary-row">
-            <span>Subtotal:</span>
-            <span id="cartSubtotal">${{ cartTotal.toFixed(2) }}</span>
-          </div>
-          <div class="cart-summary-row">
-            <span>IVA (16%):</span>
-            <span id="cartIVA">${{ (cartTotal * 0.16).toFixed(2) }}</span>
-          </div>
-          <div class="cart-total">
-            <span>Total:</span>
-            <span id="cartTotal">${{ (cartTotal * 1.16).toFixed(2) }}</span>
-          </div>
-        </div>
-        <button class="btn btn-primary btn-block" id="checkoutBtn" (click)="proceedToCheckout()">
-          Proceder al Pago
-        </button>
-      </div>
-    </div>
-  </div>
 
   <!-- Productos Section -->
   <div class="productos-section">
