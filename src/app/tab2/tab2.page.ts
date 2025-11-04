@@ -4,16 +4,17 @@ import { addIcons } from 'ionicons';
 import { cube, gift, restaurant, leaf, star, snow, cart, addCircle } from 'ionicons/icons';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
+import { ToastController } from '@ionic/angular';
 
 // Environment configuration
-const API_BASE_URL = 'http://localhost:5000';
+const API_BASE_URL = 'http://localhost:5050';
 
 interface CartItem {
   id: number;
   nombre: string;
   precio_unitario: number;
   cantidad: number;
-  imagen_base64?: string;
+  imagen?: string;
 }
 
 interface Product {
@@ -23,7 +24,7 @@ interface Product {
   categoria: string;
   precio_unitario: number;
   activo: number;
-  imagen_base64?: string;
+  imagen?: string;
   stock: number;
 }
 
@@ -49,7 +50,7 @@ export class Tab2Page implements OnInit {
   public cartItemCount: number = 0;
   public showCartModal: boolean = false;
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private toastController: ToastController) {
     addIcons({ cube, gift, restaurant, leaf, star, snow, cart, addCircle });
   }
 
@@ -68,15 +69,125 @@ export class Tab2Page implements OnInit {
     const cachedProducts = localStorage.getItem('cachedProducts');
     const cachedCategories = localStorage.getItem('cachedCategories');
 
-    if (cachedProducts && cachedCategories) {
-      this.allProducts = JSON.parse(cachedProducts);
-      this.categories = JSON.parse(cachedCategories);
-      this.applyFilters();
-      this.checkForMoreProducts();
-      console.log('Productos cargados desde cache:', this.allProducts);
-      return;
+    if (cachedProducts && cachedCategories && cachedProducts !== 'undefined' && cachedCategories !== 'undefined') {
+      try {
+        this.allProducts = JSON.parse(cachedProducts);
+        this.categories = JSON.parse(cachedCategories);
+        this.applyFilters();
+        this.checkForMoreProducts();
+        console.log('Productos cargados desde cache:', this.allProducts);
+        return;
+      } catch (error) {
+        console.warn('Error parsing cached products, fetching from API:', error);
+        // Clear invalid cache
+        localStorage.removeItem('cachedProducts');
+        localStorage.removeItem('cachedCategories');
+        this.showToast('Error al cargar productos del caché, obteniendo datos del servidor...', 'warning');
+      }
     }
 
+    // Simular carga de productos para desarrollo
+    setTimeout(() => {
+      const mockResponse = {
+        productos: [
+          {
+            id_producto: 1,
+            nombre: 'Tornillo',
+            descripcion: 'Delicioso chocolate macizo con leche',
+            categoria: 'Chocolate',
+            precio_unitario: 25.00,
+            activo: 1,
+            stock: 10,
+            imagen: '/assets/img/02Tornillo.jpg'
+          },
+          {
+            id_producto: 2,
+            nombre: 'Princesa Surtida',
+            descripcion: 'Bombón de chocolate amargo relleno de fondant y jalea',
+            categoria: 'Bombon',
+            precio_unitario: 30.00,
+            activo: 1,
+            stock: 15,
+            imagen: '/assets/img/09PrincesaSurtida.jpg'
+          },
+          {
+            id_producto: 3,
+            nombre: 'Duquesa',
+            descripcion: 'Irresistible sandwich de galleta con jalea y chocolate',
+            categoria: 'Sandwich',
+            precio_unitario: 28.00,
+            activo: 1,
+            stock: 8,
+            imagen: '/assets/img/DUQUESA-PRESENTACIONES.jpg'
+          },
+          {
+            id_producto: 4,
+            nombre: 'Esponja Natural',
+            descripcion: 'Chocolate blanco con menta fresca',
+            categoria: 'Especiales',
+            precio_unitario: 35.00,
+            activo: 1,
+            stock: 5,
+            imagen: '/assets/img/Esponja-Natural.jpg'
+          },
+          {
+            id_producto: 5,
+            nombre: 'Figura de Chocolate',
+            descripcion: 'Figuras decorativas de chocolate premium',
+            categoria: 'Decoraciones',
+            precio_unitario: 45.00,
+            activo: 1,
+            stock: 3,
+            imagen: '/assets/img/figura.png'
+          },
+          {
+            id_producto: 6,
+            nombre: 'Menta Blanca',
+            descripcion: 'Chocolate blanco con menta refrescante',
+            categoria: 'Especiales',
+            precio_unitario: 32.00,
+            activo: 1,
+            stock: 12,
+            imagen: '/assets/img/Menta-Blanca.jpg'
+          },
+          {
+            id_producto: 7,
+            nombre: 'Bombón Premium',
+            descripcion: 'Selección especial de bombones artesanales',
+            categoria: 'Bombon',
+            precio_unitario: 40.00,
+            activo: 1,
+            stock: 7,
+            imagen: '/assets/img/09PrincesaSurtida.jpg'
+          },
+          {
+            id_producto: 8,
+            nombre: 'Galleta de Chocolate',
+            descripcion: 'Galletas crujientes con chips de chocolate',
+            categoria: 'Sandwich',
+            precio_unitario: 22.00,
+            activo: 1,
+            stock: 20,
+            imagen: '/assets/img/DUQUESA-PRESENTACIONES.jpg'
+          }
+        ],
+        categorias: ['Chocolate', 'Bombon', 'Sandwich', 'Especiales', 'Decoraciones']
+      };
+
+      this.allProducts = mockResponse.productos;
+      this.categories = mockResponse.categorias;
+
+      // Cache the products and categories
+      localStorage.setItem('cachedProducts', JSON.stringify(mockResponse.productos));
+      localStorage.setItem('cachedCategories', JSON.stringify(mockResponse.categorias));
+
+      this.applyFilters();
+      this.checkForMoreProducts();
+      console.log('Productos simulados cargados:', this.allProducts);
+    }, 1000); // Simular delay de 1 segundo
+
+    // Código comentado para cuando tengas el backend listo:
+    /*
     const apiUrl = `${API_BASE_URL}/getProducts`;
 
     this.http.get<{productos: Product[], categorias: string[]}>(apiUrl).subscribe({
@@ -94,6 +205,7 @@ export class Tab2Page implements OnInit {
       },
       error: (error) => {
         console.error('Error loading products:', error);
+        this.showToast('Error al cargar productos desde el servidor. Mostrando datos de respaldo.', 'error');
         // Mock data for development
         this.allProducts = [
           {
@@ -129,6 +241,7 @@ export class Tab2Page implements OnInit {
         this.checkForMoreProducts();
       }
     });
+    */
   }
 
   filterProducts(event: any) {
@@ -212,7 +325,7 @@ export class Tab2Page implements OnInit {
         nombre: product.nombre,
         precio_unitario: product.precio_unitario,
         cantidad: 1,
-        imagen_base64: product.imagen_base64
+        imagen: product.imagen
       });
     }
 
@@ -275,5 +388,15 @@ export class Tab2Page implements OnInit {
     // TODO: Implement checkout process
     console.log('Proceeding to checkout with items:', this.cartItems);
     alert('Funcionalidad de checkout próximamente disponible');
+  }
+
+  private async showToast(message: string, type: 'success' | 'error' | 'warning' = 'success') {
+    const toast = await this.toastController.create({
+      message: message,
+      duration: 3000,
+      position: 'top',
+      cssClass: `toast-${type}`
+    });
+    await toast.present();
   }
 }

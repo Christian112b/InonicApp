@@ -18,11 +18,26 @@ export class TabsPage {
   }
 
   openCartFromTab() {
-    // Emit event to open cart modal in the active tab
-    const cartEvent = new CustomEvent('openCartModal');
-    window.dispatchEvent(cartEvent);
+    // Check if user is logged in
+    const token = localStorage.getItem('authToken');
+    const userData = localStorage.getItem('userData');
 
-    // Also refresh cart data when opening from tab bar
+    if (!token || !userData) {
+      // User not logged in, redirect to account tab
+      const accountTab = document.querySelector('ion-tab-button[tab="cuenta"]') as HTMLElement;
+      if (accountTab) {
+        accountTab.click();
+      }
+      return;
+    }
+
+    // User is logged in, proceed to cart
+    const cartTab = document.querySelector('ion-tab-button[tab="carrito"]') as HTMLElement;
+    if (cartTab) {
+      cartTab.click();
+    }
+
+    // Emit event to refresh cart data when opening
     const refreshEvent = new CustomEvent('refreshCartData');
     window.dispatchEvent(refreshEvent);
   }

@@ -33,9 +33,37 @@
     <!-- Logged In State -->
     <div class="account-section" *ngIf="isLoggedIn">
       <div class="account-header">
-        <ion-icon name="person-circle" size="large"></ion-icon>
+        <ion-icon name="person-circle" size="large" color="primary"></ion-icon>
         <h2>{{ userName || 'Usuario' }}</h2>
         <p>{{ userEmail }}</p>
+        <div class="user-status">
+          <ion-icon name="checkmark-circle" color="success"></ion-icon>
+          <span>Cuenta verificada</span>
+        </div>
+      </div>
+
+      <div class="account-stats">
+        <div class="stat-item">
+          <ion-icon name="cart-outline"></ion-icon>
+          <div class="stat-info">
+            <span class="stat-number">0</span>
+            <span class="stat-label">Pedidos</span>
+          </div>
+        </div>
+        <div class="stat-item">
+          <ion-icon name="heart-outline"></ion-icon>
+          <div class="stat-info">
+            <span class="stat-number">0</span>
+            <span class="stat-label">Favoritos</span>
+          </div>
+        </div>
+        <div class="stat-item">
+          <ion-icon name="star-outline"></ion-icon>
+          <div class="stat-info">
+            <span class="stat-number">5.0</span>
+            <span class="stat-label">Calificación</span>
+          </div>
+        </div>
       </div>
 
       <div class="account-actions">
@@ -49,7 +77,17 @@
           Mis Pedidos
         </ion-button>
 
-        <ion-button expand="block" fill="outline" class="logout-btn" (click)="logout()">
+        <ion-button expand="block" fill="outline" class="favorites-btn">
+          <ion-icon name="heart-outline" slot="start"></ion-icon>
+          Favoritos
+        </ion-button>
+
+        <ion-button expand="block" fill="outline" class="settings-btn">
+          <ion-icon name="settings-outline" slot="start"></ion-icon>
+          Configuración
+        </ion-button>
+
+        <ion-button expand="block" fill="solid" color="danger" class="logout-btn" (click)="logout()">
           <ion-icon name="log-out-outline" slot="start"></ion-icon>
           Cerrar Sesión
         </ion-button>

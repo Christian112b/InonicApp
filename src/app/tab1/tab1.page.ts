@@ -4,9 +4,10 @@ import { addIcons } from 'ionicons';
 import { cube, gift, restaurant, leaf, star, snow, cart } from 'ionicons/icons';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
+import { ToastController } from '@ionic/angular';
 
 // Environment configuration
-const API_BASE_URL = 'http://localhost:5000';
+const API_BASE_URL = 'http://localhost:5050';
 
 interface Product {
   id_producto: number;
@@ -15,7 +16,7 @@ interface Product {
   categoria: string;
   precio_unitario: number;
   activo: number;
-  imagen_base64?: string;
+  imagen?: string;
   stock: number;
 }
 
@@ -51,7 +52,7 @@ export class Tab1Page implements AfterViewInit, OnDestroy {
     spaceBetween: 0
   };
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private toastController: ToastController) {
     addIcons({ cube, gift, restaurant, leaf, star, snow, cart });
     this.loadFavoriteProducts();
   }
@@ -163,14 +164,101 @@ export class Tab1Page implements AfterViewInit, OnDestroy {
     const cachedProducts = localStorage.getItem('cachedProducts');
     const cachedCategories = localStorage.getItem('cachedCategories');
 
-    if (cachedProducts && cachedCategories) {
-      const products = JSON.parse(cachedProducts);
-      // Get first 6 products as favorites (you can modify this logic)
-      this.favoriteProducts = products.slice(0, 6);
-      console.log('Productos cargados desde cache:', this.favoriteProducts);
-      return;
+    if (cachedProducts && cachedCategories && cachedProducts !== 'undefined' && cachedCategories !== 'undefined') {
+      try {
+        const products = JSON.parse(cachedProducts);
+        // Get first 6 products as favorites (you can modify this logic)
+        this.favoriteProducts = products.slice(0, 6);
+        console.log('Productos cargados desde cache:', this.favoriteProducts);
+        return;
+      } catch (error) {
+        console.warn('Error parsing cached products, fetching from API:', error);
+        // Clear invalid cache
+        localStorage.removeItem('cachedProducts');
+        localStorage.removeItem('cachedCategories');
+        this.showToast('Error al cargar productos del caché, obteniendo datos del servidor...', 'warning');
+      }
     }
 
+    // Simular carga de productos para desarrollo
+    setTimeout(() => {
+      const mockResponse = {
+        productos: [
+          {
+            id_producto: 1,
+            nombre: 'Tornillo',
+            descripcion: 'Delicioso chocolate macizo con leche',
+            categoria: 'Chocolates',
+            precio_unitario: 25.00,
+            activo: 1,
+            stock: 10,
+            imagen: '/assets/img/02Tornillo.jpg'
+          },
+          {
+            id_producto: 2,
+            nombre: 'Princesa Surtida',
+            descripcion: 'Bombón de chocolate amargo relleno de fondant y jalea',
+            categoria: 'Bombones',
+            precio_unitario: 30.00,
+            activo: 1,
+            stock: 15,
+            imagen: '/assets/img/09PrincesaSurtida.jpg'
+          },
+          {
+            id_producto: 3,
+            nombre: 'Duquesa',
+            descripcion: 'Irresistible sandwich de galleta con jalea y chocolate',
+            categoria: 'Galletas',
+            precio_unitario: 28.00,
+            activo: 1,
+            stock: 8,
+            imagen: '/assets/img/DUQUESA-PRESENTACIONES.jpg'
+          },
+          {
+            id_producto: 4,
+            nombre: 'Esponja Natural',
+            descripcion: 'Chocolate blanco con menta fresca',
+            categoria: 'Especiales',
+            precio_unitario: 35.00,
+            activo: 1,
+            stock: 5,
+            imagen: '/assets/img/Esponja-Natural.jpg'
+          },
+          {
+            id_producto: 5,
+            nombre: 'Figura de Chocolate',
+            descripcion: 'Figuras decorativas de chocolate premium',
+            categoria: 'Decoraciones',
+            precio_unitario: 45.00,
+            activo: 1,
+            stock: 3,
+            imagen: '/assets/img/figura.png'
+          },
+          {
+            id_producto: 6,
+            nombre: 'Menta Blanca',
+            descripcion: 'Chocolate blanco con menta refrescante',
+            categoria: 'Especiales',
+            precio_unitario: 32.00,
+            activo: 1,
+            stock: 12,
+            imagen: '/assets/img/Menta-Blanca.jpg'
+          }
+        ],
+        categorias: ['Chocolates', 'Bombones', 'Galletas', 'Especiales', 'Decoraciones']
+      };
+
+      // Cache the products and categories
+      localStorage.setItem('cachedProducts', JSON.stringify(mockResponse.productos));
+      localStorage.setItem('cachedCategories', JSON.stringify(mockResponse.categorias));
+
+      // Get first 6 products as favorites (you can modify this logic)
+      this.favoriteProducts = mockResponse.productos.slice(0, 6);
+      console.log('Productos simulados cargados:', this.favoriteProducts);
+    }, 800); // Simular delay de 800ms
+
+    // Código comentado para cuando tengas el backend listo:
+    /*
     // Replace with your actual backend URL - check if your Flask server is running
     const apiUrl = `${API_BASE_URL}/getProducts`; // Adjust this to your Flask server URL
 
@@ -186,6 +274,7 @@ export class Tab1Page implements AfterViewInit, OnDestroy {
       },
       error: (error) => {
         console.error('Error loading products:', error);
+        this.showToast('Error al cargar productos desde el servidor. Mostrando datos de respaldo.', 'error');
         // Keep the placeholder products if API fails
         this.favoriteProducts = [];
         // For now, let's add some mock data so you can see the layout working
@@ -220,6 +309,7 @@ export class Tab1Page implements AfterViewInit, OnDestroy {
         ];
       }
     });
+    */
   }
 
   addToCart(product: Product) {
@@ -237,5 +327,15 @@ export class Tab1Page implements AfterViewInit, OnDestroy {
     if (name.includes('figura')) return 'star';
     if (name.includes('menta') || name.includes('blanca')) return 'snow';
     return 'cube'; // default
+  }
+
+  private async showToast(message: string, type: 'success' | 'error' | 'warning' = 'success') {
+    const toast = await this.toastController.create({
+      message: message,
+      duration: 3000,
+      position: 'top',
+      cssClass: `toast-${type}`
+    });
+    await toast.present();
   }
 }

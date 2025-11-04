@@ -7,17 +7,29 @@
 </ion-header>
 
 <ion-content [fullscreen]="true" class="cart-content">
-    <div class="cart-loading-overlay" *ngIf="isLoadingCart">
+    <div class="login-required" *ngIf="!isLoggedIn">
+      <div class="login-required-content">
+        <ion-icon name="cart-outline" size="large" color="medium"></ion-icon>
+        <h3>Inicia sesión para ver tu carrito</h3>
+        <p>Para agregar productos y gestionar tu carrito, necesitas tener una cuenta activa.</p>
+        <ion-button expand="block" fill="solid" routerLink="/tabs/cuenta" routerDirection="root">
+          <ion-icon name="log-in-outline" slot="start"></ion-icon>
+          Iniciar Sesión
+        </ion-button>
+      </div>
+    </div>
+
+    <div class="cart-loading-overlay" *ngIf="isLoadingCart && isLoggedIn">
       <div class="cart-loading-spinner">
         <ion-spinner name="crescent" color="primary"></ion-spinner>
         <p>Cargando carrito...</p>
       </div>
     </div>
 
-    <div class="cart-items" id="cartItems" *ngIf="!isLoadingCart && cartItems.length > 0; else emptyCart">
+    <div class="cart-items" id="cartItems" *ngIf="!isLoadingCart && cartItems.length > 0 && isLoggedIn; else emptyCart">
       <div class="cart-item" *ngFor="let item of cartItems">
         <div class="cart-item-image">
-          <img *ngIf="item.image" [src]="item.image.startsWith('data:image') ? item.image : '/static/img/' + item.image" alt="{{ item.name }}">
+          <img *ngIf="item.image" [src]="item.image" alt="{{ item.name }}">
           <div class="cart-item-placeholder" *ngIf="!item.image">
             <ion-icon [name]="getProductIcon(item.name)"></ion-icon>
           </div>

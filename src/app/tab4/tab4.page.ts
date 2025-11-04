@@ -7,7 +7,7 @@ import { AlertController, ToastController } from '@ionic/angular';
 import { environment } from '../../environments/environment';
 
 // Environment configuration
-const API_BASE_URL = environment.apiUrl;
+const API_BASE_URL = 'http://localhost:5050';
 
 interface LoginData {
   email: string;
@@ -70,6 +70,7 @@ export class Tab4Page implements OnInit {
 
   ngOnInit() {
     this.checkAuthStatus();
+    this.checkRememberMe();
   }
 
   private checkAuthStatus() {
@@ -81,6 +82,16 @@ export class Tab4Page implements OnInit {
       this.isLoggedIn = true;
       this.userName = user.name;
       this.userEmail = user.email;
+    }
+  }
+
+  private checkRememberMe() {
+    const rememberMe = localStorage.getItem('rememberMe');
+    const savedEmail = localStorage.getItem('savedEmail');
+
+    if (rememberMe === 'true' && savedEmail) {
+      this.loginData.email = savedEmail;
+      this.loginData.remember = true;
     }
   }
 
@@ -148,6 +159,59 @@ export class Tab4Page implements OnInit {
 
     this.isLoading = true;
 
+    // Simular login para desarrollo
+    setTimeout(() => {
+      // Credenciales de prueba
+      const validCredentials = [
+        { email: 'user@test.com', password: '123456', name: 'Usuario Test' },
+        { email: 'admin@costanzo.com', password: 'admin123', name: 'Administrador' },
+        { email: 'usuario@costanzo.com', password: 'user123', name: 'Usuario Prueba' },
+        { email: 'cliente@costanzo.com', password: 'cliente123', name: 'Cliente Regular' }
+      ];
+
+      const user = validCredentials.find(
+        cred => cred.email === this.loginData.email && cred.password === this.loginData.password
+      );
+
+      if (user) {
+        // Login successful
+        const userData = {
+          name: user.name,
+          email: this.loginData.email
+        };
+
+        // Store auth data
+        localStorage.setItem('authToken', 'simulated-jwt-token-' + Date.now());
+        localStorage.setItem('userData', JSON.stringify(userData));
+
+        // Handle remember me functionality
+        if (this.loginData.remember) {
+          localStorage.setItem('rememberMe', 'true');
+          localStorage.setItem('savedEmail', this.loginData.email);
+        } else {
+          localStorage.removeItem('rememberMe');
+          localStorage.removeItem('savedEmail');
+        }
+
+        this.isLoggedIn = true;
+        this.userName = userData.name;
+        this.userEmail = userData.email;
+
+        // Emit auth changed event for other components
+        const authEvent = new CustomEvent('authChanged');
+        window.dispatchEvent(authEvent);
+
+        this.showToast('¡Inicio de sesión exitoso!', 'success');
+        this.closeLoginModal();
+      } else {
+        this.showToast('Credenciales incorrectas', 'error');
+      }
+
+      this.isLoading = false;
+    }, 1500); // Simular delay de 1.5 segundos
+
+    // Código comentado para cuando tengas el backend listo:
+    /*
     try {
       // Create FormData to match Flask's request.form
       const formData = new FormData();
@@ -188,6 +252,7 @@ export class Tab4Page implements OnInit {
     } finally {
       this.isLoading = false;
     }
+    */
   }
 
   async register() {
@@ -209,6 +274,42 @@ export class Tab4Page implements OnInit {
 
     this.isRegisterLoading = true;
 
+    // Simular registro para desarrollo
+    setTimeout(() => {
+      // Simular validación de email único
+      const existingEmails = ['user@test.com', 'admin@costanzo.com', 'usuario@costanzo.com', 'cliente@costanzo.com'];
+
+      if (existingEmails.includes(this.registerData.email)) {
+        this.showToast('El correo ya está registrado', 'error');
+        this.isRegisterLoading = false;
+        return;
+      }
+
+      // Registration successful
+      const userData = {
+        name: this.registerData.name,
+        email: this.registerData.email
+      };
+
+      // Store auth data
+      localStorage.setItem('authToken', 'simulated-jwt-token-' + Date.now());
+      localStorage.setItem('userData', JSON.stringify(userData));
+
+      this.isLoggedIn = true;
+      this.userName = userData.name;
+      this.userEmail = userData.email;
+
+      // Emit auth changed event for other components
+      const authEvent = new CustomEvent('authChanged');
+      window.dispatchEvent(authEvent);
+
+      this.showToast('¡Registro exitoso!', 'success');
+      this.closeRegisterModal();
+      this.isRegisterLoading = false;
+    }, 2000); // Simular delay de 2 segundos
+
+    // Código comentado para cuando tengas el backend listo:
+    /*
     try {
       // Create FormData to match Flask's request.form
       const formData = new FormData();
@@ -253,6 +354,7 @@ export class Tab4Page implements OnInit {
     } finally {
       this.isRegisterLoading = false;
     }
+    */
   }
 
   async logout() {
@@ -282,9 +384,20 @@ export class Tab4Page implements OnInit {
     localStorage.removeItem('authToken');
     localStorage.removeItem('userData');
 
+    // Keep remember me data if it was set
+    const rememberMe = localStorage.getItem('rememberMe');
+    if (rememberMe !== 'true') {
+      localStorage.removeItem('rememberMe');
+      localStorage.removeItem('savedEmail');
+    }
+
     this.isLoggedIn = false;
     this.userName = '';
     this.userEmail = '';
+
+    // Emit auth changed event for other components
+    const authEvent = new CustomEvent('authChanged');
+    window.dispatchEvent(authEvent);
 
     this.showToast('Sesión cerrada exitosamente', 'success');
   }

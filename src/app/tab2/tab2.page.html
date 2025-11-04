@@ -40,8 +40,8 @@
       <div class="productos-grid">
         <div class="product-card" *ngFor="let product of filteredProducts">
           <div class="product-image">
-            <img *ngIf="product.imagen_base64" [src]="'data:image/jpeg;base64,' + product.imagen_base64" alt="{{ product.nombre }}">
-            <div class="product-placeholder" *ngIf="!product.imagen_base64">
+            <img *ngIf="product.imagen" [src]="product.imagen" alt="{{ product.nombre }}">
+            <div class="product-placeholder" *ngIf="!product.imagen">
               <ion-icon [name]="getProductIcon(product.nombre)"></ion-icon>
             </div>
             <div class="product-overlay">
