@@ -14,16 +14,21 @@
 .productos-filter {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-bottom: var(--spacing-lg);
-  margin-top: var(--spacing-sm);
-  align-items: center;
+  gap: 4px;
+  margin-bottom: 30px;
+  margin-top: 0px;
+  margin-left: 0px;
+  align-items: stretch;
+  width: 100%;
+  padding: 0 var(--spacing-sm);
 }
 
 .filter-row {
   display: flex;
   gap: 6px;
-  justify-content: center;
+  justify-content: space-between;
+  width: 100%;
+  flex-wrap: wrap;
 }
 
 .filter-btn {
@@ -36,7 +41,8 @@
   cursor: pointer;
   font-size: 0.65rem;
   border-radius: 6px;
-  width: 90px;
+  flex: 1;
+  min-width: 0;
   text-align: center;
   white-space: nowrap;
   overflow: hidden;

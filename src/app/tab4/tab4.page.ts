@@ -402,6 +402,37 @@ export class Tab4Page implements OnInit {
     this.showToast('Sesión cerrada exitosamente', 'success');
   }
 
+  async showDevelopmentToast() {
+    const toast = await this.toastController.create({
+      message: 'Esta funcionalidad está en desarrollo',
+      duration: 2000,
+      position: 'bottom',
+      cssClass: 'toast-warning',
+      buttons: [
+        {
+          text: 'OK',
+          role: 'cancel'
+        }
+      ]
+    });
+    await toast.present();
+  }
+
+  getOrderCount(): number {
+    // TODO: Get from API or local storage
+    return 0;
+  }
+
+  getFavoritesCount(): number {
+    // TODO: Get from API or local storage
+    return 0;
+  }
+
+  getRating(): string {
+    // TODO: Get from API or calculate from reviews
+    return '5.0';
+  }
+
   private async showToast(message: string, type: 'success' | 'error' | 'warning' = 'success') {
     const toast = await this.toastController.create({
       message: message,

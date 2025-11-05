@@ -1,0 +1,139 @@
+/* Más Styles */
+.mas-content {
+  --background: var(--color-light-cream);
+}
+
+.mas-container {
+  padding: var(--spacing-md) var(--spacing-sm);
+}
+
+.mas-section {
+  margin-bottom: var(--spacing-xl);
+}
+
+.section-title {
+  color: var(--ion-color-primary);
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-bottom: var(--spacing-lg);
+  text-align: center;
+}
+
+.mas-options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.option-card {
+  background: var(--color-white);
+  border-radius: 12px;
+  padding: var(--spacing-md);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(139, 69, 19, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.option-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(139, 69, 19, 0.15);
+  border-color: var(--ion-color-primary);
+}
+
+.option-icon {
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(135deg, var(--ion-color-primary), var(--ion-color-secondary));
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.option-content {
+  flex: 1;
+}
+
+.option-content h3 {
+  margin: 0 0 0.25rem 0;
+  color: var(--ion-color-primary);
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.option-content p {
+  margin: 0;
+  color: var(--ion-color-medium);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.option-arrow {
+  color: var(--ion-color-medium);
+  font-size: 1.2rem;
+}
+
+.about-card {
+  background: var(--color-white);
+  border-radius: 16px;
+  padding: var(--spacing-lg);
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(139, 69, 19, 0.1);
+}
+
+.about-logo {
+  margin-bottom: var(--spacing-lg);
+}
+
+.about-logo img {
+  width: 80px;
+  height: auto;
+}
+
+.about-info h3 {
+  color: var(--ion-color-primary);
+  font-size: 1.3rem;
+  margin-bottom: var(--spacing-sm);
+  font-weight: 600;
+}
+
+.about-info p {
+  color: var(--ion-color-medium);
+  font-size: 0.95rem;
+  margin-bottom: var(--spacing-lg);
+  line-height: 1.5;
+}
+
+.about-stats {
+  display: flex;
+  justify-content: space-around;
+  gap: var(--spacing-md);
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-number {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--ion-color-primary);
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  color: var(--ion-color-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 0.25rem;
+}

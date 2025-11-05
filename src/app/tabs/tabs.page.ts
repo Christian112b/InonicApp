@@ -31,11 +31,9 @@ export class TabsPage {
       return;
     }
 
-    // User is logged in, proceed to cart
-    const cartTab = document.querySelector('ion-tab-button[tab="carrito"]') as HTMLElement;
-    if (cartTab) {
-      cartTab.click();
-    }
+    // User is logged in, navigate to cart tab programmatically
+    // Since we can't use router.navigate in tabs context, we'll use the href approach
+    window.location.href = '/tabs/carrito';
 
     // Emit event to refresh cart data when opening
     const refreshEvent = new CustomEvent('refreshCartData');

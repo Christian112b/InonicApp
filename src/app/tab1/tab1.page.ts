@@ -32,6 +32,11 @@ export class Tab1Page implements AfterViewInit, OnDestroy {
   private slides: NodeListOf<Element> | null = null;
   private dots: NodeListOf<Element> | null = null;
   public favoriteProducts: Product[] = [];
+  public slideImages: string[] = [
+    'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDQwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRjVGNUU2Ii8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IiM4QjQ1MTMiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkNhZsOpcyAyWDE8L3RleHQ+Cjwvc3ZnPg==',
+    'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDQwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRkZGRkZGIi8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IiNEREI3NjMiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkR1bGNlcyBBcnRlc2FuYWxlczwvdGV4dD4KPC9zdmc+',
+    'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDQwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRjVGNUU2Ii8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IiM2NTQzMjEiIHRleHQtYW5jaG9yPSJtaWRkbGUiPk1lbWJyZXNpYSBQcmVtaXVtPC90ZXh0Pgo8L3N2Zz4='
+  ];
 
   slideOpts = {
     initialSlide: 0,
@@ -327,6 +332,11 @@ export class Tab1Page implements AfterViewInit, OnDestroy {
     if (name.includes('figura')) return 'star';
     if (name.includes('menta') || name.includes('blanca')) return 'snow';
     return 'cube'; // default
+  }
+
+  getSlideBackground(index: number): string {
+    // Return base64 image or default placeholder
+    return this.slideImages[index] || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDQwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRjVGNUU2Ii8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IiM4QjQ1MTMiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkRlZmF1bHQgSW1hZ2U8L3RleHQ+Cjwvc3ZnPg==';
   }
 
   private async showToast(message: string, type: 'success' | 'error' | 'warning' = 'success') {

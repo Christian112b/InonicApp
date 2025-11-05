@@ -17,19 +17,39 @@
 }
 
 .central-button.tab-selected {
-  --color: var(--ion-color-primary);
-  --background: transparent;
-  transform: translateY(-2px);
+  --color: white;
+  --background: #8B4513;
+  transform: translateY(-2px) scale(1.02);
+  animation: tabSelected 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(139, 69, 19, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  position: relative;
+}
+
+.central-button.tab-selected::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, #D2691E, #8B4513, #654321);
+  border-radius: 14px;
+  z-index: -1;
+  opacity: 0.8;
 }
 
 .central-button.tab-selected ion-icon {
-  color: var(--ion-color-primary) !important;
-  transform: scale(1.1);
+  color: white !important;
+  transform: scale(1.15);
+  animation: iconPulse 0.4s ease-out;
+  filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.6));
 }
 
 .central-button.tab-selected ion-label {
-  color: var(--ion-color-primary) !important;
+  color: white !important;
   font-weight: 700;
+  animation: textGlow 0.3s ease-out;
 }
 
 /* Tab transition animations */
@@ -102,8 +122,9 @@ ion-tab-bar {
   -webkit-backdrop-filter: blur(10px);
   position: relative;
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
   align-items: flex-end;
+  gap: 8px;
 }
 
 /* Animated background for selected tab */
@@ -164,20 +185,37 @@ ion-tab-button:not(:last-child)::after {
 }
 
 ion-tab-button.tab-selected {
-  --color: var(--ion-color-primary);
-  --background: transparent;
+  --color: white;
+  --background: #8B4513;
   transform: translateY(-2px) scale(1.02);
   animation: tabSelected 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(139, 69, 19, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  position: relative;
+}
+
+ion-tab-button.tab-selected::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, #D2691E, #8B4513, #654321);
+  border-radius: 14px;
+  z-index: -1;
+  opacity: 0.8;
 }
 
 ion-tab-button.tab-selected ion-icon {
-  color: var(--ion-color-primary) !important;
+  color: white !important;
   transform: scale(1.15);
   animation: iconPulse 0.4s ease-out;
+  filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.6));
 }
 
 ion-tab-button.tab-selected ion-label {
-  color: var(--ion-color-primary) !important;
+  color: white !important;
   font-weight: 700;
   animation: textGlow 0.3s ease-out;
 }

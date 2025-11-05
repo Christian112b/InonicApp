@@ -281,6 +281,18 @@ export class Tab3Page implements OnInit, OnDestroy {
     this.isLoggedIn = !!(token && userData);
   }
 
+
+
+  private async showDevelopmentToast(message: string) {
+    const toast = await this.toastController.create({
+      message: `${message} - Esta funcionalidad está en desarrollo`,
+      duration: 2000,
+      position: 'bottom',
+      cssClass: 'toast-warning'
+    });
+    await toast.present();
+  }
+
   private async showToast(message: string, type: 'success' | 'error' | 'warning' = 'success') {
     const toast = await this.toastController.create({
       message: message,

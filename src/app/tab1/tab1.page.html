@@ -11,21 +11,24 @@
   <!-- Promotional Slider -->
   <div class="promo-slider">
     <div class="slider-container">
-      <div class="slide active" style="background: linear-gradient(135deg, var(--ion-color-primary), var(--ion-color-secondary));">
+      <div class="slide active" [style.background-image]="getSlideBackground(0)" [style.background-size]="'cover'" [style.background-position]="'center'">
+        <div class="slide-overlay" style="background: linear-gradient(135deg, rgba(139, 69, 19, 0.7), rgba(160, 82, 45, 0.8));"></div>
         <div class="slide-content">
           <h2>¡2x1 en Cafés!</h2>
           <p>Todos los días de la semana</p>
         </div>
       </div>
 
-      <div class="slide" style="background: linear-gradient(135deg, var(--ion-color-tertiary), var(--color-golden));">
+      <div class="slide" [style.background-image]="getSlideBackground(1)" [style.background-size]="'cover'" [style.background-position]="'center'">
+        <div class="slide-overlay" style="background: linear-gradient(135deg, rgba(205, 133, 63, 0.7), rgba(222, 184, 135, 0.8));"></div>
         <div class="slide-content">
           <h2>Postres Artesanales</h2>
           <p>50% de descuento en tartas</p>
         </div>
       </div>
 
-      <div class="slide" style="background: linear-gradient(135deg, var(--color-dark-brown), var(--ion-color-primary));">
+      <div class="slide" [style.background-image]="getSlideBackground(2)" [style.background-size]="'cover'" [style.background-position]="'center'">
+        <div class="slide-overlay" style="background: linear-gradient(135deg, rgba(101, 67, 33, 0.7), rgba(139, 69, 19, 0.8));"></div>
         <div class="slide-content">
           <h2>Membresía Premium</h2>
           <p>Acumula puntos y ahorra</p>

@@ -33,56 +33,78 @@
     <!-- Logged In State -->
     <div class="account-section" *ngIf="isLoggedIn">
       <div class="account-header">
-        <ion-icon name="person-circle" size="large" color="primary"></ion-icon>
         <h2>{{ userName || 'Usuario' }}</h2>
-        <p>{{ userEmail }}</p>
-        <div class="user-status">
-          <ion-icon name="checkmark-circle" color="success"></ion-icon>
-          <span>Cuenta verificada</span>
-        </div>
       </div>
 
       <div class="account-stats">
         <div class="stat-item">
-          <ion-icon name="cart-outline"></ion-icon>
+          <div class="stat-icon-bg">
+            <ion-icon name="cart-outline"></ion-icon>
+          </div>
           <div class="stat-info">
-            <span class="stat-number">0</span>
+            <span class="stat-number">{{ getOrderCount() }}</span>
             <span class="stat-label">Pedidos</span>
           </div>
         </div>
         <div class="stat-item">
-          <ion-icon name="heart-outline"></ion-icon>
+          <div class="stat-icon-bg">
+            <ion-icon name="heart-outline"></ion-icon>
+          </div>
           <div class="stat-info">
-            <span class="stat-number">0</span>
+            <span class="stat-number">{{ getFavoritesCount() }}</span>
             <span class="stat-label">Favoritos</span>
           </div>
         </div>
         <div class="stat-item">
-          <ion-icon name="star-outline"></ion-icon>
+          <div class="stat-icon-bg">
+            <ion-icon name="star-outline"></ion-icon>
+          </div>
           <div class="stat-info">
-            <span class="stat-number">5.0</span>
+            <span class="stat-number">{{ getRating() }}</span>
             <span class="stat-label">Calificación</span>
           </div>
         </div>
       </div>
 
+      <div class="account-quick-actions">
+        <h3>Acciones rápidas</h3>
+        <div class="quick-actions-grid">
+          <div class="quick-action-item" (click)="showDevelopmentToast()">
+            <ion-icon name="location-outline"></ion-icon>
+            <span>Direcciones</span>
+          </div>
+          <div class="quick-action-item" (click)="showDevelopmentToast()">
+            <ion-icon name="card-outline"></ion-icon>
+            <span>Pagos</span>
+          </div>
+          <div class="quick-action-item" (click)="showDevelopmentToast()">
+            <ion-icon name="notifications-outline"></ion-icon>
+            <span>Notificaciones</span>
+          </div>
+          <div class="quick-action-item" (click)="showDevelopmentToast()">
+            <ion-icon name="help-circle-outline"></ion-icon>
+            <span>Ayuda</span>
+          </div>
+        </div>
+      </div>
+
       <div class="account-actions">
-        <ion-button expand="block" fill="outline" class="profile-btn">
+        <ion-button expand="block" fill="outline" class="profile-btn" (click)="showDevelopmentToast()">
           <ion-icon name="person-outline" slot="start"></ion-icon>
           Mi Perfil
         </ion-button>
 
-        <ion-button expand="block" fill="outline" class="orders-btn">
+        <ion-button expand="block" fill="outline" class="orders-btn" (click)="showDevelopmentToast()">
           <ion-icon name="receipt-outline" slot="start"></ion-icon>
           Mis Pedidos
         </ion-button>
 
-        <ion-button expand="block" fill="outline" class="favorites-btn">
+        <ion-button expand="block" fill="outline" class="favorites-btn" (click)="showDevelopmentToast()">
           <ion-icon name="heart-outline" slot="start"></ion-icon>
           Favoritos
         </ion-button>
 
-        <ion-button expand="block" fill="outline" class="settings-btn">
+        <ion-button expand="block" fill="outline" class="settings-btn" (click)="showDevelopmentToast()">
           <ion-icon name="settings-outline" slot="start"></ion-icon>
           Configuración
         </ion-button>

@@ -35,47 +35,47 @@
           </div>
         </div>
        <div class="cart-item-info">
-         <h4>{{ item.name }}</h4>
-         <div class="cart-item-price">${{ item.price.toFixed(2) }}</div>
-          <div class="cart-item-controls">
-            <button class="quantity-btn" (click)="updateCartItemQuantity(item.id, item.quantity - 1)">-</button>
-            <span class="quantity">{{ item.quantity }}</span>
-            <button class="quantity-btn" (click)="updateCartItemQuantity(item.id, item.quantity + 1)">+</button>
-          </div>
-        </div>
-        <button class="remove-item" (click)="removeFromCart(item.id)">
-          <ion-icon name="trash"></ion-icon>
-        </button>
-      </div>
-    </div>
+          <h4>{{ item.name }}</h4>
+          <div class="cart-item-price">${{ item.price.toFixed(2) }}</div>
+           <div class="cart-item-controls">
+             <button class="quantity-btn" (click)="updateCartItemQuantity(item.id, item.quantity - 1)">-</button>
+             <span class="quantity">{{ item.quantity }}</span>
+             <button class="quantity-btn" (click)="updateCartItemQuantity(item.id, item.quantity + 1)">+</button>
+           </div>
+         </div>
+         <button class="remove-item" (click)="removeFromCart(item.id)">
+           <ion-icon name="trash"></ion-icon>
+         </button>
+       </div>
+     </div>
 
-    <ng-template #emptyCart>
-      <div class="cart-empty">
-        <ion-icon name="cart-outline" size="large"></ion-icon>
-        <p>Tu carrito está vacío</p>
-      </div>
-    </ng-template>
+     <ng-template #emptyCart>
+       <div class="cart-empty">
+         <ion-icon name="cart-outline" size="large"></ion-icon>
+         <p>Tu carrito está vacío</p>
+       </div>
+     </ng-template>
 
-    <div class="cart-footer" *ngIf="cartItems.length > 0">
-      <div class="cart-summary">
-        <div class="cart-summary-row">
-          <span>Subtotal:</span>
-          <span>${{ cartTotal.toFixed(2) }}</span>
-        </div>
-        <div class="cart-summary-row">
-          <span>IVA (16%):</span>
-          <span>${{ (cartTotal * 0.16).toFixed(2) }}</span>
-        </div>
+     <div class="cart-footer" *ngIf="cartItems.length > 0">
+       <div class="cart-summary">
+         <div class="cart-summary-row">
+           <span>Subtotal:</span>
+           <span>${{ cartTotal.toFixed(2) }}</span>
+         </div>
+         <div class="cart-summary-row">
+           <span>IVA (16%):</span>
+           <span>${{ (cartTotal * 0.16).toFixed(2) }}</span>
+         </div>
 
-      <div class="cart-total">
-        <span>Total:</span>
-        <span>${{ (cartTotal * 1.16).toFixed(2) }}</span>
-      </div>
-      <!-- <button class="btn btn-primary btn-block" id="checkoutBtn" (click)="proceedToCheckout()">
-        Proceder al Pago
-      </button> -->
+       <div class="cart-total">
+         <span>Total:</span>
+         <span>${{ (cartTotal * 1.16).toFixed(2) }}</span>
+       </div>
+       <!-- <button class="btn btn-primary btn-block" id="checkoutBtn" (click)="proceedToCheckout()">
+         Proceder al Pago
+       </button> -->
 
 
-      </div>
-    </div>
+       </div>
+     </div>
 </ion-content>

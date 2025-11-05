@@ -10,8 +10,9 @@
       <ion-label>Productos</ion-label>
     </ion-tab-button>
 
-    <ion-tab-button tab="carrito" class="central-button" (click)="openCartFromTab()" href="/tabs/carrito">
+    <ion-tab-button tab="carrito" class="central-button" href="/tabs/carrito">
       <ion-icon aria-hidden="true" name="cart"></ion-icon>
+      <ion-label>Carrito</ion-label>
       <span class="cart-badge" *ngIf="getCartItemCount() > 0">{{ getCartItemCount() }}</span>
     </ion-tab-button>
 
