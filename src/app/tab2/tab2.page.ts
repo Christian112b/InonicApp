@@ -1,13 +1,15 @@
 import { Component, OnInit } from '@angular/core';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonIcon } from '@ionic/angular/standalone';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonIcon, IonButtons } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { cube, gift, restaurant, leaf, star, snow, cart, addCircle } from 'ionicons/icons';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { ToastController } from '@ionic/angular';
+import { environment } from '../../environments/environment';
 
 // Environment configuration
-const API_BASE_URL = 'http://localhost:5050';
+const API_BASE_URL = 'https://backend-app-x7k2.zeabur.app/'; // Force HTTPS production URL for testing
+// const API_BASE_URL = environment.apiUrl; // Original environment-based URL
 
 interface CartItem {
   id: number;
@@ -25,6 +27,7 @@ interface Product {
   precio_unitario: number;
   activo: number;
   imagen?: string;
+  imagen_base64?: string;
   stock: number;
 }
 
@@ -43,6 +46,11 @@ export class Tab2Page implements OnInit {
   public productsPerPage: number = 1000; // Show all products
   public currentPage: number = 1;
   public hasMoreProducts: boolean = false;
+  public lastUpdateTime: string = 'Nunca';
+  public connectionStatus: string = 'Verificando conexión...';
+  public connectionStatusColor: string = '#ffa500'; // Orange
+  public isLoading: boolean = false;
+  public hasConnectionError: boolean = false;
 
   // Cart functionality
   public cartItems: CartItem[] = [];
@@ -64,6 +72,16 @@ export class Tab2Page implements OnInit {
     });
   }
 
+  getStatusBackground(): string {
+    if (this.isLoading) {
+      return '#e3f2fd'; // Light blue
+    } else if (this.hasConnectionError) {
+      return '#ffebee'; // Light red
+    } else {
+      return '#e8f5e8'; // Light green
+    }
+  }
+
   private loadProducts() {
     // Check if products are already cached
     const cachedProducts = localStorage.getItem('cachedProducts');
@@ -75,7 +93,9 @@ export class Tab2Page implements OnInit {
         this.categories = JSON.parse(cachedCategories);
         this.applyFilters();
         this.checkForMoreProducts();
-        console.log('Productos cargados desde cache:', this.allProducts);
+        this.connectionStatus = '✅ Datos cargados desde caché';
+        this.connectionStatusColor = '#28a745';
+        this.hasConnectionError = false;
         return;
       } catch (error) {
         console.warn('Error parsing cached products, fetching from API:', error);
@@ -86,112 +106,27 @@ export class Tab2Page implements OnInit {
       }
     }
 
-    // Simular carga de productos para desarrollo
-    setTimeout(() => {
-      const mockResponse = {
-        productos: [
-          {
-            id_producto: 1,
-            nombre: 'Tornillo',
-            descripcion: 'Delicioso chocolate macizo con leche',
-            categoria: 'Chocolate',
-            precio_unitario: 25.00,
-            activo: 1,
-            stock: 10,
-            imagen: '/assets/img/02Tornillo.jpg'
-          },
-          {
-            id_producto: 2,
-            nombre: 'Princesa Surtida',
-            descripcion: 'Bombón de chocolate amargo relleno de fondant y jalea',
-            categoria: 'Bombon',
-            precio_unitario: 30.00,
-            activo: 1,
-            stock: 15,
-            imagen: '/assets/img/09PrincesaSurtida.jpg'
-          },
-          {
-            id_producto: 3,
-            nombre: 'Duquesa',
-            descripcion: 'Irresistible sandwich de galleta con jalea y chocolate',
-            categoria: 'Sandwich',
-            precio_unitario: 28.00,
-            activo: 1,
-            stock: 8,
-            imagen: '/assets/img/DUQUESA-PRESENTACIONES.jpg'
-          },
-          {
-            id_producto: 4,
-            nombre: 'Esponja Natural',
-            descripcion: 'Chocolate blanco con menta fresca',
-            categoria: 'Especiales',
-            precio_unitario: 35.00,
-            activo: 1,
-            stock: 5,
-            imagen: '/assets/img/Esponja-Natural.jpg'
-          },
-          {
-            id_producto: 5,
-            nombre: 'Figura de Chocolate',
-            descripcion: 'Figuras decorativas de chocolate premium',
-            categoria: 'Decoraciones',
-            precio_unitario: 45.00,
-            activo: 1,
-            stock: 3,
-            imagen: '/assets/img/figura.png'
-          },
-          {
-            id_producto: 6,
-            nombre: 'Menta Blanca',
-            descripcion: 'Chocolate blanco con menta refrescante',
-            categoria: 'Especiales',
-            precio_unitario: 32.00,
-            activo: 1,
-            stock: 12,
-            imagen: '/assets/img/Menta-Blanca.jpg'
-          },
-          {
-            id_producto: 7,
-            nombre: 'Bombón Premium',
-            descripcion: 'Selección especial de bombones artesanales',
-            categoria: 'Bombon',
-            precio_unitario: 40.00,
-            activo: 1,
-            stock: 7,
-            imagen: '/assets/img/09PrincesaSurtida.jpg'
-          },
-          {
-            id_producto: 8,
-            nombre: 'Galleta de Chocolate',
-            descripcion: 'Galletas crujientes con chips de chocolate',
-            categoria: 'Sandwich',
-            precio_unitario: 22.00,
-            activo: 1,
-            stock: 20,
-            imagen: '/assets/img/DUQUESA-PRESENTACIONES.jpg'
-          }
-        ],
-        categorias: ['Chocolate', 'Bombon', 'Sandwich', 'Especiales', 'Decoraciones']
-      };
-
-      this.allProducts = mockResponse.productos;
-      this.categories = mockResponse.categorias;
-
-      // Cache the products and categories
-      localStorage.setItem('cachedProducts', JSON.stringify(mockResponse.productos));
-      localStorage.setItem('cachedCategories', JSON.stringify(mockResponse.categorias));
-
-      this.applyFilters();
-      this.checkForMoreProducts();
-      console.log('Productos simulados cargados:', this.allProducts);
-    }, 1000); // Simular delay de 1 segundo
-
-    // Código comentado para cuando tengas el backend listo:
-    /*
+    // Load products from API
+    this.isLoading = true;
+    this.hasConnectionError = false;
     const apiUrl = `${API_BASE_URL}/getProducts`;
+    console.log('🌐 API URL being used:', apiUrl);
+    console.log('🔧 Environment API URL:', API_BASE_URL);
+
+    // Test basic connectivity first
+    console.log('🔍 Testing basic connectivity to server...');
+    this.connectionStatus = '🔍 Probando conexión...';
+    this.connectionStatusColor = '#17a2b8'; // Blue
 
     this.http.get<{productos: Product[], categorias: string[]}>(apiUrl).subscribe({
       next: (response) => {
+        console.log('✅ Respuesta completa de la API:', response);
+        console.log('📦 Productos recibidos:', response.productos?.length || 0);
+        console.log('🏷️ Categorías recibidas:', response.categorias?.length || 0);
+        this.isLoading = false;
+        this.hasConnectionError = false;
+        this.connectionStatus = '✅ Conectado - Datos cargados';
+        this.connectionStatusColor = '#28a745'; // Green
         this.allProducts = response.productos;
         this.categories = response.categorias;
 
@@ -201,12 +136,41 @@ export class Tab2Page implements OnInit {
 
         this.applyFilters();
         this.checkForMoreProducts();
-        console.log('Productos cargados desde API:', this.allProducts);
+        this.updateLastUpdateTime();
       },
-      error: (error) => {
-        console.error('Error loading products:', error);
+      error: (error: any) => {
+        console.error('❌ Error loading products:', error);
+        console.error('🔍 Error details:', {
+          status: error.status,
+          statusText: error.statusText,
+          url: apiUrl,
+          message: error.message,
+          name: error.name,
+          type: typeof error
+        });
+
+        this.isLoading = false;
+        this.hasConnectionError = true;
+
+        let errorMessage = 'Error desconocido';
+        if (error.status) {
+          errorMessage = `Error ${error.status}: ${error.statusText || 'Sin descripción'}`;
+        } else if (error.message) {
+          errorMessage = `Error: ${error.message}`;
+        } else if (error.name) {
+          errorMessage = `Error ${error.name}`;
+        }
+
+        this.connectionStatus = errorMessage;
+        this.connectionStatusColor = '#dc3545'; // Red
         this.showToast('Error al cargar productos desde el servidor. Mostrando datos de respaldo.', 'error');
-        // Mock data for development
+        // Show fallback data with error indication
+        console.log('⚠️ Using fallback data due to connection error');
+        this.isLoading = false;
+        this.hasConnectionError = true;
+        this.connectionStatus = 'Usando datos locales (sin conexión)';
+        this.connectionStatusColor = '#ffc107'; // Yellow
+
         this.allProducts = [
           {
             id_producto: 1,
@@ -239,9 +203,9 @@ export class Tab2Page implements OnInit {
         this.categories = ['Chocolate', 'Bombon', 'Sandwich'];
         this.applyFilters();
         this.checkForMoreProducts();
+        this.updateLastUpdateTime();
       }
     });
-    */
   }
 
   filterProducts(event: any) {
@@ -315,23 +279,50 @@ export class Tab2Page implements OnInit {
 
   // Cart functionality
   addToCart(product: Product) {
-    const existingItem = this.cartItems.find(item => item.id === product.id_producto);
-
-    if (existingItem) {
-      existingItem.cantidad++;
-    } else {
-      this.cartItems.push({
-        id: product.id_producto,
-        nombre: product.nombre,
-        precio_unitario: product.precio_unitario,
-        cantidad: 1,
-        imagen: product.imagen
-      });
+    // Check if user is logged in
+    const token = localStorage.getItem('jwt_token');
+    if (!token) {
+      this.showToast('Debes iniciar sesión para agregar productos al carrito', 'warning');
+      return;
     }
 
-    this.updateCartTotals();
-    this.saveCartToStorage();
-    console.log('Added to cart:', product.nombre);
+    // Add to backend cart
+    const headers = { 'Authorization': `Bearer ${token}` };
+    const cartData = { id_producto: product.id_producto };
+
+    this.http.post(`${API_BASE_URL}/addCart`, cartData, { headers, withCredentials: true }).subscribe({
+      next: (response: any) => {
+        if (response.ok) {
+          // Update local cart for immediate UI feedback
+          const existingItem = this.cartItems.find(item => item.id === product.id_producto);
+          if (existingItem) {
+            existingItem.cantidad++;
+          } else {
+            this.cartItems.push({
+              id: product.id_producto,
+              nombre: product.nombre,
+              precio_unitario: product.precio_unitario,
+              cantidad: 1,
+              imagen: product.imagen
+            });
+          }
+          this.updateCartTotals();
+          this.saveCartToStorage();
+
+          // Emit cart update event for other tabs
+          const cartEvent = new CustomEvent('cartUpdated');
+          window.dispatchEvent(cartEvent);
+
+          this.showToast('Producto agregado al carrito', 'success');
+        } else {
+          this.showToast(response.mensaje || 'Error al agregar producto', 'error');
+        }
+      },
+      error: (error) => {
+        console.error('Error adding to cart:', error);
+        this.showToast('Error al agregar producto al carrito', 'error');
+      }
+    });
   }
 
   removeFromCart(productId: number) {
@@ -386,8 +377,26 @@ export class Tab2Page implements OnInit {
 
   proceedToCheckout() {
     // TODO: Implement checkout process
-    console.log('Proceeding to checkout with items:', this.cartItems);
+    // console.log('Proceeding to checkout with items:', this.cartItems);
     alert('Funcionalidad de checkout próximamente disponible');
+  }
+
+  retryConnection() {
+    console.log('🔄 Retrying connection...');
+    this.loadProducts();
+  }
+
+  private updateLastUpdateTime() {
+    const now = new Date();
+    this.lastUpdateTime = now.toLocaleString('es-MX', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    });
+    console.log('📅 Last update time:', this.lastUpdateTime);
   }
 
   private async showToast(message: string, type: 'success' | 'error' | 'warning' = 'success') {

@@ -1,0 +1,36 @@
+.stripe-payment-container {
+  width: 100%;
+}
+
+.card-element-container {
+  margin-bottom: 16px;
+}
+
+.card-element {
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: white;
+  min-height: 40px;
+}
+
+.error-message {
+  color: #dc3545;
+  font-size: 14px;
+  margin-bottom: 12px;
+  padding: 8px;
+  background: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 4px;
+}
+
+.payment-button {
+  --background: #8B4513;
+  --color: white;
+  font-weight: 600;
+
+  &:disabled {
+    --background: #ccc;
+    --color: #666;
+  }
+}

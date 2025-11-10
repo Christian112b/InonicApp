@@ -5,9 +5,11 @@ import { cube, gift, restaurant, leaf, star, snow, cart } from 'ionicons/icons';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { ToastController } from '@ionic/angular';
+import { environment } from '../../environments/environment';
 
 // Environment configuration
-const API_BASE_URL = 'http://localhost:5050';
+const API_BASE_URL = 'https://backend-app-x7k2.zeabur.app/'; // Force HTTPS production URL for testing
+// const API_BASE_URL = environment.apiUrl; // Original environment-based URL
 
 interface Product {
   id_producto: number;
@@ -17,6 +19,7 @@ interface Product {
   precio_unitario: number;
   activo: number;
   imagen?: string;
+  imagen_base64?: string;
   stock: number;
 }
 
@@ -185,100 +188,30 @@ export class Tab1Page implements AfterViewInit, OnDestroy {
       }
     }
 
-    // Simular carga de productos para desarrollo
-    setTimeout(() => {
-      const mockResponse = {
-        productos: [
-          {
-            id_producto: 1,
-            nombre: 'Tornillo',
-            descripcion: 'Delicioso chocolate macizo con leche',
-            categoria: 'Chocolates',
-            precio_unitario: 25.00,
-            activo: 1,
-            stock: 10,
-            imagen: '/assets/img/02Tornillo.jpg'
-          },
-          {
-            id_producto: 2,
-            nombre: 'Princesa Surtida',
-            descripcion: 'Bombón de chocolate amargo relleno de fondant y jalea',
-            categoria: 'Bombones',
-            precio_unitario: 30.00,
-            activo: 1,
-            stock: 15,
-            imagen: '/assets/img/09PrincesaSurtida.jpg'
-          },
-          {
-            id_producto: 3,
-            nombre: 'Duquesa',
-            descripcion: 'Irresistible sandwich de galleta con jalea y chocolate',
-            categoria: 'Galletas',
-            precio_unitario: 28.00,
-            activo: 1,
-            stock: 8,
-            imagen: '/assets/img/DUQUESA-PRESENTACIONES.jpg'
-          },
-          {
-            id_producto: 4,
-            nombre: 'Esponja Natural',
-            descripcion: 'Chocolate blanco con menta fresca',
-            categoria: 'Especiales',
-            precio_unitario: 35.00,
-            activo: 1,
-            stock: 5,
-            imagen: '/assets/img/Esponja-Natural.jpg'
-          },
-          {
-            id_producto: 5,
-            nombre: 'Figura de Chocolate',
-            descripcion: 'Figuras decorativas de chocolate premium',
-            categoria: 'Decoraciones',
-            precio_unitario: 45.00,
-            activo: 1,
-            stock: 3,
-            imagen: '/assets/img/figura.png'
-          },
-          {
-            id_producto: 6,
-            nombre: 'Menta Blanca',
-            descripcion: 'Chocolate blanco con menta refrescante',
-            categoria: 'Especiales',
-            precio_unitario: 32.00,
-            activo: 1,
-            stock: 12,
-            imagen: '/assets/img/Menta-Blanca.jpg'
-          }
-        ],
-        categorias: ['Chocolates', 'Bombones', 'Galletas', 'Especiales', 'Decoraciones']
-      };
-
-      // Cache the products and categories
-      localStorage.setItem('cachedProducts', JSON.stringify(mockResponse.productos));
-      localStorage.setItem('cachedCategories', JSON.stringify(mockResponse.categorias));
-
-      // Get first 6 products as favorites (you can modify this logic)
-      this.favoriteProducts = mockResponse.productos.slice(0, 6);
-      console.log('Productos simulados cargados:', this.favoriteProducts);
-    }, 800); // Simular delay de 800ms
-
-    // Código comentado para cuando tengas el backend listo:
-    /*
-    // Replace with your actual backend URL - check if your Flask server is running
-    const apiUrl = `${API_BASE_URL}/getProducts`; // Adjust this to your Flask server URL
+    // Load products from API
+    const apiUrl = `${API_BASE_URL}/getProducts`;
+    console.log('🌐 API URL (tab1):', apiUrl);
+    console.log('🔧 Environment API URL (tab1):', API_BASE_URL);
 
     this.http.get<{productos: Product[], categorias: string[]}>(apiUrl).subscribe({
       next: (response) => {
+        console.log('✅ Respuesta completa de la API (tab1):', response);
+        console.log('📦 Productos recibidos (tab1):', response.productos?.length || 0);
         // Cache the products and categories
         localStorage.setItem('cachedProducts', JSON.stringify(response.productos));
         localStorage.setItem('cachedCategories', JSON.stringify(response.categorias));
 
         // Get first 6 products as favorites (you can modify this logic)
         this.favoriteProducts = response.productos.slice(0, 6);
-        console.log('Productos cargados desde API:', this.favoriteProducts);
       },
       error: (error) => {
-        console.error('Error loading products:', error);
+        console.error('❌ Error loading products (tab1):', error);
+        console.error('🔍 Error details (tab1):', {
+          status: error.status,
+          statusText: error.statusText,
+          url: apiUrl,
+          message: error.message
+        });
         this.showToast('Error al cargar productos desde el servidor. Mostrando datos de respaldo.', 'error');
         // Keep the placeholder products if API fails
         this.favoriteProducts = [];
@@ -314,13 +247,37 @@ export class Tab1Page implements AfterViewInit, OnDestroy {
         ];
       }
     });
-    */
   }
 
   addToCart(product: Product) {
-    // TODO: Implement cart functionality
-    console.log('Adding to cart:', product);
-    // You can implement cart logic here later
+    // Check if user is logged in
+    const token = localStorage.getItem('jwt_token');
+    if (!token) {
+      this.showToast('Debes iniciar sesión para agregar productos al carrito', 'warning');
+      return;
+    }
+
+    // Add to backend cart
+    const headers = { 'Authorization': `Bearer ${token}` };
+    const cartData = { id_producto: product.id_producto };
+
+    this.http.post(`${API_BASE_URL}/addCart`, cartData, { headers, withCredentials: true }).subscribe({
+      next: (response: any) => {
+        if (response.ok) {
+          this.showToast('Producto agregado al carrito', 'success');
+
+          // Emit cart update event for other tabs
+          const cartEvent = new CustomEvent('cartUpdated');
+          window.dispatchEvent(cartEvent);
+        } else {
+          this.showToast(response.mensaje || 'Error al agregar producto', 'error');
+        }
+      },
+      error: (error) => {
+        console.error('Error adding to cart:', error);
+        this.showToast('Error al agregar producto al carrito', 'error');
+      }
+    });
   }
 
   getProductIcon(productName: string): string {

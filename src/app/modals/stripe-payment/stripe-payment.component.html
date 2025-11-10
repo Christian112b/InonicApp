@@ -1,0 +1,18 @@
+<div class="stripe-payment-container">
+  <div class="card-element-container">
+    <div #cardElement class="card-element"></div>
+  </div>
+
+  <div *ngIf="errorMessage" class="error-message">
+    {{ errorMessage }}
+  </div>
+
+  <ion-button
+    expand="block"
+    (click)="processPayment()"
+    [disabled]="isLoading || !stripe"
+    class="payment-button">
+    <span *ngIf="!isLoading">Procesar Pago</span>
+    <span *ngIf="isLoading">Procesando...</span>
+  </ion-button>
+</div>

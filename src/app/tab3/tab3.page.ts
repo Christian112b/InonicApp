@@ -1,5 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { IonHeader, IonToolbar, IonTitle, IonContent, IonIcon, IonSpinner, IonButton, IonRouterLink } from '@ionic/angular/standalone';
+import { CheckoutModalComponent } from '../modals/checkout-modal/checkout-modal.component';
+import { Router } from '@angular/router';
 import { addIcons } from 'ionicons';
 import { cube, gift, restaurant, leaf, star, snow, cart, addCircle, trash } from 'ionicons/icons';
 import { HttpClient } from '@angular/common/http';
@@ -7,7 +9,8 @@ import { CommonModule } from '@angular/common';
 import { ToastController } from '@ionic/angular';
 
 // Environment configuration
-const API_BASE_URL = 'http://localhost:5050';
+const API_BASE_URL = 'http://localhost:5000'; // Localhost URL for development
+// const API_BASE_URL = 'https://backend-app-x7k2.zeabur.app/'; // Production URL
 
 interface CartItem {
   id: number;
@@ -21,7 +24,7 @@ interface CartItem {
   selector: 'app-tab3',
   templateUrl: 'tab3.page.html',
   styleUrls: ['tab3.page.scss'],
-  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonIcon, IonSpinner, IonButton, IonRouterLink, CommonModule],
+  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonIcon, IonButton, IonSpinner, IonRouterLink, CommonModule, CheckoutModalComponent],
 })
 export class Tab3Page implements OnInit, OnDestroy {
   public cartItems: CartItem[] = [];
@@ -29,19 +32,41 @@ export class Tab3Page implements OnInit, OnDestroy {
   public cartItemCount: number = 0;
   public isLoadingCart: boolean = false;
   public isLoggedIn: boolean = false;
+  public hasError: boolean = false;
 
-  constructor(private http: HttpClient, private toastController: ToastController) {
-    addIcons({ cube, gift, restaurant, leaf, star, snow, cart, addCircle, trash });
+  constructor(private http: HttpClient, private toastController: ToastController, private router: Router) {
+    addIcons({
+      cube, gift, restaurant, leaf, star, snow, cart, addCircle, trash,
+      'cart-outline': cart,
+      'log-in-outline': 'log-in',
+      'storefront-outline': 'storefront',
+      'image-outline': 'image',
+      'remove': 'remove',
+      'add': 'add',
+      'card-outline': 'card'
+    });
   }
 
   ngOnInit() {
     this.checkAuthStatus();
-    this.loadCartFromStorage();
-    this.updateCartUI();
+
+    // Load cart from backend if logged in (no localStorage fallback)
+    if (this.isLoggedIn) {
+      this.updateCartUI();
+    }
 
     // Listen for cart refresh events from tab bar
     window.addEventListener('refreshCartData', () => {
-      this.updateCartUI();
+      if (this.isLoggedIn) {
+        this.updateCartUI();
+      }
+    });
+
+    // Listen for cart updates from other tabs
+    window.addEventListener('cartUpdated', () => {
+      if (this.isLoggedIn) {
+        this.updateCartUI();
+      }
     });
 
     // Listen for auth changes
@@ -138,7 +163,6 @@ export class Tab3Page implements OnInit, OnDestroy {
     // Simular guardado en backend
     return new Promise((resolve, reject) => {
       setTimeout(() => {
-        console.log('🛒 Carrito guardado en backend (simulado):', this.cartItems);
         resolve({ ok: true });
       }, 500);
     });
@@ -161,92 +185,64 @@ export class Tab3Page implements OnInit, OnDestroy {
 
   updateCartUI() {
     this.isLoadingCart = true;
-    console.log('🔄 Iniciando carga del carrito...');
 
-    // Simular datos del carrito para desarrollo
-    setTimeout(() => {
-      // Simular respuesta del backend con datos de ejemplo
-      const mockData = {
-        ok: true,
-        items: [
-          {
-            id: 1,
-            name: 'Tornillo',
-            image: '/assets/img/02Tornillo.jpg',
-            price: '25.00',
-            quantity: 2
-          },
-          {
-            id: 2,
-            name: 'Princesa Surtida',
-            image: '/assets/img/09PrincesaSurtida.jpg',
-            price: '30.00',
-            quantity: 1
-          },
-          {
-            id: 3,
-            name: 'Duquesa',
-            image: '/assets/img/DUQUESA-PRESENTACIONES.jpg',
-            price: '28.00',
-            quantity: 3
-          }
-        ]
-      };
+    // Load cart from backend (now uses JWT authentication)
+    const token = localStorage.getItem('jwt_token');
+    let headers = {};
+    if (token) {
+      headers = { 'Authorization': `Bearer ${token}` };
+    }
+    console.log('Loading cart - token:', token);
 
-      console.log('📦 Respuesta simulada del carrito:', mockData);
-      if (mockData.ok) {
-        const items = (mockData.items || []).map((item: any) => ({
-          id: item.id,
-          name: item.name,
-          image: item.image,
-          price: parseFloat(item.price) || 0,
-          quantity: item.quantity
-        }));
-
-        console.log('✅ Items procesados:', items);
-        this.cartItems = items;
-        this.updateCartTotals();
-        this.saveCartToStorage();
-      } else {
-        console.warn('⚠️ Respuesta no OK:', mockData);
-      }
-      this.isLoadingCart = false;
-    }, 1000); // Simular delay de 1 segundo
-
-    // Código comentado para cuando tengas el backend listo:
-    /*
-    // Load cart from backend (uses Flask session, not JWT)
-    this.http.get(`${API_BASE_URL}/getItemsCart`, { withCredentials: true }).subscribe({
+    this.http.get(`${API_BASE_URL}/getItemsCart`, { headers, withCredentials: true }).subscribe({
       next: (data: any) => {
         console.log('📦 Respuesta del carrito:', data);
         if (data.ok) {
-          const items = (data.items || []).map((item: any) => ({
-            id: item.id,
-            name: item.name,
-            image: item.image,
-            price: parseFloat(item.price) || 0,
-            quantity: item.quantity
-          }));
+          const items = (data.items || []).map((item: any) => {
+            // Check if image already has data URL prefix
+            let imageUrl = null;
+            if (item.image) {
+              if (item.image.startsWith('data:image')) {
+                imageUrl = item.image; // Already has prefix
+              } else {
+                imageUrl = `data:image/jpeg;base64,${item.image}`; // Add prefix
+              }
+            }
 
-          console.log('✅ Items procesados:', items);
+            return {
+              id: item.id,
+              name: item.name,
+              image: imageUrl,
+              price: parseFloat(item.price) || 0,
+              quantity: item.quantity
+            };
+          });
+
+
+          console.log('✅ Items procesados:', items.length, 'items');
           this.cartItems = items;
           this.updateCartTotals();
           this.saveCartToStorage();
         } else {
           console.warn('⚠️ Respuesta no OK:', data);
+          // Clear cart if no items
+          this.cartItems = [];
+          this.updateCartTotals();
         }
         this.isLoadingCart = false;
       },
       error: (error) => {
         console.error('❌ Error loading cart from backend:', error);
-        this.showToast('Error al cargar el carrito desde el servidor. Usando datos locales.', 'error');
-        // Fallback to localStorage if backend fails
-        this.loadCartFromStorage();
+        this.hasError = true;
         this.isLoadingCart = false;
+        // Clear cart on error
+        this.cartItems = [];
+        this.updateCartTotals();
       }
     });
-    */
   }
+
+  showCheckoutModal = false;
 
   proceedToCheckout() {
     if (this.cartItems.length === 0) {
@@ -254,16 +250,28 @@ export class Tab3Page implements OnInit, OnDestroy {
       return;
     }
 
-    // Save cart to backend before proceeding to checkout
-    this.persistCartToBackend().then(() => {
-      console.log('Cart saved to backend, proceeding to checkout');
-      // Open checkout modal (you would implement this)
-      alert('Funcionalidad de checkout próximamente disponible');
-    }).catch((error) => {
-      console.error('Error saving cart before checkout:', error);
-      // Still proceed to checkout even if save fails
-      alert('Funcionalidad de checkout próximamente disponible');
-    });
+    // Open checkout modal
+    this.showCheckoutModal = true;
+  }
+
+  onCheckoutComplete(result: any) {
+    this.showCheckoutModal = false;
+    if (result.success) {
+      // Clear cart after successful payment
+      this.cartItems = [];
+      this.updateCartTotals();
+      this.saveCartToStorage();
+
+      // Show success message
+      this.showToast('¡Compra realizada exitosamente!', 'success');
+
+      // Navigate to home or order confirmation
+      this.router.navigate(['/tabs/inicio']);
+    }
+  }
+
+  closeCheckoutModal() {
+    this.showCheckoutModal = false;
   }
 
   ngOnDestroy() {
@@ -276,9 +284,10 @@ export class Tab3Page implements OnInit, OnDestroy {
   }
 
   private checkAuthStatus() {
-    const token = localStorage.getItem('authToken');
+    const token = localStorage.getItem('jwt_token');
     const userData = localStorage.getItem('userData');
     this.isLoggedIn = !!(token && userData);
+    console.log('checkAuthStatus - token:', token, 'userData:', userData, 'isLoggedIn:', this.isLoggedIn);
   }
 
 
@@ -291,6 +300,17 @@ export class Tab3Page implements OnInit, OnDestroy {
       cssClass: 'toast-warning'
     });
     await toast.present();
+  }
+
+  goToLogin() {
+    // Navigate to the account tab (tab4) without page reload
+    this.router.navigate(['/tabs/cuenta']);
+  }
+
+  retryLoadCart() {
+    if (this.isLoggedIn) {
+      this.updateCartUI();
+    }
   }
 
   private async showToast(message: string, type: 'success' | 'error' | 'warning' = 'success') {

@@ -19,7 +19,7 @@ export class TabsPage {
 
   openCartFromTab() {
     // Check if user is logged in
-    const token = localStorage.getItem('authToken');
+    const token = localStorage.getItem('jwt_token');
     const userData = localStorage.getItem('userData');
 
     if (!token || !userData) {

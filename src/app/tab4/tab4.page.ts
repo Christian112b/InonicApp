@@ -5,9 +5,12 @@ import { IonContent, IonHeader, IonTitle, IonToolbar, IonIcon, IonButton, IonInp
 import { HttpClient } from '@angular/common/http';
 import { AlertController, ToastController } from '@ionic/angular';
 import { environment } from '../../environments/environment';
+import { addIcons } from 'ionicons';
+import { personCircleOutline, logInOutline, personAddOutline, cartOutline, heartOutline, starOutline, locationOutline, cardOutline, notificationsOutline, helpCircleOutline, personOutline, receiptOutline, settingsOutline, logOutOutline, close, mailOutline, lockClosedOutline, eyeOutline, eyeOffOutline, callOutline } from 'ionicons/icons';
 
 // Environment configuration
-const API_BASE_URL = 'http://localhost:5050';
+const API_BASE_URL = 'http://localhost:5000'; // Localhost URL for development
+// const API_BASE_URL = 'https://backend-app-x7k2.zeabur.app/'; // Production URL
 
 interface LoginData {
   email: string;
@@ -66,7 +69,30 @@ export class Tab4Page implements OnInit {
     private http: HttpClient,
     private alertController: AlertController,
     private toastController: ToastController
-  ) { }
+  ) {
+    addIcons({
+      personCircleOutline,
+      logInOutline,
+      personAddOutline,
+      cartOutline,
+      heartOutline,
+      starOutline,
+      locationOutline,
+      cardOutline,
+      notificationsOutline,
+      helpCircleOutline,
+      personOutline,
+      receiptOutline,
+      settingsOutline,
+      logOutOutline,
+      close,
+      mailOutline,
+      lockClosedOutline,
+      eyeOutline,
+      eyeOffOutline,
+      callOutline
+    });
+  }
 
   ngOnInit() {
     this.checkAuthStatus();
@@ -159,30 +185,27 @@ export class Tab4Page implements OnInit {
 
     this.isLoading = true;
 
-    // Simular login para desarrollo
-    setTimeout(() => {
-      // Credenciales de prueba
-      const validCredentials = [
-        { email: 'user@test.com', password: '123456', name: 'Usuario Test' },
-        { email: 'admin@costanzo.com', password: 'admin123', name: 'Administrador' },
-        { email: 'usuario@costanzo.com', password: 'user123', name: 'Usuario Prueba' },
-        { email: 'cliente@costanzo.com', password: 'cliente123', name: 'Cliente Regular' }
-      ];
+    try {
+      // Create FormData to match Flask's request.form
+      const formData = new FormData();
+      formData.append('email', this.loginData.email);
+      formData.append('password', this.loginData.password);
 
-      const user = validCredentials.find(
-        cred => cred.email === this.loginData.email && cred.password === this.loginData.password
-      );
+      const response = await this.http.post(`${API_BASE_URL}/validationLogin`, formData, { withCredentials: true }).toPromise() as any;
+      console.log('Backend login response:', response);
 
-      if (user) {
+      if (response.token) {
         // Login successful
         const userData = {
-          name: user.name,
-          email: this.loginData.email
+          name: response.user?.name || 'Usuario',
+          email: response.user?.email || this.loginData.email
         };
 
         // Store auth data
-        localStorage.setItem('authToken', 'simulated-jwt-token-' + Date.now());
+        console.log('Storing JWT token:', response.token);
+        localStorage.setItem('jwt_token', response.token);
         localStorage.setItem('userData', JSON.stringify(userData));
+        console.log('Token saved to localStorage:', localStorage.getItem('jwt_token'));
 
         // Handle remember me functionality
         if (this.loginData.remember) {
@@ -204,41 +227,7 @@ export class Tab4Page implements OnInit {
         this.showToast('¡Inicio de sesión exitoso!', 'success');
         this.closeLoginModal();
       } else {
-        this.showToast('Credenciales incorrectas', 'error');
-      }
-
-      this.isLoading = false;
-    }, 1500); // Simular delay de 1.5 segundos
-
-    // Código comentado para cuando tengas el backend listo:
-    /*
-    try {
-      // Create FormData to match Flask's request.form
-      const formData = new FormData();
-      formData.append('email', this.loginData.email);
-      formData.append('password', this.loginData.password);
-
-      const response = await this.http.post(`${API_BASE_URL}/validationLogin`, formData, { withCredentials: true }).toPromise() as any;
-
-      if (response.status === 200) {
-        // Login successful
-        const userData = {
-          name: response.user?.name || 'Usuario',
-          email: this.loginData.email
-        };
-
-        // Store auth data
-        localStorage.setItem('authToken', response.token);
-        localStorage.setItem('userData', JSON.stringify(userData));
-
-        this.isLoggedIn = true;
-        this.userName = userData.name;
-        this.userEmail = userData.email;
-
-        this.showToast('¡Inicio de sesión exitoso!', 'success');
-        this.closeLoginModal();
-      } else {
-        this.showToast(response.message || 'Credenciales incorrectas', 'error');
+        this.showToast(response.message || 'Error en el login', 'error');
       }
     } catch (error: any) {
       console.error('Login error:', error);
@@ -246,13 +235,14 @@ export class Tab4Page implements OnInit {
         this.showToast('Usuario no encontrado', 'error');
       } else if (error.status === 403) {
         this.showToast('Contraseña incorrecta', 'error');
+      } else if (error.status === 400) {
+        this.showToast(error.error?.message || 'Datos inválidos', 'error');
       } else {
         this.showToast('Error al iniciar sesión', 'error');
       }
     } finally {
       this.isLoading = false;
     }
-    */
   }
 
   async register() {
@@ -308,8 +298,7 @@ export class Tab4Page implements OnInit {
       this.isRegisterLoading = false;
     }, 2000); // Simular delay de 2 segundos
 
-    // Código comentado para cuando tengas el backend listo:
-    /*
+    // Real backend registration
     try {
       // Create FormData to match Flask's request.form
       const formData = new FormData();
@@ -337,6 +326,10 @@ export class Tab4Page implements OnInit {
         this.userName = userData.name;
         this.userEmail = userData.email;
 
+        // Emit auth changed event for other components
+        const authEvent = new CustomEvent('authChanged');
+        window.dispatchEvent(authEvent);
+
         this.showToast('¡Registro exitoso!', 'success');
         this.closeRegisterModal();
       } else {
@@ -354,7 +347,6 @@ export class Tab4Page implements OnInit {
     } finally {
       this.isRegisterLoading = false;
     }
-    */
   }
 
   async logout() {

@@ -36,12 +36,35 @@
         </div>
       </div>
 
+      <!-- Loading/Error Section -->
+      <div class="status-section" style="padding: 10px; margin: 10px 0; border-radius: 5px;" [style.background]="getStatusBackground()" *ngIf="isLoading || hasConnectionError">
+        <div *ngIf="isLoading" style="text-align: center;">
+          <ion-icon name="refresh" style="font-size: 24px; color: #007bff; animation: spin 1s linear infinite;"></ion-icon>
+          <div style="margin-top: 5px; font-size: 14px; color: #007bff;">Cargando productos...</div>
+        </div>
+
+        <div *ngIf="!isLoading && hasConnectionError" style="text-align: center;">
+          <div style="font-size: 16px; color: #dc3545; margin-bottom: 10px;">❌ {{ connectionStatus }}</div>
+          <button class="retry-btn" (click)="retryConnection()" style="background: #dc3545; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer;">
+            🔄 Reintentar
+          </button>
+        </div>
+      </div>
+
+      <style>
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      </style>
+
       <!-- Products Grid -->
       <div class="productos-grid">
         <div class="product-card" *ngFor="let product of filteredProducts">
           <div class="product-image">
-            <img *ngIf="product.imagen" [src]="product.imagen" alt="{{ product.nombre }}">
-            <div class="product-placeholder" *ngIf="!product.imagen">
+            <img *ngIf="product.imagen_base64" [src]="'data:image/jpeg;base64,' + product.imagen_base64" alt="{{ product.nombre }}">
+            <img *ngIf="product.imagen && !product.imagen_base64" [src]="product.imagen" alt="{{ product.nombre }}">
+            <div class="product-placeholder" *ngIf="!product.imagen && !product.imagen_base64">
               <ion-icon [name]="getProductIcon(product.nombre)"></ion-icon>
             </div>
             <div class="product-overlay">

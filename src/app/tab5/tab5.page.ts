@@ -2,32 +2,60 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonContent, IonHeader, IonTitle, IonToolbar, IonIcon } from '@ionic/angular/standalone';
-import { ToastController } from '@ionic/angular';
+import { ToastController, ModalController } from '@ionic/angular';
+import { PrivacyPolicyModalComponent } from '../modals/privacy-policy-modal.component';
+import { ReturnsPolicyModalComponent } from '../modals/returns-policy-modal.component';
+import { TermsOfServiceModalComponent } from '../modals/terms-of-service-modal.component';
 
 @Component({
   selector: 'app-tab5',
   templateUrl: './tab5.page.html',
   styleUrls: ['./tab5.page.scss'],
   standalone: true,
-  imports: [IonContent, IonHeader, IonTitle, IonToolbar, IonIcon, CommonModule, FormsModule]
+  imports: [IonContent, IonHeader, IonTitle, IonToolbar, IonIcon, CommonModule, FormsModule],
+  providers: [ModalController]
 })
 export class Tab5Page implements OnInit {
 
-  constructor(private toastController: ToastController) { }
+  constructor(private toastController: ToastController, private modalController: ModalController) { }
 
   ngOnInit() {
   }
 
   async openPrivacyPolicy() {
-    this.showDevelopmentToast('Política de Privacidad');
+    const modal = await this.modalController.create({
+      component: PrivacyPolicyModalComponent,
+      cssClass: 'policy-modal',
+      backdropDismiss: true,
+      breakpoints: [0, 1],
+      initialBreakpoint: 1,
+      handle: false
+    });
+    return await modal.present();
   }
 
   async openReturnsPolicy() {
-    this.showDevelopmentToast('Políticas de Devolución');
+    const modal = await this.modalController.create({
+      component: ReturnsPolicyModalComponent,
+      cssClass: 'policy-modal',
+      backdropDismiss: true,
+      breakpoints: [0, 1],
+      initialBreakpoint: 1,
+      handle: false
+    });
+    return await modal.present();
   }
 
   async openTermsOfService() {
-    this.showDevelopmentToast('Términos de Servicio');
+    const modal = await this.modalController.create({
+      component: TermsOfServiceModalComponent,
+      cssClass: 'policy-modal',
+      backdropDismiss: true,
+      breakpoints: [0, 1],
+      initialBreakpoint: 1,
+      handle: false
+    });
+    return await modal.present();
   }
 
   async openContact() {

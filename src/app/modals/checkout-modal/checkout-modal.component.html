@@ -1,0 +1,285 @@
+<!-- Checkout Modal Overlay -->
+<div class="checkout-modal-overlay" *ngIf="true">
+  <div class="checkout-modal">
+    <!-- Header with Tabs -->
+    <div class="modal-header">
+      <div class="tab-buttons">
+        <button
+          *ngFor="let tab of tabs; let i = index"
+          [class.active]="activeTab === i"
+          (click)="setActiveTab(i)"
+          class="tab-btn">
+          {{ tab }}
+        </button>
+      </div>
+      <button class="close-btn" (click)="close()">
+        <ion-icon name="close"></ion-icon>
+      </button>
+    </div>
+
+    <!-- Tab Content -->
+    <div class="modal-content">
+
+      <!-- Tab 0: Resumen -->
+      <div *ngIf="activeTab === 0" class="tab-panel">
+        <h3>Resumen del Pedido</h3>
+        <div class="cart-items-summary">
+          <div *ngFor="let item of cartItems" class="summary-item">
+            <img *ngIf="item.image" [src]="item.image" [alt]="item.name" class="item-image">
+            <div *ngIf="!item.image" class="item-placeholder">📦</div>
+            <div class="item-details">
+              <h4>{{ item.name }}</h4>
+              <p>{{ item.quantity }} × ${{ item.price.toFixed(2) }}</p>
+            </div>
+            <div class="item-total">${{ (item.price * item.quantity).toFixed(2) }}</div>
+          </div>
+        </div>
+
+        <div class="summary-totals">
+          <div class="total-row">
+            <span>Subtotal:</span>
+            <span>${{ getSubtotal().toFixed(2) }}</span>
+          </div>
+          <div class="total-row">
+            <span>IVA (16%):</span>
+            <span>${{ getIVA().toFixed(2) }}</span>
+          </div>
+          <div class="total-row final">
+            <span>Total:</span>
+            <span>${{ cartTotal.toFixed(2) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 1: Dirección -->
+      <div *ngIf="activeTab === 1" class="tab-panel">
+        <h3>Seleccionar Dirección de Envío</h3>
+
+        <div *ngIf="isLoadingAddresses" class="loading">
+          <ion-icon name="business" style="font-size: 24px;"></ion-icon>
+          <p>Cargando direcciones...</p>
+        </div>
+
+        <div *ngIf="!isLoadingAddresses" class="addresses-list">
+          <div
+            *ngFor="let address of addresses"
+            [class.selected]="selectedAddress?.id === address.id"
+            (click)="selectAddress(address)"
+            class="address-card">
+            <div class="address-header">
+              <strong>{{ address.alias }}</strong>
+            </div>
+            <div class="address-details">
+              {{ address.calle }}, {{ address.colonia }}<br>
+              {{ address.ciudad }}, {{ address.estado }}<br>
+              CP: {{ address.cp }}
+            </div>
+          </div>
+
+          <div
+            [class.selected]="showNewAddressForm"
+            (click)="toggleNewAddressForm()"
+            class="address-card add-new">
+            <div class="add-icon">
+              <ion-icon name="add"></ion-icon>
+            </div>
+            <div>Agregar nueva dirección</div>
+          </div>
+        </div>
+
+        <!-- New Address Form -->
+        <div *ngIf="showNewAddressForm" class="new-address-form">
+          <div class="form-row">
+            <ion-item>
+              <ion-label position="floating">Alias</ion-label>
+              <ion-input [(ngModel)]="newAddress.alias" placeholder="Casa, Trabajo, etc."></ion-input>
+            </ion-item>
+            <ion-item>
+              <ion-label position="floating">Código Postal</ion-label>
+              <ion-input [(ngModel)]="newAddress.postalCode" type="number" maxlength="5"></ion-input>
+            </ion-item>
+          </div>
+
+          <div class="form-row">
+            <ion-item>
+              <ion-label position="floating">Calle</ion-label>
+              <ion-input [(ngModel)]="newAddress.street"></ion-input>
+            </ion-item>
+            <ion-item>
+              <ion-label position="floating">Colonia</ion-label>
+              <ion-input [(ngModel)]="newAddress.neighborhood"></ion-input>
+            </ion-item>
+          </div>
+
+          <div class="form-row">
+            <ion-item>
+              <ion-label position="floating">Ciudad</ion-label>
+              <ion-input [(ngModel)]="newAddress.city"></ion-input>
+            </ion-item>
+            <ion-item>
+              <ion-label position="floating">Estado</ion-label>
+              <ion-input [(ngModel)]="newAddress.state"></ion-input>
+            </ion-item>
+          </div>
+
+          <ion-button expand="block" (click)="saveNewAddress()" style="margin-top: 16px;">
+            <ion-icon name="checkmark" slot="start"></ion-icon>
+            Guardar Dirección
+          </ion-button>
+        </div>
+      </div>
+
+      <!-- Tab 2: Método de Pago -->
+      <div *ngIf="activeTab === 2" class="tab-panel">
+        <h3>Método de Pago</h3>
+
+        <ion-radio-group [(ngModel)]="selectedPaymentMethod">
+           <ion-item>
+             <ion-radio value="1" slot="start"></ion-radio>
+             <ion-icon name="card" slot="start" style="margin-right: 8px;"></ion-icon>
+             <ion-label>
+               <strong>Tarjeta de Crédito/Débito</strong>
+               <p>Pago seguro con Stripe</p>
+             </ion-label>
+           </ion-item>
+
+           <ion-item>
+             <ion-radio value="4" slot="start"></ion-radio>
+             <ion-icon name="business" slot="start" style="margin-right: 8px;"></ion-icon>
+             <ion-label>
+               <strong>Transferencia Bancaria</strong>
+               <p>Pago por depósito o transferencia</p>
+             </ion-label>
+           </ion-item>
+
+           <ion-item>
+             <ion-radio value="5" slot="start"></ion-radio>
+             <ion-icon name="cash" slot="start" style="margin-right: 8px;"></ion-icon>
+             <ion-label>
+               <strong>Efectivo en Tienda</strong>
+               <p>Pago contra entrega en tienda</p>
+             </ion-label>
+           </ion-item>
+         </ion-radio-group>
+
+         <!-- Stripe Payment Form -->
+         <div *ngIf="showStripeForm" class="stripe-form-container" style="margin-top: 20px; padding: 16px; background: #f8f9fa; border-radius: 8px;">
+           <h4 style="margin: 0 0 16px 0; color: #8B4513;">Datos de la Tarjeta</h4>
+           <app-stripe-payment
+             [amount]="getFinalTotal() * 100"
+             (paymentSuccess)="onStripePaymentSuccess($event)"
+             (paymentError)="onStripePaymentError($event)">
+           </app-stripe-payment>
+         </div>
+
+        <!-- Coupon Section -->
+        <div class="coupon-section" style="margin-top: 24px; padding: 16px; background: #f8f9fa; border-radius: 8px;">
+          <h4 style="margin: 0 0 12px 0;">¿Tienes un cupón?</h4>
+          <div style="display: flex; gap: 8px;">
+            <ion-input [(ngModel)]="couponCode" placeholder="Ingresa código de cupón" style="flex: 1;"></ion-input>
+            <ion-button fill="outline">Aplicar</ion-button>
+          </div>
+        </div>
+
+        <!-- Order Summary -->
+        <div class="payment-summary" style="margin-top: 24px; padding: 16px; background: #f8f9fa; border-radius: 8px;">
+          <h4 style="margin: 0 0 16px 0;">Resumen del Pago</h4>
+          <div class="summary-row">
+            <span>Subtotal:</span>
+            <span>${{ getSubtotal().toFixed(2) }}</span>
+          </div>
+          <div class="summary-row">
+            <span>IVA (16%):</span>
+            <span>${{ getIVA().toFixed(2) }}</span>
+          </div>
+          <div class="summary-row" *ngIf="discount > 0">
+            <span>Descuento:</span>
+            <span style="color: #dc3545;">-${{ discount.toFixed(2) }}</span>
+          </div>
+          <div class="summary-row final">
+            <span>Total a pagar:</span>
+            <span>${{ getFinalTotal().toFixed(2) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 3: Confirmación -->
+      <div *ngIf="activeTab === 3" class="tab-panel">
+        <h3>Confirmar Pedido</h3>
+
+        <div class="confirmation-summary">
+          <div class="confirm-section">
+            <h4>Productos</h4>
+            <div *ngFor="let item of cartItems" class="confirm-item">
+              <span>{{ item.name }} ({{ item.quantity }}×)</span>
+              <span>${{ (item.price * item.quantity).toFixed(2) }}</span>
+            </div>
+          </div>
+
+          <div class="confirm-section" *ngIf="selectedAddress">
+            <h4>Dirección de Envío</h4>
+            <div class="address-display">
+              <strong>{{ selectedAddress.alias }}</strong><br>
+              {{ selectedAddress.calle }}, {{ selectedAddress.colonia }}<br>
+              {{ selectedAddress.ciudad }}, {{ selectedAddress.estado }}<br>
+              CP: {{ selectedAddress.cp }}
+            </div>
+          </div>
+
+          <div class="confirm-section">
+            <h4>Método de Pago</h4>
+            <div class="payment-display">
+              <span *ngIf="selectedPaymentMethod === '1'">💳 Tarjeta de Crédito/Débito</span>
+              <span *ngIf="selectedPaymentMethod === '4'">🏦 Transferencia Bancaria</span>
+              <span *ngIf="selectedPaymentMethod === '5'">💵 Efectivo en Tienda</span>
+            </div>
+          </div>
+
+          <div class="confirm-totals">
+            <div class="total-row">
+              <span>Subtotal:</span>
+              <span>${{ getSubtotal().toFixed(2) }}</span>
+            </div>
+            <div class="total-row">
+              <span>IVA (16%):</span>
+              <span>${{ getIVA().toFixed(2) }}</span>
+            </div>
+            <div class="total-row final">
+              <span>Total:</span>
+              <span>${{ getFinalTotal().toFixed(2) }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="modal-footer">
+      <ion-button
+        fill="outline"
+        (click)="prevTab()"
+        [disabled]="activeTab === 0"
+        style="margin-right: 8px;">
+        Anterior
+      </ion-button>
+
+      <ion-button
+        *ngIf="activeTab < tabs.length - 1"
+        fill="solid"
+        (click)="nextTab()"
+        [disabled]="!canProceed()">
+        Siguiente
+      </ion-button>
+
+      <ion-button
+        *ngIf="activeTab === tabs.length - 1"
+        fill="solid"
+        (click)="processPayment()"
+        [disabled]="isProcessingPayment">
+        <span *ngIf="!isProcessingPayment">Finalizar Compra</span>
+        <span *ngIf="isProcessingPayment">Procesando...</span>
+      </ion-button>
+    </div>
+  </div>
+</div>
