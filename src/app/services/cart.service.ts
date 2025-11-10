@@ -33,7 +33,7 @@ export class CartService {
 
     const formData = new FormData();
     formData.append('id_producto', productId.toString());
-    return this.http.post(`${this.apiUrl}/cart/addCart`, formData, {
+    return this.http.post(`${this.apiUrl}/addCart`, formData, {
       headers: this.authService.getAuthHeaders(),
       withCredentials: true
     });

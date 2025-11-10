@@ -9,8 +9,8 @@ import { addIcons } from 'ionicons';
 import { personCircleOutline, logInOutline, personAddOutline, cartOutline, heartOutline, starOutline, locationOutline, cardOutline, notificationsOutline, helpCircleOutline, personOutline, receiptOutline, settingsOutline, logOutOutline, close, mailOutline, lockClosedOutline, eyeOutline, eyeOffOutline, callOutline } from 'ionicons/icons';
 
 // Environment configuration
-const API_BASE_URL = 'http://localhost:5000'; // Localhost URL for development
-// const API_BASE_URL = 'https://backend-app-x7k2.zeabur.app/'; // Production URL
+// const API_BASE_URL = 'http://localhost:5000'; // Localhost URL for development
+const API_BASE_URL = 'https://backend-app-x7k2.zeabur.app/'; // Production URL
 
 interface LoginData {
   email: string;
@@ -100,14 +100,30 @@ export class Tab4Page implements OnInit {
   }
 
   private checkAuthStatus() {
-    const token = localStorage.getItem('authToken');
+    const token = localStorage.getItem('jwt_token');
     const userData = localStorage.getItem('userData');
 
     if (token && userData) {
-      const user = JSON.parse(userData);
-      this.isLoggedIn = true;
-      this.userName = user.name;
-      this.userEmail = user.email;
+      // Check if token is still valid
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        const currentTime = Math.floor(Date.now() / 1000);
+
+        if (payload.exp > currentTime) {
+          const user = JSON.parse(userData);
+          this.isLoggedIn = true;
+          this.userName = user.name;
+          this.userEmail = user.email;
+        } else {
+          // Token expired, clear it
+          localStorage.removeItem('jwt_token');
+          localStorage.removeItem('userData');
+        }
+      } catch (error) {
+        // Invalid token, clear it
+        localStorage.removeItem('jwt_token');
+        localStorage.removeItem('userData');
+      }
     }
   }
 
@@ -373,7 +389,7 @@ export class Tab4Page implements OnInit {
 
   private performLogout() {
     // Clear auth data
-    localStorage.removeItem('authToken');
+    localStorage.removeItem('jwt_token');
     localStorage.removeItem('userData');
 
     // Keep remember me data if it was set

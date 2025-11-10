@@ -8,8 +8,8 @@ import { ToastController } from '@ionic/angular';
 import { environment } from '../../environments/environment';
 
 // Environment configuration
-const API_BASE_URL = 'https://backend-app-x7k2.zeabur.app/'; // Force HTTPS production URL for testing
-// const API_BASE_URL = environment.apiUrl; // Original environment-based URL
+// const API_BASE_URL = 'https://backend-app-x7k2.zeabur.app/'; // Force HTTPS production URL for testing
+const API_BASE_URL = environment.apiUrl; // Original environment-based URL
 
 interface Product {
   id_producto: number;

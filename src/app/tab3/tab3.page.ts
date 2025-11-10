@@ -9,8 +9,8 @@ import { CommonModule } from '@angular/common';
 import { ToastController } from '@ionic/angular';
 
 // Environment configuration
-const API_BASE_URL = 'http://localhost:5000'; // Localhost URL for development
-// const API_BASE_URL = 'https://backend-app-x7k2.zeabur.app/'; // Production URL
+// const API_BASE_URL = 'http://localhost:5000'; // Localhost URL for development
+const API_BASE_URL = 'https://backend-app-x7k2.zeabur.app/'; // Production URL
 
 interface CartItem {
   id: number;
