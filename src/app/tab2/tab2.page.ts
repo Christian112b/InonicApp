@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonIcon, IonButtons } from '@ionic/angular/standalone';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonIcon, IonButtons, IonSpinner } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { cube, gift, restaurant, leaf, star, snow, cart, addCircle } from 'ionicons/icons';
 import { HttpClient } from '@angular/common/http';
@@ -35,7 +35,7 @@ interface Product {
   selector: 'app-tab2',
   templateUrl: 'tab2.page.html',
   styleUrls: ['tab2.page.scss'],
-  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonIcon, CommonModule]
+  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonIcon, IonSpinner, CommonModule]
 })
 export class Tab2Page implements OnInit {
   public allProducts: Product[] = [];
@@ -96,6 +96,8 @@ export class Tab2Page implements OnInit {
         this.connectionStatus = '✅ Datos cargados desde caché';
         this.connectionStatusColor = '#28a745';
         this.hasConnectionError = false;
+        console.log('🗂️ Fuente de datos: CACHÉ LOCAL');
+        console.log('📦 Total productos desde caché:', this.allProducts.length);
         return;
       } catch (error) {
         console.warn('Error parsing cached products, fetching from API:', error);
@@ -123,6 +125,8 @@ export class Tab2Page implements OnInit {
         console.log('✅ Respuesta completa de la API:', response);
         console.log('📦 Productos recibidos:', response.productos?.length || 0);
         console.log('🏷️ Categorías recibidas:', response.categorias?.length || 0);
+        console.log('🗂️ Fuente de datos: API (no caché)');
+        console.log('📦 Total productos desde API:', response.productos?.length || 0);
         this.isLoading = false;
         this.hasConnectionError = false;
         this.connectionStatus = '✅ Conectado - Datos cargados';
@@ -131,6 +135,7 @@ export class Tab2Page implements OnInit {
         this.categories = response.categorias;
 
         // Cache the products and categories
+        console.log('💾 Guardando productos en caché local');
         localStorage.setItem('cachedProducts', JSON.stringify(response.productos));
         localStorage.setItem('cachedCategories', JSON.stringify(response.categorias));
 
@@ -170,6 +175,7 @@ export class Tab2Page implements OnInit {
         this.hasConnectionError = true;
         this.connectionStatus = 'Usando datos locales (sin conexión)';
         this.connectionStatusColor = '#ffc107'; // Yellow
+        console.log('🗂️ Fuente de datos: DATOS DE RESPALDO (fallback)');
 
         this.allProducts = [
           {
@@ -275,6 +281,41 @@ export class Tab2Page implements OnInit {
     if (name.includes('figura')) return 'star';
     if (name.includes('menta') || name.includes('blanca')) return 'snow';
     return 'cube';
+  }
+
+  getImageSrc(product: Product): string | null {
+    if (product.imagen_base64) {
+      try {
+        // Clean the base64 string by removing whitespace and invalid characters
+        let cleanedBase64 = product.imagen_base64.replace(/\s/g, '');
+        // Remove data URL prefix if present (e.g., "data:image/png;base64,")
+        const dataUrlMatch = cleanedBase64.match(/^data:image\/[^;]+;base64,/);
+        if (dataUrlMatch) {
+          cleanedBase64 = cleanedBase64.substring(dataUrlMatch[0].length);
+        }
+        // Remove any non-base64 characters (keep only A-Z, a-z, 0-9, +, /, =)
+        cleanedBase64 = cleanedBase64.replace(/[^A-Za-z0-9+/=]/g, '');
+        // Ensure proper padding
+        while (cleanedBase64.length % 4 !== 0) {
+          cleanedBase64 += '=';
+        }
+        // Return the cleaned base64 data URL
+        return 'data:image/jpeg;base64,' + cleanedBase64;
+      } catch (e) {
+        console.error('Error processing base64 image data for product:', product.nombre, e);
+      }
+    }
+    if (product.imagen) {
+      return product.imagen;
+    }
+    return null;
+  }
+
+  onImageError(event: Event) {
+    const imgElement = event.target as HTMLImageElement;
+    console.warn('Image failed to load:', imgElement.src);
+    // Hide the broken image
+    imgElement.style.display = 'none';
   }
 
   // Cart functionality

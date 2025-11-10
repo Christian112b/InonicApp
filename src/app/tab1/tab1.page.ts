@@ -1,5 +1,5 @@
 import { Component, AfterViewInit, OnDestroy } from '@angular/core';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonIcon } from '@ionic/angular/standalone';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonIcon, IonSpinner, IonButton } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { cube, gift, restaurant, leaf, star, snow, cart } from 'ionicons/icons';
 import { HttpClient } from '@angular/common/http';
@@ -27,7 +27,7 @@ interface Product {
   selector: 'app-tab1',
   templateUrl: 'tab1.page.html',
   styleUrls: ['tab1.page.scss'],
-  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonIcon, CommonModule]
+  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonIcon, IonSpinner, IonButton, CommonModule]
 })
 export class Tab1Page implements AfterViewInit, OnDestroy {
   private currentSlide = 0;
@@ -35,6 +35,9 @@ export class Tab1Page implements AfterViewInit, OnDestroy {
   private slides: NodeListOf<Element> | null = null;
   private dots: NodeListOf<Element> | null = null;
   public favoriteProducts: Product[] = [];
+  public isLoadingProducts = false;
+  public hasError = false;
+  public errorMessage = '';
   public slideImages: string[] = [
     'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDQwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRjVGNUU2Ii8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IiM4QjQ1MTMiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkNhZsOpcyAyWDE8L3RleHQ+Cjwvc3ZnPg==',
     'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDQwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRkZGRkZGIi8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IiNEREI3NjMiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkR1bGNlcyBBcnRlc2FuYWxlczwvdGV4dD4KPC9zdmc+',
@@ -168,6 +171,10 @@ export class Tab1Page implements AfterViewInit, OnDestroy {
   }
 
   private loadFavoriteProducts() {
+    this.isLoadingProducts = true;
+    this.hasError = false;
+    this.errorMessage = '';
+
     // Check if products are already cached
     const cachedProducts = localStorage.getItem('cachedProducts');
     const cachedCategories = localStorage.getItem('cachedCategories');
@@ -178,6 +185,7 @@ export class Tab1Page implements AfterViewInit, OnDestroy {
         // Get first 6 products as favorites (you can modify this logic)
         this.favoriteProducts = products.slice(0, 6);
         console.log('Productos cargados desde cache:', this.favoriteProducts);
+        this.isLoadingProducts = false;
         return;
       } catch (error) {
         console.warn('Error parsing cached products, fetching from API:', error);
@@ -203,6 +211,7 @@ export class Tab1Page implements AfterViewInit, OnDestroy {
 
         // Get first 6 products as favorites (you can modify this logic)
         this.favoriteProducts = response.productos.slice(0, 6);
+        this.isLoadingProducts = false;
       },
       error: (error) => {
         console.error('❌ Error loading products (tab1):', error);
@@ -212,41 +221,21 @@ export class Tab1Page implements AfterViewInit, OnDestroy {
           url: apiUrl,
           message: error.message
         });
-        this.showToast('Error al cargar productos desde el servidor. Mostrando datos de respaldo.', 'error');
+
+        this.isLoadingProducts = false;
+        this.hasError = true;
+        this.errorMessage = error.status ? `Error ${error.status}: ${error.statusText || 'Sin descripción'}` : `Error: ${error.message || 'Desconocido'}`;
+        this.showToast('Error al cargar productos desde el servidor.', 'error');
+
         // Keep the placeholder products if API fails
         this.favoriteProducts = [];
-        // For now, let's add some mock data so you can see the layout working
-        this.favoriteProducts = [
-          {
-            id_producto: 1,
-            nombre: 'Tornillo',
-            descripcion: 'Delicioso chocolate macizo con leche',
-            categoria: 'Chocolates',
-            precio_unitario: 25.00,
-            activo: 1,
-            stock: 10
-          },
-          {
-            id_producto: 2,
-            nombre: 'Princesa Surtida',
-            descripcion: 'Bombón de chocolate amargo relleno de fondant y jalea',
-            categoria: 'Bombones',
-            precio_unitario: 30.00,
-            activo: 1,
-            stock: 15
-          },
-          {
-            id_producto: 3,
-            nombre: 'Duquesa',
-            descripcion: 'Irresistible sandwich de galleta con jalea y chocolate',
-            categoria: 'Galletas',
-            precio_unitario: 28.00,
-            activo: 1,
-            stock: 8
-          }
-        ];
       }
     });
+  }
+
+  retryLoadProducts() {
+    console.log('Retrying to load products...');
+    this.loadFavoriteProducts();
   }
 
   addToCart(product: Product) {
@@ -289,6 +278,41 @@ export class Tab1Page implements AfterViewInit, OnDestroy {
     if (name.includes('figura')) return 'star';
     if (name.includes('menta') || name.includes('blanca')) return 'snow';
     return 'cube'; // default
+  }
+
+  getImageSrc(product: Product): string | null {
+    if (product.imagen_base64) {
+      try {
+        // Clean the base64 string by removing whitespace and invalid characters
+        let cleanedBase64 = product.imagen_base64.replace(/\s/g, '');
+        // Remove data URL prefix if present (e.g., "data:image/png;base64,")
+        const dataUrlMatch = cleanedBase64.match(/^data:image\/[^;]+;base64,/);
+        if (dataUrlMatch) {
+          cleanedBase64 = cleanedBase64.substring(dataUrlMatch[0].length);
+        }
+        // Remove any non-base64 characters (keep only A-Z, a-z, 0-9, +, /, =)
+        cleanedBase64 = cleanedBase64.replace(/[^A-Za-z0-9+/=]/g, '');
+        // Ensure proper padding
+        while (cleanedBase64.length % 4 !== 0) {
+          cleanedBase64 += '=';
+        }
+        // Return the cleaned base64 data URL
+        return 'data:image/jpeg;base64,' + cleanedBase64;
+      } catch (e) {
+        console.error('Error processing base64 image data for product:', product.nombre, e);
+      }
+    }
+    if (product.imagen) {
+      return product.imagen;
+    }
+    return null;
+  }
+
+  onImageError(event: Event) {
+    const imgElement = event.target as HTMLImageElement;
+    console.warn('Image failed to load:', imgElement.src);
+    // Hide the broken image
+    imgElement.style.display = 'none';
   }
 
   getSlideBackground(index: number): string {

@@ -8,8 +8,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 9999;
   padding: 16px;
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
 }
 
 .checkout-modal {
@@ -22,6 +24,9 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  transform: scale(1);
+  transition: transform 0.3s ease-out;
 }
 
 .modal-header {
@@ -309,5 +314,24 @@ ion-radio-group ion-item ion-icon {
 
   .modal-footer ion-button {
     width: 100%;
+  }
+}
+
+// Mobile-specific fixes
+@media screen and (max-width: 768px) {
+  .checkout-modal-overlay {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-perspective: 1000;
+    perspective: 1000;
+  }
+
+  .checkout-modal {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
   }
 }

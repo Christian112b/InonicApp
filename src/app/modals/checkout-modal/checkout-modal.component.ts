@@ -85,6 +85,8 @@ export class CheckoutModalComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    console.log('🛒 Checkout modal initialized');
+
     // Small delay to ensure token is available
     setTimeout(() => {
       this.loadAddresses();
@@ -265,6 +267,7 @@ export class CheckoutModalComponent implements OnInit, OnDestroy {
   }
 
   close() {
+    console.log('🛒 Closing checkout modal');
     this.closeModal.emit();
   }
 }

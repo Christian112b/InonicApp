@@ -250,8 +250,18 @@ export class Tab3Page implements OnInit, OnDestroy {
       return;
     }
 
+    // Debug: Check if modal is being triggered
+    console.log('🛒 Opening checkout modal...');
+    console.log('Cart items:', this.cartItems.length);
+    console.log('Cart total:', this.cartTotal);
+
     // Open checkout modal
     this.showCheckoutModal = true;
+
+    // Debug: Confirm modal state after opening
+    setTimeout(() => {
+      console.log('Modal showCheckoutModal state:', this.showCheckoutModal);
+    }, 100);
   }
 
   onCheckoutComplete(result: any) {

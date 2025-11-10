@@ -8,8 +8,28 @@
 
 <ion-content [fullscreen]="true">
 
-  <!-- Promotional Slider -->
-  <div class="promo-slider">
+   <!-- Loading State -->
+   <div class="loading-container" *ngIf="isLoadingProducts" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px; gap: 16px;">
+     <ion-spinner name="crescent" style="color: #8B4513;"></ion-spinner>
+     <p style="margin: 0; color: #8B4513; font-weight: 500;">Cargando productos...</p>
+   </div>
+
+   <!-- Error State -->
+   <div class="error-container" *ngIf="!isLoadingProducts && hasError" style="text-align: center; padding: 60px 20px; color: #666;">
+     <div style="font-size: 64px; color: #ff6b6b; margin-bottom: 16px;">⚠️</div>
+     <h3 style="margin: 0 0 8px 0; color: #333; font-size: 20px;">Error al cargar productos</h3>
+     <p style="margin: 0 0 16px 0; font-size: 14px;">{{ errorMessage }}</p>
+     <ion-button fill="solid" (click)="retryLoadProducts()" style="--border-radius: 10px; height: 44px;">
+       <ion-icon name="refresh" slot="start"></ion-icon>
+       Reintentar
+     </ion-button>
+   </div>
+
+   <!-- Content (only show when loaded and no error) -->
+   <div *ngIf="!isLoadingProducts && !hasError">
+
+   <!-- Promotional Slider -->
+   <div class="promo-slider">
     <div class="slider-container">
       <div class="slide active" [style.background-image]="getSlideBackground(0)" [style.background-size]="'cover'" [style.background-position]="'center'">
         <div class="slide-overlay" style="background: linear-gradient(135deg, rgba(139, 69, 19, 0.7), rgba(160, 82, 45, 0.8));"></div>
@@ -52,9 +72,8 @@
       <div class="favoritos-grid">
         <div class="product-card" *ngFor="let product of favoriteProducts">
           <div class="product-image">
-            <img *ngIf="product.imagen_base64" [src]="'data:image/jpeg;base64,' + product.imagen_base64" alt="{{ product.nombre }}">
-            <img *ngIf="product.imagen && !product.imagen_base64" [src]="product.imagen" alt="{{ product.nombre }}">
-            <div class="product-placeholder" *ngIf="!product.imagen && !product.imagen_base64">
+            <img *ngIf="getImageSrc(product)" [src]="getImageSrc(product)" alt="{{ product.nombre }}" (error)="onImageError($event)">
+            <div class="product-placeholder" *ngIf="!getImageSrc(product)">
               <ion-icon [name]="getProductIcon(product.nombre)"></ion-icon>
             </div>
             <div class="product-overlay">
@@ -72,5 +91,7 @@
       </div>
     </div>
   </div>
+
+  </div> <!-- End of content wrapper -->
 
 </ion-content>
