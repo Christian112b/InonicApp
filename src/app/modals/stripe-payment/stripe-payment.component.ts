@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter, ElementRef, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
-import { IonButton } from '@ionic/angular/standalone';
+import { IonButton, IonIcon } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
 import { loadStripe, Stripe, StripeElements, StripeCardElement } from '@stripe/stripe-js';
 import { environment } from '../../../environments/environment';
@@ -8,7 +8,7 @@ import { environment } from '../../../environments/environment';
   selector: 'app-stripe-payment',
   templateUrl: './stripe-payment.component.html',
   styleUrls: ['./stripe-payment.component.scss'],
-  imports: [IonButton, CommonModule]
+  imports: [IonButton, IonIcon, CommonModule]
 })
 export class StripePaymentComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() amount: number = 0; // Amount in cents
@@ -22,52 +22,77 @@ export class StripePaymentComponent implements OnInit, AfterViewInit, OnDestroy 
   private card: StripeCardElement | null = null;
 
   isLoading = false;
+  isInitializingCard = true;
   errorMessage = '';
 
   async ngOnInit() {
+    console.time('Stripe-Init');
     try {
       // Load Stripe
       this.stripe = await loadStripe(environment.stripePublishableKey);
       if (!this.stripe) {
         throw new Error('Stripe failed to initialize');
       }
+      console.timeEnd('Stripe-Init');
     } catch (error) {
+      console.timeEnd('Stripe-Init');
       console.error('Error loading Stripe:', error);
       this.errorMessage = 'Error al cargar Stripe';
     }
   }
 
   async ngAfterViewInit() {
-    if (this.stripe && this.cardElement) {
-      // Create elements
-      this.elements = this.stripe.elements();
+    console.time('Stripe-Elements');
 
-      // Create card element
-      this.card = this.elements.create('card', {
-        style: {
-          base: {
-            fontSize: '16px',
-            color: '#32325d',
-            fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
-            '::placeholder': {
-              color: '#aab7c4'
+    // Wait a bit for Stripe to be fully loaded
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+    if (this.stripe && this.cardElement) {
+      try {
+        // Create elements
+        this.elements = this.stripe.elements();
+
+        // Create card element
+        this.card = this.elements.create('card', {
+          style: {
+            base: {
+              fontSize: '16px',
+              color: '#32325d',
+              fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
+              '::placeholder': {
+                color: '#aab7c4'
+              }
             }
           }
-        }
-      });
+        });
 
-      // Mount the card element
-      this.card.mount(this.cardElement.nativeElement);
+        // Mount the card element
+        this.card.mount(this.cardElement.nativeElement);
 
-      // Listen for changes
-      this.card.on('change', (event) => {
-        if (event.error) {
-          this.errorMessage = event.error.message;
-        } else {
-          this.errorMessage = '';
-        }
-      });
+        // Listen for changes
+        this.card.on('change', (event) => {
+          if (event.error) {
+            this.errorMessage = event.error.message;
+          } else {
+            this.errorMessage = '';
+          }
+        });
+
+        console.log('Stripe card element mounted successfully');
+        this.isInitializingCard = false;
+      } catch (error) {
+        console.error('Error mounting Stripe card element:', error);
+        this.errorMessage = 'Error al inicializar el formulario de tarjeta';
+        this.isInitializingCard = false;
+      }
+    } else {
+      console.warn('Stripe or card element not available');
+      if (!this.stripe) {
+        this.errorMessage = 'Stripe no está disponible';
+      }
+      this.isInitializingCard = false;
     }
+    console.timeEnd('Stripe-Elements');
   }
 
   ngOnDestroy() {
@@ -77,8 +102,13 @@ export class StripePaymentComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   async processPayment() {
-    if (!this.stripe || !this.card) {
-      this.paymentError.emit('Stripe no está inicializado');
+    if (!this.stripe) {
+      this.paymentError.emit('Stripe no está inicializado. Verifica tu conexión a internet o desactiva extensiones de bloqueo de anuncios.');
+      return;
+    }
+
+    if (!this.card) {
+      this.paymentError.emit('El formulario de tarjeta no está listo. Inténtalo de nuevo.');
       return;
     }
 

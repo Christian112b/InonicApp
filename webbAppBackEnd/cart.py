@@ -126,16 +126,13 @@ def getItemsCart():
 
     db.close()
 
-    # Agregar encabezado base64 a cada imagen
+    # Agregar imagen default a cada item
     items = []
     for item in raw_items:
-        imagen_base64 = item['image']
-        imagen_final = f"data:image/png;base64,{imagen_base64}" if imagen_base64 else None
-
         items.append({
             'id': item['id'],
             'name': item['name'],
-            'image': imagen_final,
+            'image': '/assets/img/costanzo.png',  # Usar imagen default
             'price': item['price'],
             'quantity': item['cantidad']
         })

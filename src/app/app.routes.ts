@@ -12,5 +12,17 @@ export const routes: Routes = [
     path: 'tab5',
     loadComponent: () => import('./tab5/tab5.page').then( m => m.Tab5Page)
   },
+  {
+    path: 'privacy-policy',
+    loadComponent: () => import('./privacy-policy/privacy-policy.page').then( m => m.PrivacyPolicyPage)
+  },
+  {
+    path: 'returns-policy',
+    loadComponent: () => import('./returns-policy/returns-policy.page').then( m => m.ReturnsPolicyPage)
+  },
+  {
+    path: 'terms-of-service',
+    loadComponent: () => import('./terms-of-service/terms-of-service.page').then( m => m.TermsOfServicePage)
+  },
 
 ];

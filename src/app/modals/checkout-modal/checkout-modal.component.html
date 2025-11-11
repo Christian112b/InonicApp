@@ -1,12 +1,7 @@
 <!-- Checkout Modal Overlay -->
 <div class="checkout-modal-overlay" *ngIf="true" (click)="close()">
   <div class="checkout-modal" (click)="$event.stopPropagation()">
-    <!-- Debug Info -->
-    <div style="position: absolute; top: 5px; right: 5px; background: rgba(0,255,0,0.9); color: white; padding: 10px; border-radius: 5px; font-size: 12px; z-index: 10001; border: 2px solid red;">
-      <strong>MODAL IS VISIBLE</strong><br>
-      Active Tab: {{ activeTab }}<br>
-      Can Proceed: {{ canProceed() }}
-    </div>
+
     <!-- Header with Tabs -->
     <div class="modal-header">
       <div class="tab-buttons">
@@ -128,9 +123,11 @@
             </ion-item>
           </div>
 
-          <ion-button expand="block" (click)="saveNewAddress()" style="margin-top: 16px;">
-            <ion-icon name="checkmark" slot="start"></ion-icon>
-            Guardar Dirección
+          <ion-button expand="block" (click)="saveNewAddress()" [disabled]="isSavingAddress" style="margin-top: 16px;">
+            <ion-icon name="checkmark" slot="start" *ngIf="!isSavingAddress"></ion-icon>
+            <ion-spinner name="crescent" *ngIf="isSavingAddress"></ion-spinner>
+            <span *ngIf="!isSavingAddress">Guardar Dirección</span>
+            <span *ngIf="isSavingAddress">Guardando...</span>
           </ion-button>
         </div>
       </div>
@@ -140,33 +137,33 @@
         <h3>Método de Pago</h3>
 
         <ion-radio-group [(ngModel)]="selectedPaymentMethod">
-           <ion-item>
-             <ion-radio value="1" slot="start"></ion-radio>
-             <ion-icon name="card" slot="start" style="margin-right: 8px;"></ion-icon>
-             <ion-label>
-               <strong>Tarjeta de Crédito/Débito</strong>
-               <p>Pago seguro con Stripe</p>
-             </ion-label>
-           </ion-item>
+            <ion-item (click)="selectedPaymentMethod = '1'" [class.selected]="selectedPaymentMethod === '1'">
+              <ion-radio value="1" slot="start"></ion-radio>
+              <ion-icon name="card" slot="start" style="margin-right: 8px;"></ion-icon>
+              <ion-label>
+                <strong>Tarjeta de Crédito/Débito</strong>
+                <p>Pago seguro con Stripe</p>
+              </ion-label>
+            </ion-item>
 
-           <ion-item>
-             <ion-radio value="4" slot="start"></ion-radio>
-             <ion-icon name="business" slot="start" style="margin-right: 8px;"></ion-icon>
-             <ion-label>
-               <strong>Transferencia Bancaria</strong>
-               <p>Pago por depósito o transferencia</p>
-             </ion-label>
-           </ion-item>
+            <ion-item (click)="selectedPaymentMethod = '4'" [class.selected]="selectedPaymentMethod === '4'">
+              <ion-radio value="4" slot="start"></ion-radio>
+              <ion-icon name="business" slot="start" style="margin-right: 8px;"></ion-icon>
+              <ion-label>
+                <strong>Transferencia Bancaria</strong>
+                <p>Pago por depósito o transferencia</p>
+              </ion-label>
+            </ion-item>
 
-           <ion-item>
-             <ion-radio value="5" slot="start"></ion-radio>
-             <ion-icon name="cash" slot="start" style="margin-right: 8px;"></ion-icon>
-             <ion-label>
-               <strong>Efectivo en Tienda</strong>
-               <p>Pago contra entrega en tienda</p>
-             </ion-label>
-           </ion-item>
-         </ion-radio-group>
+            <ion-item (click)="selectedPaymentMethod = '5'" [class.selected]="selectedPaymentMethod === '5'">
+              <ion-radio value="5" slot="start"></ion-radio>
+              <ion-icon name="cash" slot="start" style="margin-right: 8px;"></ion-icon>
+              <ion-label>
+                <strong>Efectivo en Tienda</strong>
+                <p>Pago contra entrega en tienda</p>
+              </ion-label>
+            </ion-item>
+          </ion-radio-group>
 
          <!-- Stripe Payment Form -->
          <div *ngIf="showStripeForm" class="stripe-form-container" style="margin-top: 20px; padding: 16px; background: #f8f9fa; border-radius: 8px;">
@@ -202,7 +199,7 @@
             <span>Descuento:</span>
             <span style="color: #dc3545;">-${{ discount.toFixed(2) }}</span>
           </div>
-          <div class="summary-row final">
+          <div class="summary-row final" style="color: white;">
             <span>Total a pagar:</span>
             <span>${{ getFinalTotal().toFixed(2) }}</span>
           </div>
@@ -211,48 +208,87 @@
 
       <!-- Tab 3: Confirmación -->
       <div *ngIf="activeTab === 3" class="tab-panel">
-        <h3>Confirmar Pedido</h3>
+        <div class="confirmation-header">
+          <ion-icon name="checkmark-circle" class="success-icon"></ion-icon>
+          <h3>Confirmar Pedido</h3>
+          <p class="confirmation-subtitle">Revisa los detalles antes de finalizar tu compra</p>
+        </div>
 
         <div class="confirmation-summary">
           <div class="confirm-section">
-            <h4>Productos</h4>
-            <div *ngFor="let item of cartItems" class="confirm-item">
-              <span>{{ item.name }} ({{ item.quantity }}×)</span>
-              <span>${{ (item.price * item.quantity).toFixed(2) }}</span>
+            <div class="section-header">
+              <ion-icon name="bag" class="section-icon"></ion-icon>
+              <h4>Productos</h4>
+            </div>
+            <div class="products-list">
+              <div *ngFor="let item of cartItems" class="confirm-item">
+                <div class="item-info">
+                  <span class="item-name">{{ item.name }}</span>
+                  <span class="item-quantity">{{ item.quantity }}×</span>
+                </div>
+                <span class="item-price">${{ (item.price * item.quantity).toFixed(2) }}</span>
+              </div>
             </div>
           </div>
 
           <div class="confirm-section" *ngIf="selectedAddress">
-            <h4>Dirección de Envío</h4>
+            <div class="section-header">
+              <ion-icon name="location" class="section-icon"></ion-icon>
+              <h4>Dirección de Envío</h4>
+            </div>
             <div class="address-display">
-              <strong>{{ selectedAddress.alias }}</strong><br>
-              {{ selectedAddress.calle }}, {{ selectedAddress.colonia }}<br>
-              {{ selectedAddress.ciudad }}, {{ selectedAddress.estado }}<br>
-              CP: {{ selectedAddress.cp }}
+              <div class="address-alias">{{ selectedAddress.alias }}</div>
+              <div class="address-details">
+                {{ selectedAddress.calle }}, {{ selectedAddress.colonia }}<br>
+                {{ selectedAddress.ciudad }}, {{ selectedAddress.estado }}<br>
+                <span class="postal-code">CP: {{ selectedAddress.cp }}</span>
+              </div>
             </div>
           </div>
 
           <div class="confirm-section">
-            <h4>Método de Pago</h4>
+            <div class="section-header">
+              <ion-icon name="card" class="section-icon"></ion-icon>
+              <h4>Método de Pago</h4>
+            </div>
             <div class="payment-display">
-              <span *ngIf="selectedPaymentMethod === '1'">💳 Tarjeta de Crédito/Débito</span>
-              <span *ngIf="selectedPaymentMethod === '4'">🏦 Transferencia Bancaria</span>
-              <span *ngIf="selectedPaymentMethod === '5'">💵 Efectivo en Tienda</span>
+              <div class="payment-method" *ngIf="selectedPaymentMethod === '1'">
+                <ion-icon name="card" class="payment-icon"></ion-icon>
+                <span>Tarjeta de Crédito/Débito</span>
+              </div>
+              <div class="payment-method" *ngIf="selectedPaymentMethod === '4'">
+                <ion-icon name="business" class="payment-icon"></ion-icon>
+                <span>Transferencia Bancaria</span>
+              </div>
+              <div class="payment-method" *ngIf="selectedPaymentMethod === '5'">
+                <ion-icon name="cash" class="payment-icon"></ion-icon>
+                <span>Efectivo en Tienda</span>
+              </div>
             </div>
           </div>
 
           <div class="confirm-totals">
-            <div class="total-row">
-              <span>Subtotal:</span>
-              <span>${{ getSubtotal().toFixed(2) }}</span>
+            <div class="totals-header">
+              <ion-icon name="calculator" class="totals-icon"></ion-icon>
+              <h4>Resumen de Pago</h4>
             </div>
-            <div class="total-row">
-              <span>IVA (16%):</span>
-              <span>${{ getIVA().toFixed(2) }}</span>
-            </div>
-            <div class="total-row final">
-              <span>Total:</span>
-              <span>${{ getFinalTotal().toFixed(2) }}</span>
+            <div class="totals-breakdown">
+              <div class="total-row">
+                <span>Subtotal:</span>
+                <span>${{ getSubtotal().toFixed(2) }}</span>
+              </div>
+              <div class="total-row">
+                <span>IVA (16%):</span>
+                <span>${{ getIVA().toFixed(2) }}</span>
+              </div>
+              <div class="total-row" *ngIf="discount > 0">
+                <span>Descuento:</span>
+                <span class="discount-amount">-${{ discount.toFixed(2) }}</span>
+              </div>
+              <div class="total-row final">
+                <span>Total a pagar:</span>
+                <span class="final-amount">${{ getFinalTotal().toFixed(2) }}</span>
+              </div>
             </div>
           </div>
         </div>

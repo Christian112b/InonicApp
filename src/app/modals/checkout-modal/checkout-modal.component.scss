@@ -171,6 +171,11 @@
   color: #8B4513;
 }
 
+// Override for confirmation totals section
+.confirm-totals .total-row.final {
+  color: white;
+}
+
 // Addresses
 .addresses-list {
   display: flex;
@@ -237,6 +242,19 @@ ion-radio-group ion-item {
   --padding-start: 16px;
   --inner-padding-end: 16px;
   margin-bottom: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+ion-radio-group ion-item:hover {
+  background: #fef7f0;
+  border-color: #8B4513;
+}
+
+ion-radio-group ion-item.selected {
+  background: #fef7f0;
+  border: 2px solid #8B4513;
+  box-shadow: 0 2px 8px rgba(139, 69, 19, 0.1);
 }
 
 ion-radio-group ion-item ion-icon {
@@ -244,25 +262,193 @@ ion-radio-group ion-item ion-icon {
 }
 
 // Confirmation
+.confirmation-header {
+  text-align: center;
+  margin-bottom: 24px;
+  padding: 20px;
+  background: linear-gradient(135deg, #fef7f0 0%, #f8f9fa 100%);
+  border-radius: 12px;
+  border: 1px solid #e9ecef;
+}
+
+.success-icon {
+  font-size: 48px;
+  color: #28a745;
+  margin-bottom: 12px;
+}
+
+.confirmation-header h3 {
+  margin: 0 0 8px 0;
+  color: #8B4513;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.confirmation-subtitle {
+  margin: 0;
+  color: #666;
+  font-size: 14px;
+}
+
 .confirmation-summary {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
 }
 
 .confirm-section {
-  background: #f8f9fa;
-  padding: 16px;
-  border-radius: 8px;
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid #e9ecef;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s ease;
+}
+
+.confirm-section:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.section-icon {
+  font-size: 20px;
+  color: #8B4513;
 }
 
 .confirm-section h4 {
-  margin: 0 0 12px 0;
+  margin: 0;
   color: #8B4513;
-  font-size: 16px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.products-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .confirm-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.item-name {
+  font-weight: 500;
+  color: #333;
+  font-size: 14px;
+}
+
+.item-quantity {
+  color: #666;
+  font-size: 12px;
+}
+
+.item-price {
+  font-weight: 600;
+  color: #8B4513;
+  font-size: 14px;
+}
+
+.address-display {
+  line-height: 1.5;
+}
+
+.address-alias {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8px;
+  font-size: 16px;
+}
+
+.address-details {
+  color: #666;
+  font-size: 14px;
+}
+
+.postal-code {
+  color: #8B4513;
+  font-weight: 500;
+}
+
+.payment-display {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.payment-method {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  color: #333;
+}
+
+.payment-icon {
+  font-size: 20px;
+  color: #8B4513;
+}
+
+.confirm-totals {
+  background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+  color: white;
+  padding: 20px;
+  border-radius: 12px;
+  border: none;
+}
+
+.totals-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.totals-icon {
+  font-size: 20px;
+  color: #FFD700;
+}
+
+.confirm-totals h4 {
+  margin: 0;
+  color: white;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.totals-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.total-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -270,9 +456,14 @@ ion-radio-group ion-item ion-icon {
   font-size: 14px;
 }
 
-.address-display, .payment-display {
-  font-size: 14px;
-  line-height: 1.4;
+.discount-amount {
+  color: #FFD700 !important;
+}
+
+.final-amount {
+  font-size: 18px;
+  font-weight: 700;
+  color: #FFD700;
 }
 
 // Modal footer

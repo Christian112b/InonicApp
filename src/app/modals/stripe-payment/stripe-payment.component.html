@@ -1,18 +1,28 @@
 <div class="stripe-payment-container">
   <div class="card-element-container">
-    <div #cardElement class="card-element"></div>
+    <div *ngIf="isInitializingCard" class="card-loading">
+      <ion-icon name="card-outline"></ion-icon>
+      <span>Cargando formulario de tarjeta...</span>
+    </div>
+    <div #cardElement class="card-element" [class.hidden]="isInitializingCard"></div>
   </div>
 
-  <div *ngIf="errorMessage" class="error-message">
+  <div *ngIf="!stripe" class="warning-message">
+    <ion-icon name="warning-outline"></ion-icon>
+    Stripe no se pudo cargar. Verifica tu conexión a internet o desactiva extensiones de bloqueo de anuncios.
+  </div>
+
+  <div *ngIf="errorMessage && stripe" class="error-message">
     {{ errorMessage }}
   </div>
 
   <ion-button
     expand="block"
     (click)="processPayment()"
-    [disabled]="isLoading || !stripe"
+    [disabled]="isLoading || !stripe || isInitializingCard"
     class="payment-button">
-    <span *ngIf="!isLoading">Procesar Pago</span>
+    <span *ngIf="!isLoading && !isInitializingCard">Procesar Pago</span>
     <span *ngIf="isLoading">Procesando...</span>
+    <span *ngIf="isInitializingCard && !isLoading">Inicializando...</span>
   </ion-button>
 </div>

@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, Input, Output, EventEmitter } from '@angular/core';
-import { IonButton, IonIcon, IonInput, IonItem, IonLabel, IonRadioGroup, IonRadio } from '@ionic/angular/standalone';
+import { IonButton, IonIcon, IonInput, IonItem, IonLabel, IonRadioGroup, IonRadio, IonSpinner } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { close, card, cash, business, checkmark, add, remove } from 'ionicons/icons';
+import { close, card, cash, business, checkmark, add, remove, checkmarkCircle, bag, location, calculator } from 'ionicons/icons';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -31,7 +31,7 @@ interface Address {
   selector: 'app-checkout-modal',
   templateUrl: './checkout-modal.component.html',
   styleUrls: ['./checkout-modal.component.scss'],
-  imports: [IonButton, IonIcon, IonInput, IonItem, IonLabel, IonRadioGroup, IonRadio, CommonModule, FormsModule, StripePaymentComponent]
+  imports: [IonButton, IonIcon, IonInput, IonItem, IonLabel, IonRadioGroup, IonRadio, IonSpinner, CommonModule, FormsModule, StripePaymentComponent]
 })
 export class CheckoutModalComponent implements OnInit, OnDestroy {
   @Input() cartItems: CartItem[] = [];
@@ -78,14 +78,16 @@ export class CheckoutModalComponent implements OnInit, OnDestroy {
   // Loading states
   isLoadingAddresses = false;
   isProcessingPayment = false;
+  isSavingAddress = false;
   showNewAddressForm = false;
 
   constructor(private http: HttpClient, private cartService: CartService) {
-    addIcons({ close, card, cash, business, checkmark, add, remove });
+    addIcons({ close, card, cash, business, checkmark, add, remove, checkmarkCircle, bag, location, calculator });
   }
 
   ngOnInit() {
     console.log('🛒 Checkout modal initialized');
+    console.time('CheckoutModal-Init');
 
     // Small delay to ensure token is available
     setTimeout(() => {
@@ -136,30 +138,78 @@ export class CheckoutModalComponent implements OnInit, OnDestroy {
   }
 
   saveNewAddress() {
-    if (!this.newAddress.alias || !this.newAddress.street || !this.newAddress.postalCode) {
+    // Validación completa de campos requeridos
+    if (!this.newAddress.alias?.trim() ||
+        !this.newAddress.street?.trim() ||
+        !this.newAddress.neighborhood?.trim() ||
+        !this.newAddress.city?.trim() ||
+        !this.newAddress.state?.trim() ||
+        !this.newAddress.postalCode) {
+      alert('Por favor complete todos los campos requeridos');
+      return;
+    }
+
+    // Validación del código postal (5 dígitos)
+    const postalCodeStr = String(this.newAddress.postalCode || '').trim();
+    if (postalCodeStr.length !== 5 || !/^\d{5}$/.test(postalCodeStr)) {
+      alert('El código postal debe tener exactamente 5 dígitos');
+      return;
+    }
+
+    // Validación de longitud máxima
+    if (this.newAddress.alias.length > 50 ||
+        this.newAddress.street.length > 100 ||
+        this.newAddress.neighborhood.length > 100 ||
+        this.newAddress.city.length > 100 ||
+        this.newAddress.state.length > 100 ||
+        postalCodeStr.length > 5) {
+      alert('Uno o más campos exceden la longitud máxima permitida');
       return;
     }
 
     const addressData = {
-      alias: this.newAddress.alias,
-      street: this.newAddress.street,
-      neighborhood: this.newAddress.neighborhood,
-      city: this.newAddress.city,
-      state: this.newAddress.state,
-      postalCode: this.newAddress.postalCode
+      alias: this.newAddress.alias.trim(),
+      street: this.newAddress.street.trim(),
+      neighborhood: this.newAddress.neighborhood.trim(),
+      city: this.newAddress.city.trim(),
+      state: this.newAddress.state.trim(),
+      postalCode: postalCodeStr
     };
+
+    console.log('Enviando datos de dirección:', addressData);
+
+    this.isSavingAddress = true;
 
     this.cartService.addAddress(addressData).subscribe({
       next: (response: any) => {
+        console.log('Respuesta del servidor:', response);
+        this.isSavingAddress = false;
+
         if (response.ok) {
+          alert('Dirección agregada correctamente');
           this.loadAddresses();
           this.showNewAddressForm = false;
           // Reset form
           this.newAddress = { alias: '', street: '', neighborhood: '', city: '', state: '', postalCode: '' };
+        } else {
+          alert('Error: ' + (response.message || 'No se pudo agregar la dirección'));
         }
       },
-      error: (error) => {
+      error: (error: any) => {
         console.error('Error saving address:', error);
+        this.isSavingAddress = false;
+
+        let errorMessage = 'Error al guardar la dirección';
+
+        if (error.status === 401) {
+          errorMessage = 'Sesión expirada. Por favor inicie sesión nuevamente.';
+        } else if (error.status === 400) {
+          errorMessage = error.error?.message || 'Datos inválidos. Verifique la información.';
+        } else if (error.status === 500) {
+          errorMessage = 'Error interno del servidor. Intente nuevamente.';
+        }
+
+        alert(errorMessage);
       }
     });
   }
@@ -262,6 +312,7 @@ export class CheckoutModalComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    console.timeEnd('CheckoutModal-Init');
     // Close modal when component is destroyed (e.g., when navigating away)
     this.closeModal.emit();
   }

@@ -1,12 +1,14 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { IonHeader, IonToolbar, IonTitle, IonContent, IonIcon, IonSpinner, IonButton, IonRouterLink } from '@ionic/angular/standalone';
 import { CheckoutModalComponent } from '../modals/checkout-modal/checkout-modal.component';
-import { Router } from '@angular/router';
+import { Router, NavigationEnd } from '@angular/router';
 import { addIcons } from 'ionicons';
 import { cube, gift, restaurant, leaf, star, snow, cart, addCircle, trash } from 'ionicons/icons';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { ToastController } from '@ionic/angular';
+import { CartService } from '../services/cart.service';
+import { filter } from 'rxjs/operators';
 
 // Environment configuration
 // const API_BASE_URL = 'http://localhost:5000'; // Localhost URL for development
@@ -27,6 +29,7 @@ interface CartItem {
   imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonIcon, IonButton, IonSpinner, IonRouterLink, CommonModule, CheckoutModalComponent],
 })
 export class Tab3Page implements OnInit, OnDestroy {
+  private routerSubscription: any;
   public cartItems: CartItem[] = [];
   public cartTotal: number = 0;
   public cartItemCount: number = 0;
@@ -34,7 +37,7 @@ export class Tab3Page implements OnInit, OnDestroy {
   public isLoggedIn: boolean = false;
   public hasError: boolean = false;
 
-  constructor(private http: HttpClient, private toastController: ToastController, private router: Router) {
+  constructor(private http: HttpClient, private toastController: ToastController, private router: Router, private cartService: CartService) {
     addIcons({
       cube, gift, restaurant, leaf, star, snow, cart, addCircle, trash,
       'cart-outline': cart,
@@ -55,17 +58,36 @@ export class Tab3Page implements OnInit, OnDestroy {
       this.updateCartUI();
     }
 
+    // Listen for navigation events to save cart when leaving
+    this.routerSubscription = this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe((event: NavigationEnd) => {
+        // Save cart when navigating away from cart tab
+        if (this.isLoggedIn && this.cartItems.length > 0) {
+          console.log('🚶‍♂️ User navigating away from cart, saving...');
+          this.persistCartToBackend().catch((error) => {
+            console.error('Error saving cart on navigation:', error);
+          });
+        }
+      });
+
     // Listen for cart refresh events from tab bar
     window.addEventListener('refreshCartData', () => {
       if (this.isLoggedIn) {
-        this.updateCartUI();
+        // Save current cart state before refreshing
+        this.persistCartToBackend().finally(() => {
+          this.updateCartUI();
+        });
       }
     });
 
     // Listen for cart updates from other tabs
     window.addEventListener('cartUpdated', () => {
       if (this.isLoggedIn) {
-        this.updateCartUI();
+        // Save current cart state before updating
+        this.persistCartToBackend().finally(() => {
+          this.updateCartUI();
+        });
       }
     });
 
@@ -93,7 +115,7 @@ export class Tab3Page implements OnInit, OnDestroy {
     this.cartItems = this.cartItems.filter(item => item.id !== productId);
     this.updateCartTotals();
     this.saveCartToStorage();
-    // Save to backend when navigating away or proceeding to checkout
+    // Cart will be saved when proceeding to checkout or changing tabs
   }
 
   updateCartItemQuantity(productId: number, quantity: number) {
@@ -105,7 +127,7 @@ export class Tab3Page implements OnInit, OnDestroy {
       } else {
         this.updateCartTotals();
         this.saveCartToStorage();
-        // Save to backend when navigating away or proceeding to checkout
+        // Cart will be saved when proceeding to checkout or changing tabs
       }
     }
   }
@@ -156,31 +178,37 @@ export class Tab3Page implements OnInit, OnDestroy {
     this.cartItems = [];
     this.updateCartTotals();
     this.saveCartToStorage();
-    // Save to backend when navigating away or proceeding to checkout
+    // Cart will be saved when proceeding to checkout or changing tabs
   }
 
   persistCartToBackend() {
-    // Simular guardado en backend
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        resolve({ ok: true });
-      }, 500);
-    });
+    if (!this.isLoggedIn || this.cartItems.length === 0) {
+      return Promise.resolve({ ok: true }); // No need to save if not logged in or cart is empty
+    }
 
-    // Código comentado para cuando tengas el backend listo:
-    /*
-    return this.http.post(`${API_BASE_URL}/saveCart`, { items: this.cartItems }, { withCredentials: true }).toPromise()
+    console.log('💾 Auto-saving cart to backend...');
+
+    // Convert cart items to the format expected by the backend
+    const cartData = this.cartItems.map(item => ({
+      id: item.id,
+      quantity: item.quantity,
+      price: item.price
+    }));
+
+    return this.cartService.saveCart(cartData).toPromise()
       .then((data: any) => {
-        if (!data.ok) {
-          console.error('Error saving cart to backend');
+        if (data.ok) {
+          console.log('✅ Cart saved successfully to backend');
+        } else {
+          console.error('❌ Error saving cart to backend:', data);
         }
         return data;
       })
       .catch(err => {
-        console.error('Error saving cart:', err);
-        throw err;
+        console.error('❌ Error saving cart to backend:', err);
+        // Don't throw error - we don't want to break the user experience
+        return { ok: false, error: err };
       });
-    */
   }
 
   updateCartUI() {
@@ -250,18 +278,23 @@ export class Tab3Page implements OnInit, OnDestroy {
       return;
     }
 
-    // Debug: Check if modal is being triggered
-    console.log('🛒 Opening checkout modal...');
-    console.log('Cart items:', this.cartItems.length);
-    console.log('Cart total:', this.cartTotal);
+    // Save cart to backend before proceeding to checkout
+    console.log('💾 Saving cart before checkout...');
+    this.persistCartToBackend().then(() => {
+      console.log('✅ Cart saved, opening checkout modal...');
 
-    // Open checkout modal
-    this.showCheckoutModal = true;
+      // Open checkout modal
+      this.showCheckoutModal = true;
 
-    // Debug: Confirm modal state after opening
-    setTimeout(() => {
-      console.log('Modal showCheckoutModal state:', this.showCheckoutModal);
-    }, 100);
+      // Debug: Confirm modal state after opening
+      setTimeout(() => {
+        console.log('Modal showCheckoutModal state:', this.showCheckoutModal);
+      }, 100);
+    }).catch((error) => {
+      console.error('❌ Error saving cart before checkout:', error);
+      // Still proceed to checkout even if save fails
+      this.showCheckoutModal = true;
+    });
   }
 
   onCheckoutComplete(result: any) {
@@ -285,10 +318,16 @@ export class Tab3Page implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    // Save cart to backend when component is destroyed (user navigates away)
-    if (this.cartItems.length > 0) {
+    // Unsubscribe from router events
+    if (this.routerSubscription) {
+      this.routerSubscription.unsubscribe();
+    }
+
+    // Final cart save when component is destroyed
+    if (this.isLoggedIn && this.cartItems.length > 0) {
+      console.log('💾 Final cart save on component destroy...');
       this.persistCartToBackend().catch((error) => {
-        console.error('Error saving cart on component destroy:', error);
+        console.error('Error saving cart on destroy:', error);
       });
     }
   }

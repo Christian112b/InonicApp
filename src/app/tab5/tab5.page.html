@@ -6,12 +6,12 @@
 
 <ion-content [fullscreen]="true" class="mas-content">
 
-  <div class="mas-container">
+  <div class="mas-container" style="margin-top: 11%;">
     <div class="mas-section">
       <h2 class="section-title">Información Legal</h2>
 
       <div class="mas-options">
-        <div class="option-card" (click)="openPrivacyPolicy()" [style.background]="privacyPolicyClicked ? 'rgba(255, 255, 0, 0.3)' : ''" (touchstart)="onButtonPress('privacy')" (touchend)="onButtonRelease('privacy')" (touchcancel)="onButtonRelease('privacy')">
+        <div class="option-card" (click)="openPrivacyPolicy()">
           <div class="option-icon">
             <ion-icon name="shield-checkmark-outline"></ion-icon>
           </div>
@@ -22,7 +22,7 @@
           <ion-icon name="chevron-forward-outline" class="option-arrow"></ion-icon>
         </div>
 
-        <div class="option-card" (click)="openReturnsPolicy()" [style.background]="returnsPolicyClicked ? 'rgba(255, 255, 0, 0.3)' : ''" (touchstart)="onButtonPress('returns')" (touchend)="onButtonRelease('returns')" (touchcancel)="onButtonRelease('returns')">
+        <div class="option-card" (click)="openReturnsPolicy()">
           <div class="option-icon">
             <ion-icon name="refresh-outline"></ion-icon>
           </div>
@@ -33,7 +33,7 @@
           <ion-icon name="chevron-forward-outline" class="option-arrow"></ion-icon>
         </div>
 
-        <div class="option-card" (click)="openTermsOfService()" [style.background]="termsOfServiceClicked ? 'rgba(255, 255, 0, 0.3)' : ''" (touchstart)="onButtonPress('terms')" (touchend)="onButtonRelease('terms')" (touchcancel)="onButtonRelease('terms')">
+        <div class="option-card" (click)="openTermsOfService()">
           <div class="option-icon">
             <ion-icon name="document-text-outline"></ion-icon>
           </div>

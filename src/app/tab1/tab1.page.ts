@@ -281,31 +281,8 @@ export class Tab1Page implements AfterViewInit, OnDestroy {
   }
 
   getImageSrc(product: Product): string | null {
-    if (product.imagen_base64) {
-      try {
-        // Clean the base64 string by removing whitespace and invalid characters
-        let cleanedBase64 = product.imagen_base64.replace(/\s/g, '');
-        // Remove data URL prefix if present (e.g., "data:image/png;base64,")
-        const dataUrlMatch = cleanedBase64.match(/^data:image\/[^;]+;base64,/);
-        if (dataUrlMatch) {
-          cleanedBase64 = cleanedBase64.substring(dataUrlMatch[0].length);
-        }
-        // Remove any non-base64 characters (keep only A-Z, a-z, 0-9, +, /, =)
-        cleanedBase64 = cleanedBase64.replace(/[^A-Za-z0-9+/=]/g, '');
-        // Ensure proper padding
-        while (cleanedBase64.length % 4 !== 0) {
-          cleanedBase64 += '=';
-        }
-        // Return the cleaned base64 data URL
-        return 'data:image/jpeg;base64,' + cleanedBase64;
-      } catch (e) {
-        console.error('Error processing base64 image data for product:', product.nombre, e);
-      }
-    }
-    if (product.imagen) {
-      return product.imagen;
-    }
-    return null;
+    // Return default image instead of processing base64
+    return 'assets/img/costanzo.png';
   }
 
   onImageError(event: Event) {

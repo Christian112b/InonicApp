@@ -12,6 +12,45 @@
   border-radius: 6px;
   background: white;
   min-height: 40px;
+  transition: opacity 0.3s ease;
+}
+
+.card-element.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.card-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px;
+  color: #666;
+  font-size: 14px;
+
+  ion-icon {
+    font-size: 20px;
+    color: #8B4513;
+  }
+}
+
+.warning-message {
+  color: #856404;
+  font-size: 14px;
+  margin-bottom: 12px;
+  padding: 12px;
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  ion-icon {
+    font-size: 18px;
+    flex-shrink: 0;
+  }
 }
 
 .error-message {

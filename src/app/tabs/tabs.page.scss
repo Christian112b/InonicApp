@@ -117,6 +117,7 @@ ion-tab-bar {
   --border: 1px solid rgba(0, 0, 0, 0.08);
   box-shadow: 0 -4px 20px rgba(139, 69, 19, 0.1);
   padding: 12px 0;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
   border-radius: 20px 20px 0 0;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);

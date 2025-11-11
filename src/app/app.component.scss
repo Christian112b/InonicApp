@@ -1,14 +1,15 @@
 .small-header {
-  --min-height: 80px;
+  --min-height: 106px;
   padding-top: env(safe-area-inset-top);
 }
 
 .small-toolbar {
-  --min-height: 80px;
+  --min-height: 106px;
   padding-left: 2px;
   padding-right: env(safe-area-inset-right);
   display: flex;
-  align-items: center;
+  align-items: flex-end;
+  justify-content: flex-start;
   --background: var(--color-white);
   box-shadow: var(--shadow-sm);
   transition: all var(--transition-normal);
@@ -26,10 +27,11 @@
 }
 
 .header-logo {
-  height: 40px !important;
+  height: 30px !important;
   width: auto;
   object-fit: contain;
-  margin-left: 16px;
+  margin-left: max(16px, env(safe-area-inset-left));
+  margin-bottom: 16px;
 }
 
 .loading-container {
@@ -86,4 +88,9 @@
     transform: scale(1);
     opacity: 1;
   }
+}
+
+/* Ensure proper spacing for content */
+ion-router-outlet {
+  padding-top: calc(106px + env(safe-area-inset-top, 0px));
 }

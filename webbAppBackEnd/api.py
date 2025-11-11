@@ -12,7 +12,7 @@ def getProducts():
         db = DBConnection()
 
         productos = db.query("""
-            SELECT p.id_producto, p.nombre, p.descripcion, p.categoria, p.precio_unitario, p.activo, p.imagen_base64,
+            SELECT p.id_producto, p.nombre, p.descripcion, p.categoria, p.precio_unitario, p.activo,
                    COALESCE(i.cantidad_actual, 0) as stock
             FROM costanzo.productos p
             LEFT JOIN costanzo.inventario i ON p.id_producto = i.id_producto
