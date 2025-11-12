@@ -8,6 +8,7 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { CartService } from '../../services/cart.service';
 import { StripePaymentComponent } from '../stripe-payment/stripe-payment.component';
+import { ViewChild } from '@angular/core';
 
 interface CartItem {
   id: number;
@@ -80,6 +81,9 @@ export class CheckoutModalComponent implements OnInit, OnDestroy {
   isProcessingPayment = false;
   isSavingAddress = false;
   showNewAddressForm = false;
+
+  // Stripe component reference
+  @ViewChild(StripePaymentComponent) stripeComponent!: StripePaymentComponent;
 
   constructor(private http: HttpClient, private cartService: CartService) {
     addIcons({ close, card, cash, business, checkmark, add, remove, checkmarkCircle, bag, location, calculator });
@@ -215,15 +219,25 @@ export class CheckoutModalComponent implements OnInit, OnDestroy {
   }
 
   // Payment processing
-  processPayment() {
+  async processPayment() {
     if (!this.selectedAddress || !this.selectedPaymentMethod) {
       return;
     }
 
-    // If credit card is selected, check if we have stripe payment data
-    if (this.selectedPaymentMethod === '1' && !this.stripePaymentData) {
-      alert('Por favor complete los datos de la tarjeta');
-      return;
+    // If credit card is selected, create payment method first
+    if (this.selectedPaymentMethod === '1') {
+      if (!this.stripeComponent) {
+        alert('Error: Componente de Stripe no disponible');
+        return;
+      }
+
+      try {
+        // Create payment method from Stripe component
+        this.stripePaymentData = await this.stripeComponent.createPaymentMethod();
+      } catch (error: any) {
+        alert('Error con la tarjeta: ' + error.message);
+        return;
+      }
     }
 
     this.isProcessingPayment = true;
@@ -245,6 +259,15 @@ export class CheckoutModalComponent implements OnInit, OnDestroy {
       next: (response: any) => {
         this.isProcessingPayment = false;
         if (response.ok) {
+          // Clear local cart after successful payment
+          this.cartService.clearCartAfterPayment();
+
+          // Also clear backend cart to ensure it's empty (workaround for backend issue)
+          this.cartService.saveCart([]).subscribe({
+            next: () => console.log('Backend cart cleared'),
+            error: (err) => console.warn('Could not clear backend cart:', err)
+          });
+
           this.checkoutComplete.emit({
             success: true,
             paymentIntent: response.clientSecret,
@@ -271,21 +294,13 @@ export class CheckoutModalComponent implements OnInit, OnDestroy {
   onPaymentMethodChange() {
     // Show Stripe form when credit card is selected
     this.showStripeForm = this.selectedPaymentMethod === '1';
-    // Reset stripe payment data when changing payment method
+    // Only reset stripe payment data when changing AWAY from credit card
+    // Keep the data if user navigates back to credit card option
     if (!this.showStripeForm) {
       this.stripePaymentData = null;
     }
   }
 
-  onStripePaymentSuccess(paymentData: any) {
-    console.log('Stripe payment success:', paymentData);
-    this.stripePaymentData = paymentData;
-  }
-
-  onStripePaymentError(error: string) {
-    console.error('Stripe payment error:', error);
-    alert('Error en el pago: ' + error);
-  }
 
   // Validation
   canProceed(): boolean {

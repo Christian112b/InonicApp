@@ -12,8 +12,7 @@ import { environment } from '../../../environments/environment';
 })
 export class StripePaymentComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() amount: number = 0; // Amount in cents
-  @Output() paymentSuccess = new EventEmitter<any>();
-  @Output() paymentError = new EventEmitter<string>();
+  // Removed outputs since we now use the method directly
 
   @ViewChild('cardElement', { static: true }) cardElement!: ElementRef;
 
@@ -101,15 +100,14 @@ export class StripePaymentComponent implements OnInit, AfterViewInit, OnDestroy 
     }
   }
 
-  async processPayment() {
+  // Public method to create payment method (called by checkout modal)
+  async createPaymentMethod(): Promise<any> {
     if (!this.stripe) {
-      this.paymentError.emit('Stripe no está inicializado. Verifica tu conexión a internet o desactiva extensiones de bloqueo de anuncios.');
-      return;
+      throw new Error('Stripe no está inicializado. Verifica tu conexión a internet o desactiva extensiones de bloqueo de anuncios.');
     }
 
     if (!this.card) {
-      this.paymentError.emit('El formulario de tarjeta no está listo. Inténtalo de nuevo.');
-      return;
+      throw new Error('El formulario de tarjeta no está listo. Inténtalo de nuevo.');
     }
 
     this.isLoading = true;
@@ -124,20 +122,19 @@ export class StripePaymentComponent implements OnInit, AfterViewInit, OnDestroy 
 
       if (error) {
         this.errorMessage = error.message || 'Error al procesar la tarjeta';
-        this.paymentError.emit(this.errorMessage);
-        return;
+        throw new Error(this.errorMessage);
       }
 
-      // Emit success with payment method
-      this.paymentSuccess.emit({
+      // Return payment method data (no longer emitting events)
+      return {
         paymentMethodId: paymentMethod.id,
         last4: paymentMethod.card?.last4,
         brand: paymentMethod.card?.brand
-      });
+      };
 
     } catch (error: any) {
       this.errorMessage = error.message || 'Error desconocido';
-      this.paymentError.emit(this.errorMessage);
+      throw error;
     } finally {
       this.isLoading = false;
     }

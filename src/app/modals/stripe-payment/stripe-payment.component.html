@@ -16,13 +16,4 @@
     {{ errorMessage }}
   </div>
 
-  <ion-button
-    expand="block"
-    (click)="processPayment()"
-    [disabled]="isLoading || !stripe || isInitializingCard"
-    class="payment-button">
-    <span *ngIf="!isLoading && !isInitializingCard">Procesar Pago</span>
-    <span *ngIf="isLoading">Procesando...</span>
-    <span *ngIf="isInitializingCard && !isLoading">Inicializando...</span>
-  </ion-button>
 </div>

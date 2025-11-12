@@ -132,6 +132,7 @@
         </div>
       </div>
 
+
       <!-- Tab 2: Método de Pago -->
       <div *ngIf="activeTab === 2" class="tab-panel">
         <h3>Método de Pago</h3>
@@ -165,24 +166,6 @@
             </ion-item>
           </ion-radio-group>
 
-         <!-- Stripe Payment Form -->
-         <div *ngIf="showStripeForm" class="stripe-form-container" style="margin-top: 20px; padding: 16px; background: #f8f9fa; border-radius: 8px;">
-           <h4 style="margin: 0 0 16px 0; color: #8B4513;">Datos de la Tarjeta</h4>
-           <app-stripe-payment
-             [amount]="getFinalTotal() * 100"
-             (paymentSuccess)="onStripePaymentSuccess($event)"
-             (paymentError)="onStripePaymentError($event)">
-           </app-stripe-payment>
-         </div>
-
-        <!-- Coupon Section -->
-        <div class="coupon-section" style="margin-top: 24px; padding: 16px; background: #f8f9fa; border-radius: 8px;">
-          <h4 style="margin: 0 0 12px 0;">¿Tienes un cupón?</h4>
-          <div style="display: flex; gap: 8px;">
-            <ion-input [(ngModel)]="couponCode" placeholder="Ingresa código de cupón" style="flex: 1;"></ion-input>
-            <ion-button fill="outline">Aplicar</ion-button>
-          </div>
-        </div>
 
         <!-- Order Summary -->
         <div class="payment-summary" style="margin-top: 24px; padding: 16px; background: #f8f9fa; border-radius: 8px;">
@@ -294,6 +277,14 @@
         </div>
       </div>
 
+    </div>
+
+    <!-- Stripe Payment Form (outside tabs, only visible in Pago tab when card selected) -->
+    <div [hidden]="!(activeTab === 2 && showStripeForm)" class="stripe-form-container" style="margin: 20px; padding: 16px; background: white; border-radius: 8px; border: 1px solid #e9ecef;">
+      <h4 style="margin: 0 0 16px 0; color: #8B4513;">Datos de la Tarjeta</h4>
+      <app-stripe-payment
+        [amount]="getFinalTotal() * 100">
+      </app-stripe-payment>
     </div>
 
     <!-- Footer -->

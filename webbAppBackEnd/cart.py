@@ -1,14 +1,12 @@
 
 import os
 import stripe
-from threading import Thread
 
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
 from pytz import timezone
 from controllers.dbConnection import DBConnection
 from flask import Blueprint, jsonify, request, session
-from flask_mail import Message
 
 load_dotenv()
 stripe_api_key = os.getenv("STRIPE_PRIVATE_KEY")
@@ -390,10 +388,6 @@ def create_payment():
                 # Borrar items del carrito
                 db.execute("DELETE FROM costanzo.carrito_items WHERE id_carrito = %s", (id_carrito,))
                 db.execute("DELETE FROM costanzo.carritocompra WHERE id_carrito = %s", (id_carrito,))
-
-                # Enviar correo de confirmación en background si hay email
-                if email_usuario:
-                    Thread(target=enviar_correo_confirmacion, args=(email_usuario, datos_pedido)).start()
         except Exception as del_exc:
             print('Error borrando carrito (exitoso):', str(del_exc))
 
@@ -417,116 +411,6 @@ def create_payment():
         except Exception:
             pass
 
-def enviar_correo_confirmacion(email_usuario, datos_pedido):
-    """Envía correo de confirmación de pedido"""
-    try:
-        # Crear lista de productos para el email
-        productos_html = ""
-        for producto in datos_pedido['productos']:
-            productos_html += f"""
-            <tr>
-                <td style="padding: 8px; border-bottom: 1px solid #ddd;">{producto['name']}</td>
-                <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: center;">{producto['quantity']}</td>
-                <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right;">${producto['price']:.2f}</td>
-                <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right;">${producto['price'] * producto['quantity']:.2f}</td>
-            </tr>
-            """
-
-        # Template HTML del correo
-        html_content = f"""
-        <!DOCTYPE html>
-        <html lang="es">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Confirmación de Pedido - Chocolates Costanzo</title>
-        </head>
-        <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-            <!-- Header -->
-            <div style="text-align: center; margin-bottom: 30px;">
-                <h1 style="color: #8B4513; margin-bottom: 10px;">¡Gracias por tu compra!</h1>
-                <p style="font-size: 16px; color: #666;">Tu pedido ha sido confirmado exitosamente</p>
-            </div>
-
-            <!-- Order Details -->
-            <div style="background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-                <h2 style="color: #8B4513; margin-bottom: 15px;">Detalles del Pedido</h2>
-                <p><strong>Número de pedido:</strong> {datos_pedido['numero_pedido']}</p>
-                <p><strong>Fecha:</strong> {datos_pedido['fecha_pedido']}</p>
-                <p><strong>Método de pago:</strong> {datos_pedido['metodo_pago']}</p>
-            </div>
-
-            <!-- Products Table -->
-            <div style="margin-bottom: 20px;">
-                <h3 style="color: #8B4513; margin-bottom: 10px;">Productos</h3>
-                <table style="width: 100%; border-collapse: collapse; background: white; border: 1px solid #ddd;">
-                    <thead>
-                        <tr style="background: #8B4513; color: white;">
-                            <th style="padding: 10px; text-align: left;">Producto</th>
-                            <th style="padding: 10px; text-align: center;">Cantidad</th>
-                            <th style="padding: 10px; text-align: right;">Precio</th>
-                            <th style="padding: 10px; text-align: right;">Total</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {productos_html}
-                    </tbody>
-                    <tfoot>
-                        <tr style="background: #f9f9f9; font-weight: bold;">
-                            <td colspan="3" style="padding: 10px; text-align: right;">Subtotal:</td>
-                            <td style="padding: 10px; text-align: right;">${datos_pedido['subtotal']:.2f}</td>
-                        </tr>
-                        <tr style="background: #f9f9f9; font-weight: bold;">
-                            <td colspan="3" style="padding: 10px; text-align: right;">IVA (16%):</td>
-                            <td style="padding: 10px; text-align: right;">${datos_pedido['iva']:.2f}</td>
-                        </tr>
-                        {f'<tr style="background: #f9f9f9; font-weight: bold;"><td colspan="3" style="padding: 10px; text-align: right;">Descuento ({datos_pedido.get("descuento_info", "")}):</td><td style="padding: 10px; text-align: right; color: #d9534f;">-${datos_pedido["descuento"]:.2f}</td></tr>' if datos_pedido.get('descuento', 0) > 0 else ''}
-                        <tr style="background: #8B4513; color: white; font-weight: bold; font-size: 18px;">
-                            <td colspan="3" style="padding: 15px; text-align: right;">Total:</td>
-                            <td style="padding: 15px; text-align: right;">${datos_pedido['total']:.2f}</td>
-                        </tr>
-                    </tfoot>
-                </table>
-            </div>
-
-            <!-- Shipping Info -->
-            <div style="background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-                <h3 style="color: #8B4513; margin-bottom: 10px;">Información de Envío</h3>
-                <p><strong>Dirección:</strong> {datos_pedido['direccion_envio']}</p>
-                <p>Recibirás actualizaciones sobre el estado de tu pedido por este medio.</p>
-            </div>
-
-            <!-- Footer -->
-            <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd;">
-                <p style="color: #666; font-size: 14px;">
-                    Gracias por elegir <strong>Chocolates Costanzo</strong><br>
-                    ¡Esperamos verte pronto!
-                </p>
-                <div style="margin-top: 15px;">
-                    <a href="#" style="color: #8B4513; text-decoration: none; margin: 0 10px;">Sitio Web</a> |
-                    <a href="#" style="color: #8B4513; text-decoration: none; margin: 0 10px;">Contacto</a> |
-                    <a href="#" style="color: #8B4513; text-decoration: none; margin: 0 10px;">Ayuda</a>
-                </div>
-            </div>
-        </body>
-        </html>
-        """
-
-        # Importar mail aquí para evitar import circular
-        from app import mail
-
-        msg = Message(
-            subject=f'Confirmación de Pedido #{datos_pedido["numero_pedido"]} - Chocolates Costanzo',
-            recipients=[email_usuario],
-            html=html_content
-        )
-
-        mail.send(msg)
-        print(f"Correo de confirmación enviado exitosamente a {email_usuario}")
-        return True
-    except Exception as e:
-        print(f"Error enviando correo de confirmación: {e}")
-        return False
 
 @cart_bp.route('/validate-coupon', methods=['POST'])
 def validate_coupon():
