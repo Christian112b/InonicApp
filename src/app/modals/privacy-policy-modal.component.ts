@@ -16,12 +16,10 @@ export class PrivacyPolicyModalComponent {
   @Input() content: string = '';
 
   constructor(private modalController: ModalController) {
-    console.time('PrivacyModal-Init');
     addIcons({ close, shieldCheckmarkOutline });
   }
 
   dismiss() {
-    console.timeEnd('PrivacyModal-Init');
     this.modalController.dismiss();
   }
 }

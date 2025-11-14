@@ -170,9 +170,10 @@
             type="submit"
             [disabled]="!loginForm.valid || isLoading"
             class="login-submit-btn">
-            <ion-icon name="log-in-outline" slot="start" *ngIf="!isLoading"></ion-icon>
+            <ion-icon name="log-in-outline" slot="start" *ngIf="!isLoading && !loginSuccess"></ion-icon>
+            <ion-icon name="checkmark-circle" slot="start" *ngIf="loginSuccess" class="success-icon"></ion-icon>
             <ion-spinner name="crescent" *ngIf="isLoading"></ion-spinner>
-            {{ isLoading ? 'Iniciando...' : 'Iniciar Sesión' }}
+            {{ isLoading ? 'Iniciando...' : loginSuccess ? '¡Éxito!' : 'Iniciar Sesión' }}
           </ion-button>
         </form>
 

@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonContent, IonHeader, IonTitle, IonToolbar, IonIcon } from '@ionic/angular/standalone';
-import { ToastController } from '@ionic/angular';
 import { Router } from '@angular/router';
+import { ModalController, ToastController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { shieldCheckmarkOutline, refreshOutline, documentTextOutline, callOutline, helpCircleOutline, chevronForwardOutline } from 'ionicons/icons';
 
@@ -13,11 +13,11 @@ import { shieldCheckmarkOutline, refreshOutline, documentTextOutline, callOutlin
   styleUrls: ['./tab5.page.scss'],
   standalone: true,
   imports: [IonContent, IonHeader, IonTitle, IonToolbar, IonIcon, CommonModule, FormsModule],
-  providers: []
+  providers: [ModalController, ToastController]
 })
 export class Tab5Page implements OnInit {
 
-  constructor(private toastController: ToastController, private router: Router) {
+  constructor(private router: Router, private modalController: ModalController, private toastController: ToastController) {
     addIcons({
       shieldCheckmarkOutline,
       refreshOutline,
@@ -46,29 +46,11 @@ export class Tab5Page implements OnInit {
   }
 
   async openContact() {
-    this.showDevelopmentToast('Contactanos');
+    await this.router.navigate(['/contact']);
   }
 
   async openFAQ() {
-    this.showDevelopmentToast('Preguntas Frecuentes');
-  }
-
-
-
-  private async showDevelopmentToast(message: string) {
-    const toast = await this.toastController.create({
-      message: `${message} - Esta funcionalidad está en desarrollo`,
-      duration: 2000,
-      position: 'bottom',
-      cssClass: 'toast-warning',
-      buttons: [
-        {
-          text: 'OK',
-          role: 'cancel'
-        }
-      ]
-    });
-    await toast.present();
+    await this.router.navigate(['/faq']);
   }
 
 }

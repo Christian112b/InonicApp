@@ -2,7 +2,9 @@
   <ion-toolbar>
     <ion-title>Política de Privacidad</ion-title>
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/tabs/tab5"></ion-back-button>
+      <ion-button fill="clear" (click)="closePage()" class="back-button">
+        ← Atrás
+      </ion-button>
     </ion-buttons>
     <ion-buttons slot="end">
       <ion-button fill="clear" (click)="closePage()">

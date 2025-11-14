@@ -1,0 +1,39 @@
+<ion-header class="modal-header">
+  <ion-toolbar class="modal-toolbar">
+    <div class="modal-title-section">
+      <ion-icon name="call-outline" class="modal-title-icon"></ion-icon>
+      <div class="modal-title-content">
+        <ion-title class="modal-title">Contactanos</ion-title>
+      </div>
+    </div>
+    <ion-buttons slot="end">
+      <ion-button fill="clear" (click)="dismiss()" class="close-button">
+        <ion-icon name="close" size="large"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <form (ngSubmit)="submitForm()">
+    <ion-item>
+      <ion-label position="floating">Nombre</ion-label>
+      <ion-input [(ngModel)]="contactForm.name" name="name" required></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Email</ion-label>
+      <ion-input [(ngModel)]="contactForm.email" name="email" type="email" required></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Mensaje</ion-label>
+      <ion-textarea [(ngModel)]="contactForm.message" name="message" rows="6" required></ion-textarea>
+    </ion-item>
+
+    <ion-button expand="block" type="submit" class="submit-button">
+      <ion-icon name="send-outline" slot="start"></ion-icon>
+      Enviar Mensaje
+    </ion-button>
+  </form>
+</ion-content>

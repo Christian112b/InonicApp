@@ -24,5 +24,13 @@ export const routes: Routes = [
     path: 'terms-of-service',
     loadComponent: () => import('./terms-of-service/terms-of-service.page').then( m => m.TermsOfServicePage)
   },
+  {
+    path: 'faq',
+    loadComponent: () => import('./faq/faq.page').then( m => m.FaqPage)
+  },
+  {
+    path: 'contact',
+    loadComponent: () => import('./contact/contact.page').then( m => m.ContactPage)
+  },
 
 ];

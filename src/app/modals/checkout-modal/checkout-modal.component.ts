@@ -90,8 +90,6 @@ export class CheckoutModalComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    console.log('🛒 Checkout modal initialized');
-    console.time('CheckoutModal-Init');
 
     // Small delay to ensure token is available
     setTimeout(() => {
@@ -136,9 +134,7 @@ export class CheckoutModalComponent implements OnInit, OnDestroy {
   }
 
   toggleNewAddressForm() {
-    console.log('Toggling new address form, current state:', this.showNewAddressForm);
     this.showNewAddressForm = !this.showNewAddressForm;
-    console.log('New state:', this.showNewAddressForm);
   }
 
   saveNewAddress() {
@@ -180,13 +176,11 @@ export class CheckoutModalComponent implements OnInit, OnDestroy {
       postalCode: postalCodeStr
     };
 
-    console.log('Enviando datos de dirección:', addressData);
 
     this.isSavingAddress = true;
 
     this.cartService.addAddress(addressData).subscribe({
       next: (response: any) => {
-        console.log('Respuesta del servidor:', response);
         this.isSavingAddress = false;
 
         if (response.ok) {

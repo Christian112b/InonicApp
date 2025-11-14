@@ -79,7 +79,7 @@
 
       <!-- Products Grid -->
       <div class="productos-grid">
-        <div class="product-card" *ngFor="let product of filteredProducts">
+        <div class="product-card" *ngFor="let product of filteredProducts" [class.animate-card-success]="animatingCardId === product.id_producto" [class.animate-quantity-change]="animatingQuantityId === product.id_producto">
           <div class="product-image">
             <img *ngIf="getImageSrc(product)" [src]="getImageSrc(product)" alt="{{ product.nombre }}" (error)="onImageError($event)">
             <div class="product-placeholder" *ngIf="!getImageSrc(product)">
@@ -95,9 +95,9 @@
             <h3>{{ product.nombre }}</h3>
             <p>{{ product.descripcion }}</p>
             <div class="product-price">${{ product.precio_unitario.toFixed(2) }}</div>
-            <ion-button fill="outline" size="small" (click)="addToCart(product)">
-              <ion-icon name="add-circle" slot="start"></ion-icon>
-              Agregar
+            <ion-button fill="outline" size="small" (click)="addToCart(product)" [class.animate-success]="animatingProductId === product.id_producto" [class.animate-return]="animatingProductId !== product.id_producto && animatingProductId === null" [disabled]="animatingProductId === product.id_producto">
+              <ion-icon name="add-circle" slot="start" [class.animate-success]="animatingProductId === product.id_producto"></ion-icon>
+              {{ animatingProductId === product.id_producto ? '¡Agregado!' : 'Agregar' }}
             </ion-button>
           </div>
         </div>

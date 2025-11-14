@@ -5,13 +5,13 @@ import { IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonButton } fr
 import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-returns-policy',
-  templateUrl: './returns-policy.page.html',
-  styleUrls: ['./returns-policy.page.scss'],
+  selector: 'app-faq',
+  templateUrl: './faq.page.html',
+  styleUrls: ['./faq.page.scss'],
   standalone: true,
   imports: [IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonButton, CommonModule, FormsModule]
 })
-export class ReturnsPolicyPage implements OnInit {
+export class FaqPage implements OnInit {
 
   constructor(private router: Router) { }
 

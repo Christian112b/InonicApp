@@ -57,6 +57,9 @@ export class Tab2Page implements OnInit {
   public cartTotal: number = 0;
   public cartItemCount: number = 0;
   public showCartModal: boolean = false;
+  public animatingProductId: number | null = null;
+  public animatingCardId: number | null = null;
+  public animatingQuantityId: number | null = null;
 
   constructor(private http: HttpClient, private toastController: ToastController) {
     addIcons({ cube, gift, restaurant, leaf, star, snow, cart, addCircle });
@@ -327,6 +330,23 @@ export class Tab2Page implements OnInit {
       return;
     }
 
+    // Trigger animations
+    this.animatingProductId = product.id_producto;
+    this.animatingCardId = product.id_producto;
+
+    // Dispatch event for cart tab animation - commented out to avoid compilation issues
+    // const addEvent = new CustomEvent('itemAddedToCart', {
+    //   detail: { productId: product.id_producto }
+    // });
+    // window.dispatchEvent(addEvent);
+
+    setTimeout(() => {
+      this.animatingProductId = null;
+    }, 1000); // Button animation duration
+    setTimeout(() => {
+      this.animatingCardId = null;
+    }, 1500); // Card animation duration
+
     // Add to backend cart
     const headers = { 'Authorization': `Bearer ${token}` };
     const cartData = { id_producto: product.id_producto };
@@ -354,13 +374,12 @@ export class Tab2Page implements OnInit {
           const cartEvent = new CustomEvent('cartUpdated');
           window.dispatchEvent(cartEvent);
 
-          this.showToast('Producto agregado al carrito', 'success');
+          // Animation feedback instead of toast
         } else {
           this.showToast(response.mensaje || 'Error al agregar producto', 'error');
         }
       },
       error: (error) => {
-        console.error('Error adding to cart:', error);
         this.showToast('Error al agregar producto al carrito', 'error');
       }
     });
@@ -373,6 +392,12 @@ export class Tab2Page implements OnInit {
   }
 
   updateCartItemQuantity(productId: number, quantity: number) {
+    // Trigger animation
+    this.animatingQuantityId = productId;
+    setTimeout(() => {
+      this.animatingQuantityId = null;
+    }, 300); // Shorter animation for quantity changes
+
     const item = this.cartItems.find(item => item.id === productId);
     if (item) {
       item.cantidad = Math.max(0, quantity);

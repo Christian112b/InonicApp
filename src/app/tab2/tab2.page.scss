@@ -711,4 +711,85 @@
   color: #5c3a21;
   font-weight: 600;
 }
+
+/* Animation for successful cart addition */
+.animate-success {
+  animation: bounce 1s ease-in-out;
+  --background: var(--ion-color-success);
+  --color: white;
+  --border-color: var(--ion-color-success);
+  transition: all 0.5s ease;
+  transform-origin: center;
+}
+
+.animate-return {
+  transition: all 0.5s ease;
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-10px);
+  }
+  60% {
+    transform: translateY(-5px);
+  }
+}
+
+/* Product card animation */
+.product-card {
+  transition: all 0.3s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(139, 69, 19, 0.15);
+}
+
+.product-card.animate-card-success {
+  animation: card-success 1s ease-in-out;
+}
+
+@keyframes card-success {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+  25% {
+    transform: scale(1.02);
+    box-shadow: 0 4px 20px rgba(40, 167, 69, 0.2);
+  }
+  50% {
+    transform: scale(1.01);
+    box-shadow: 0 6px 25px rgba(40, 167, 69, 0.3);
+  }
+  75% {
+    transform: scale(1.02);
+    box-shadow: 0 4px 20px rgba(40, 167, 69, 0.2);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* Quantity change animation */
+.animate-quantity-change {
+  animation: quantity-change 0.3s ease-in-out;
+}
+
+@keyframes quantity-change {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 4px 15px rgba(139, 69, 19, 0.3);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
 }

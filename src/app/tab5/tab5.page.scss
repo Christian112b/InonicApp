@@ -24,6 +24,7 @@
 
 .mas-container {
   padding: 20px;
+  padding-bottom: 150px;
 }
 
 .section-title {
@@ -110,10 +111,10 @@
 }
 
 .about-logo img {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  object-fit: cover;
+  max-width: 250px;
+  height: auto;
+  display: block;
+  margin: 0 auto;
 }
 
 .about-info h3 {

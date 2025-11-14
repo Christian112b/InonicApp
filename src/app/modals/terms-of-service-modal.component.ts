@@ -16,12 +16,10 @@ export class TermsOfServiceModalComponent {
   @Input() content: string = '';
 
   constructor(private modalController: ModalController) {
-    console.time('TermsModal-Init');
     addIcons({ close, documentTextOutline });
   }
 
   dismiss() {
-    console.timeEnd('TermsModal-Init');
     this.modalController.dismiss();
   }
 }

@@ -64,6 +64,7 @@ export class Tab4Page implements OnInit {
   showPassword: boolean = false;
   showRegisterPassword: boolean = false;
   showConfirmPassword: boolean = false;
+  loginSuccess: boolean = false;
 
   constructor(
     private http: HttpClient,
@@ -208,7 +209,6 @@ export class Tab4Page implements OnInit {
       formData.append('password', this.loginData.password);
 
       const response = await this.http.post(`${API_BASE_URL}/validationLogin`, formData, { withCredentials: true }).toPromise() as any;
-      console.log('Backend login response:', response);
 
       if (response.token) {
         // Login successful
@@ -218,10 +218,8 @@ export class Tab4Page implements OnInit {
         };
 
         // Store auth data
-        console.log('Storing JWT token:', response.token);
         localStorage.setItem('jwt_token', response.token);
         localStorage.setItem('userData', JSON.stringify(userData));
-        console.log('Token saved to localStorage:', localStorage.getItem('jwt_token'));
 
         // Handle remember me functionality
         if (this.loginData.remember) {
@@ -240,13 +238,16 @@ export class Tab4Page implements OnInit {
         const authEvent = new CustomEvent('authChanged');
         window.dispatchEvent(authEvent);
 
-        this.showToast('¡Inicio de sesión exitoso!', 'success');
-        this.closeLoginModal();
+        // Animation feedback instead of toast
+        this.loginSuccess = true;
+        setTimeout(() => {
+          this.loginSuccess = false;
+          this.closeLoginModal();
+        }, 1500); // Show animation for 1.5 seconds
       } else {
         this.showToast(response.message || 'Error en el login', 'error');
       }
     } catch (error: any) {
-      console.error('Login error:', error);
       if (error.status === 401) {
         this.showToast('Usuario no encontrado', 'error');
       } else if (error.status === 403) {
@@ -352,7 +353,6 @@ export class Tab4Page implements OnInit {
         this.showToast(response.message || 'Error en el registro', 'error');
       }
     } catch (error: any) {
-      console.error('Register error:', error);
       if (error.status === 409) {
         this.showToast('El correo ya está registrado', 'error');
       } else if (error.status === 400) {

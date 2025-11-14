@@ -77,7 +77,6 @@ export class StripePaymentComponent implements OnInit, AfterViewInit, OnDestroy 
           }
         });
 
-        console.log('Stripe card element mounted successfully');
         this.isInitializingCard = false;
       } catch (error) {
         console.error('Error mounting Stripe card element:', error);

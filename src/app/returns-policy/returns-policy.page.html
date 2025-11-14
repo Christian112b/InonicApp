@@ -2,11 +2,8 @@
   <ion-toolbar>
     <ion-title>Políticas de Devolución</ion-title>
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/tabs/tab5"></ion-back-button>
-    </ion-buttons>
-    <ion-buttons slot="end">
-      <ion-button fill="clear" (click)="closePage()">
-        <ion-icon name="close" size="large"></ion-icon>
+      <ion-button fill="clear" (click)="closePage()" class="back-button">
+        ← Atrás
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
@@ -32,6 +29,8 @@
         <li>Envío gratis en compras mayores a $800 MXN</li>
         <li>Costo estándar: $120 MXN</li>
         <li>Interior: $180–$250 MXN</li>
+        <li>Envíos express: $200 MXN (entrega en 24h)</li>
+        <li>Zonas extendidas: $300–$400 MXN</li>
       </ul>
       <h3>Condiciones:</h3>
       <p>Usamos empaques térmicos. Es importante refrigerar los productos al recibirlos.</p>

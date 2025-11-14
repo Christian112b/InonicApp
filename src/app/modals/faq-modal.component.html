@@ -1,0 +1,19 @@
+<ion-header class="modal-header">
+  <ion-toolbar class="modal-toolbar">
+    <div class="modal-title-section">
+      <ion-icon name="help-circle-outline" class="modal-title-icon"></ion-icon>
+      <div class="modal-title-content">
+        <ion-title class="modal-title">Preguntas Frecuentes</ion-title>
+      </div>
+    </div>
+    <ion-buttons slot="end">
+      <ion-button fill="clear" (click)="dismiss()" class="close-button">
+        <ion-icon name="close" size="large"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div [innerHTML]="content"></div>
+</ion-content>

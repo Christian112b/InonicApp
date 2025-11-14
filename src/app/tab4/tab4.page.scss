@@ -408,3 +408,24 @@
   --background: var(--ion-color-warning);
   --color: var(--ion-color-dark);
 }
+
+/* Success animation for login */
+.success-icon {
+  color: var(--ion-color-success);
+  animation: success-pulse 1.5s ease-in-out;
+}
+
+@keyframes success-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}

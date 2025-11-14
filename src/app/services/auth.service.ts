@@ -24,12 +24,9 @@ export class AuthService {
       withCredentials: true
     }).pipe(
       tap((response: any) => {
-        console.log('Login response:', response);
         if (response.token) {
-          console.log('Saving JWT token:', response.token);
           this.saveToken(response.token);
         } else {
-          console.log('No token in response');
         }
       })
     );
@@ -47,14 +44,11 @@ export class AuthService {
   }
 
   saveToken(token: string) {
-    console.log('Saving JWT token to localStorage:', token);
     localStorage.setItem(this.tokenKey, token);
-    console.log('Token saved, verifying:', localStorage.getItem(this.tokenKey));
   }
 
   getToken(): string | null {
     const token = localStorage.getItem(this.tokenKey);
-    console.log('Getting JWT token from localStorage:', token);
     return token;
   }
 
