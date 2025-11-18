@@ -1,0 +1,53 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Notificaciones</ion-title>
+    <ion-buttons slot="start">
+      <ion-button fill="clear" (click)="closePage()" class="back-button">
+        ← Atrás
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="notifications-content">
+
+  <div class="notifications-container" style="margin-top: 5%; padding: 1rem;">
+
+    <div class="notification-settings">
+      <h3 style="color: #8B4513; margin-bottom: 1.5rem;">Preferencias de Notificación</h3>
+
+      <ion-item lines="none" style="background: white; border-radius: 12px; margin-bottom: 1rem; box-shadow: 0 2px 8px rgba(139, 69, 19, 0.08);">
+        <ion-label>
+          <h4>Actualizaciones de Pedidos</h4>
+          <p>Recibe notificaciones sobre el estado de tus pedidos</p>
+        </ion-label>
+        <ion-toggle [(ngModel)]="notificationSettings.orderUpdates" slot="end" color="primary"></ion-toggle>
+      </ion-item>
+
+      <ion-item lines="none" style="background: white; border-radius: 12px; margin-bottom: 1rem; box-shadow: 0 2px 8px rgba(139, 69, 19, 0.08);">
+        <ion-label>
+          <h4>Promociones y Ofertas</h4>
+          <p>Descubre ofertas especiales y descuentos</p>
+        </ion-label>
+        <ion-toggle [(ngModel)]="notificationSettings.promotions" slot="end" color="primary"></ion-toggle>
+      </ion-item>
+
+      <ion-item lines="none" style="background: white; border-radius: 12px; margin-bottom: 1rem; box-shadow: 0 2px 8px rgba(139, 69, 19, 0.08);">
+        <ion-label>
+          <h4>Nuevos Productos</h4>
+          <p>Entérate cuando agreguemos nuevos chocolates</p>
+        </ion-label>
+        <ion-toggle [(ngModel)]="notificationSettings.newProducts" slot="end" color="primary"></ion-toggle>
+      </ion-item>
+
+      <ion-item lines="none" style="background: white; border-radius: 12px; margin-bottom: 1rem; box-shadow: 0 2px 8px rgba(139, 69, 19, 0.08);">
+        <ion-label>
+          <h4>Alertas de Entrega</h4>
+          <p>Notificaciones sobre entregas y horarios</p>
+        </ion-label>
+        <ion-toggle [(ngModel)]="notificationSettings.deliveryAlerts" slot="end" color="primary"></ion-toggle>
+      </ion-item>
+    </div>
+
+  </div>
+</ion-content>

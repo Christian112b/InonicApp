@@ -25,7 +25,7 @@ interface CartItem {
   selector: 'app-tab3',
   templateUrl: 'tab3.page.html',
   styleUrls: ['tab3.page.scss'],
-  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonIcon, IonButton, IonSpinner, IonRouterLink, CommonModule, CheckoutModalComponent],
+  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonIcon, IonButton, IonSpinner, CommonModule, CheckoutModalComponent],
 })
 export class Tab3Page implements OnInit, OnDestroy, ViewWillEnter {
   private routerSubscription: any;
@@ -265,8 +265,10 @@ export class Tab3Page implements OnInit, OnDestroy, ViewWillEnter {
       // Show success message
       this.showToast('¡Compra realizada exitosamente!', 'success');
 
-      // Navigate to home or order confirmation
-      this.router.navigate(['/tabs/inicio']);
+      // Navigate to orders page with refresh flag to show the new order
+      this.router.navigate(['/orders'], {
+        state: { refreshOrders: true }
+      });
     }
   }
 
@@ -307,6 +309,11 @@ export class Tab3Page implements OnInit, OnDestroy, ViewWillEnter {
   goToLogin() {
     // Navigate to the account tab (tab4) without page reload
     this.router.navigate(['/tabs/cuenta']);
+  }
+
+  goToProducts() {
+    // Navigate to the products tab (tab2)
+    this.router.navigate(['/tabs/productos']);
   }
 
   retryLoadCart() {

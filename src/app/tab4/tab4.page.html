@@ -39,27 +39,29 @@
       <div class="account-quick-actions">
         <h3>Acciones rápidas</h3>
         <div class="quick-actions-grid">
-          <div class="quick-action-item" (click)="showDevelopmentToast()">
-            <ion-icon name="location-outline"></ion-icon>
-            <span>Direcciones</span>
+          <div class="quick-action-item" (click)="goToAddresses()">
+            <div class="action-icon">
+              <ion-icon name="location-outline"></ion-icon>
+            </div>
+            <span class="action-text">Direcciones</span>
           </div>
-          <div class="quick-action-item" (click)="showDevelopmentToast()">
-            <ion-icon name="card-outline"></ion-icon>
-            <span>Pagos</span>
+          <div class="quick-action-item" (click)="goToNotifications()">
+            <div class="action-icon">
+              <ion-icon name="notifications-outline"></ion-icon>
+            </div>
+            <span class="action-text">Notificaciones</span>
           </div>
-          <div class="quick-action-item" (click)="showDevelopmentToast()">
-            <ion-icon name="notifications-outline"></ion-icon>
-            <span>Notificaciones</span>
-          </div>
-          <div class="quick-action-item" (click)="showDevelopmentToast()">
-            <ion-icon name="help-circle-outline"></ion-icon>
-            <span>Ayuda</span>
+          <div class="quick-action-item" (click)="goToHelp()">
+            <div class="action-icon">
+              <ion-icon name="help-circle-outline"></ion-icon>
+            </div>
+            <span class="action-text">Ayuda</span>
           </div>
         </div>
       </div>
 
       <div class="account-actions">
-        <ion-button expand="block" fill="outline" class="profile-btn" (click)="showDevelopmentToast()">
+        <ion-button expand="block" fill="outline" class="profile-btn" (click)="goToProfile()">
           <ion-icon name="person-outline" slot="start"></ion-icon>
           Mi Perfil
         </ion-button>

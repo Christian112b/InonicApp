@@ -13,5 +13,7 @@
     "buildOptions": {
       "releaseType": "APK"
     }
-  }
+  },
+  "ios": {},
+  "icon": "resources/icon.png"
 }

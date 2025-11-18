@@ -1,0 +1,63 @@
+.profile-content {
+  --background: linear-gradient(135deg, #fef7f0 0%, #fdf2e9 50%, #fce8dc 100%);
+  --padding-top: 20px;
+  --padding-bottom: 20px;
+  --padding-start: 16px;
+  --padding-end: 16px;
+}
+
+.profile-container {
+  padding: 0 1rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.profile-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding: 2rem 1rem;
+  background: linear-gradient(145deg, #ffffff 0%, #fefefe 100%);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(139, 69, 19, 0.1);
+}
+
+.profile-avatar {
+  margin-bottom: 1rem;
+}
+
+.profile-avatar ion-icon {
+  font-size: 4rem;
+  color: #8B4513;
+}
+
+.profile-header h2 {
+  color: #8B4513;
+  margin: 0.5rem 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.profile-header p {
+  color: #6c757d;
+  margin: 0;
+  font-size: 1rem;
+}
+
+.profile-info {
+  margin-bottom: 2rem;
+}
+
+.profile-info h3 {
+  color: #8B4513;
+  margin-bottom: 1.5rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.profile-actions {
+  margin-top: 2rem;
+}
+
+.back-button {
+  margin-top: 90px;
+}

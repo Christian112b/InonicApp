@@ -6,6 +6,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { ToastController, ViewWillEnter, AlertController } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
+import { OrderDataService } from '../services/order-data.service';
 
 const API_BASE_URL = environment.apiUrl;
 
@@ -25,7 +26,8 @@ export class OrdersPage implements OnInit, ViewWillEnter {
     private http: HttpClient,
     private toastController: ToastController,
     private alertController: AlertController,
-    private router: Router
+    private router: Router,
+    private orderDataService: OrderDataService
   ) {}
 
   ngOnInit() {
@@ -33,6 +35,16 @@ export class OrdersPage implements OnInit, ViewWillEnter {
   }
 
   ionViewWillEnter() {
+    // Check if we need to refresh orders (e.g., after placing a new order)
+    const navigation = this.router.getCurrentNavigation();
+    const shouldRefresh = navigation?.extras?.state?.['refreshOrders'] ||
+                          navigation?.extras?.queryParams?.['refresh'];
+
+    if (shouldRefresh) {
+      console.log('🔄 [ORDERS] Refresh requested, invalidating cache');
+      this.invalidateOrdersCache();
+    }
+
     this.loadUserOrders();
   }
 
@@ -43,12 +55,24 @@ export class OrdersPage implements OnInit, ViewWillEnter {
       return;
     }
 
-    this.ordersLoading = true;
     const userData = localStorage.getItem('userData');
     if (!userData) {
       this.ordersLoading = false;
       return;
     }
+
+    // Check cache first
+    const cachedOrders = this.getCachedOrders();
+    if (cachedOrders && !this.isCacheStale()) {
+      console.log('📦 [ORDERS] Using cached orders');
+      this.userOrders = cachedOrders;
+      this.ordersLoading = false;
+      return;
+    }
+
+    // Load from API if no cache or cache is stale
+    console.log('🌐 [ORDERS] Loading orders from API');
+    this.ordersLoading = true;
 
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${token}`
@@ -58,6 +82,8 @@ export class OrdersPage implements OnInit, ViewWillEnter {
       next: (response: any) => {
         if (response.success) {
           this.userOrders = response.orders || [];
+          this.cacheOrders(this.userOrders); // Cache the orders
+          console.log('💾 [ORDERS] Orders cached');
         } else {
           this.userOrders = [];
         }
@@ -84,186 +110,39 @@ export class OrdersPage implements OnInit, ViewWillEnter {
   }
 
   toggleOrderTracking(order: any) {
-    order.showTracking = !order.showTracking;
-  }
+    console.log('🔄 [ORDERS] Starting navigation to order tracking');
+    console.log('📦 [ORDERS] Order data:', order);
 
-  getTrackingSteps(order: any) {
-    const orderDate = new Date(order.fecha_pedido);
-    const steps = [];
+    try {
+      // Only pass the data we actually need for tracking
+      const minimalOrderData = {
+        id_pedido: order.id_pedido,
+        numero_pedido: order.numero_pedido,
+        fecha_pedido: order.fecha_pedido,
+        estado: order.estado
+      };
 
-    switch (order.estado) {
-      case 'pendiente':
-        steps.push(
-          {
-            icon: 'checkmark-circle',
-            iconClass: 'completed',
-            title: 'Pedido Recibido',
-            description: 'Tu pedido ha sido registrado en nuestro sistema',
-            date: orderDate.toLocaleDateString('es-MX')
-          },
-          {
-            icon: 'card',
-            iconClass: 'pending',
-            title: 'Procesando Pago',
-            description: 'Verificación del método de pago',
-            date: null
-          },
-          {
-            icon: 'cube',
-            iconClass: 'pending',
-            title: 'Preparando Productos',
-            description: 'Recopilando y empacando tus productos',
-            date: null
-          }
-        );
-        break;
+      console.log('📝 [ORDERS] Minimal data prepared:', minimalOrderData);
+      this.orderDataService.setOrderData(minimalOrderData);
+      console.log('💾 [ORDERS] Data set in service');
 
-      case 'procesando':
-        steps.push(
-          {
-            icon: 'checkmark-circle',
-            iconClass: 'completed',
-            title: 'Pedido Recibido',
-            description: 'Tu pedido ha sido registrado en nuestro sistema',
-            date: orderDate.toLocaleDateString('es-MX')
-          },
-          {
-            icon: 'checkmark-circle',
-            iconClass: 'completed',
-            title: 'Pago Verificado',
-            description: 'El pago ha sido procesado correctamente',
-            date: new Date(orderDate.getTime() + 2 * 60 * 60 * 1000).toLocaleDateString('es-MX') // +2 hours
-          },
-          {
-            icon: 'cube',
-            iconClass: 'current',
-            title: 'Preparando Productos',
-            description: 'Estamos recopilando y empacando tus productos',
-            date: null
-          },
-          {
-            icon: 'send',
-            iconClass: 'pending',
-            title: 'Listo para Envío',
-            description: 'El pedido estará listo para envío próximamente',
-            date: null
-          }
-        );
-        break;
+      console.log('🧭 [ORDERS] Starting router navigation...');
+      this.router.navigate(['/order-tracking']).then(success => {
+        console.log('✅ [ORDERS] Navigation completed:', success);
+      }).catch(error => {
+        console.error('❌ [ORDERS] Navigation failed:', error);
+      });
 
-      case 'enviado':
-        steps.push(
-          {
-            icon: 'checkmark-circle',
-            iconClass: 'completed',
-            title: 'Pedido Recibido',
-            description: 'Tu pedido ha sido registrado en nuestro sistema',
-            date: orderDate.toLocaleDateString('es-MX')
-          },
-          {
-            icon: 'checkmark-circle',
-            iconClass: 'completed',
-            title: 'Pago Verificado',
-            description: 'El pago ha sido procesado correctamente',
-            date: new Date(orderDate.getTime() + 2 * 60 * 60 * 1000).toLocaleDateString('es-MX')
-          },
-          {
-            icon: 'checkmark-circle',
-            iconClass: 'completed',
-            title: 'Productos Preparados',
-            description: 'Tu pedido ha sido empacado y preparado',
-            date: new Date(orderDate.getTime() + 6 * 60 * 60 * 1000).toLocaleDateString('es-MX') // +6 hours
-          },
-          {
-            icon: 'send',
-            iconClass: 'current',
-            title: 'Enviado',
-            description: `Tu pedido está en camino con Estafeta. Guía: ES${order.id_pedido}MX`,
-            date: new Date(orderDate.getTime() + 8 * 60 * 60 * 1000).toLocaleDateString('es-MX') // +8 hours
-          },
-          {
-            icon: 'home',
-            iconClass: 'pending',
-            title: 'Entrega',
-            description: 'El pedido será entregado en tu dirección',
-            date: null
-          }
-        );
-        break;
+      // Check if app is still responsive after 5 seconds
+      setTimeout(() => {
+        console.log('⏰ [ORDERS] 5 seconds passed - app still responsive');
+      }, 5000);
 
-      case 'entregado':
-        steps.push(
-          {
-            icon: 'checkmark-circle',
-            iconClass: 'completed',
-            title: 'Pedido Recibido',
-            description: 'Tu pedido ha sido registrado en nuestro sistema',
-            date: orderDate.toLocaleDateString('es-MX')
-          },
-          {
-            icon: 'checkmark-circle',
-            iconClass: 'completed',
-            title: 'Pago Verificado',
-            description: 'El pago ha sido procesado correctamente',
-            date: new Date(orderDate.getTime() + 2 * 60 * 60 * 1000).toLocaleDateString('es-MX')
-          },
-          {
-            icon: 'checkmark-circle',
-            iconClass: 'completed',
-            title: 'Productos Preparados',
-            description: 'Tu pedido ha sido empacado y preparado',
-            date: new Date(orderDate.getTime() + 6 * 60 * 60 * 1000).toLocaleDateString('es-MX')
-          },
-          {
-            icon: 'checkmark-circle',
-            iconClass: 'completed',
-            title: 'Enviado',
-            description: `Tu pedido fue enviado con Estafeta. Guía: ES${order.id_pedido}MX`,
-            date: new Date(orderDate.getTime() + 8 * 60 * 60 * 1000).toLocaleDateString('es-MX')
-          },
-          {
-            icon: 'checkmark-circle',
-            iconClass: 'completed',
-            title: 'Entregado',
-            description: '¡Tu pedido ha sido entregado exitosamente!',
-            date: new Date(orderDate.getTime() + 24 * 60 * 60 * 1000).toLocaleDateString('es-MX') // +1 day
-          }
-        );
-        break;
-
-      case 'cancelado':
-        steps.push(
-          {
-            icon: 'checkmark-circle',
-            iconClass: 'completed',
-            title: 'Pedido Recibido',
-            description: 'Tu pedido ha sido registrado en nuestro sistema',
-            date: orderDate.toLocaleDateString('es-MX')
-          },
-          {
-            icon: 'close-circle',
-            iconClass: 'cancelled',
-            title: 'Pedido Cancelado',
-            description: 'El pedido ha sido cancelado',
-            date: new Date().toLocaleDateString('es-MX')
-          }
-        );
-        break;
-
-      default:
-        steps.push(
-          {
-            icon: 'help-circle',
-            iconClass: 'unknown',
-            title: this.getStatusText(order.estado),
-            description: 'Estado del pedido desconocido',
-            date: orderDate.toLocaleDateString('es-MX')
-          }
-        );
+    } catch (error) {
+      console.error('💥 [ORDERS] Error in toggleOrderTracking:', error);
     }
-
-    return steps;
   }
+
 
   trackByOrderId(index: number, order: any): any {
     return order.id_pedido || order.numero_pedido;
@@ -314,6 +193,55 @@ export class OrdersPage implements OnInit, ViewWillEnter {
         this.showToast('Error al cancelar pedido', 'error');
       }
     });
+  }
+
+  private getCachedOrders(): any[] | null {
+    try {
+      const cached = localStorage.getItem('userOrdersCache');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        return parsed.orders || null;
+      }
+    } catch (error) {
+      console.error('Error reading cached orders:', error);
+    }
+    return null;
+  }
+
+  private cacheOrders(orders: any[]): void {
+    try {
+      const cacheData = {
+        orders: orders,
+        timestamp: Date.now()
+      };
+      localStorage.setItem('userOrdersCache', JSON.stringify(cacheData));
+    } catch (error) {
+      console.error('Error caching orders:', error);
+    }
+  }
+
+  private isCacheStale(): boolean {
+    try {
+      const cached = localStorage.getItem('userOrdersCache');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        const cacheTime = parsed.timestamp;
+        const now = Date.now();
+        const fiveMinutes = 5 * 60 * 1000; // 5 minutes in milliseconds
+
+        // Check if cache is older than 5 minutes
+        return (now - cacheTime) > fiveMinutes;
+      }
+    } catch (error) {
+      console.error('Error checking cache staleness:', error);
+    }
+    return true; // Consider stale if error
+  }
+
+  // Method to invalidate cache when a new order is placed
+  invalidateOrdersCache(): void {
+    console.log('🗑️ [ORDERS] Invalidating orders cache');
+    localStorage.removeItem('userOrdersCache');
   }
 
   closePage() {

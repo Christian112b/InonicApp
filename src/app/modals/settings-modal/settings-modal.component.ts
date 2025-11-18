@@ -17,7 +17,7 @@ interface UserPreferences {
   templateUrl: './settings-modal.component.html',
   styleUrls: ['./settings-modal.component.scss'],
   standalone: true,
-  imports: [IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonButton, IonIcon, IonItem, IonLabel, IonSelect, IonSelectOption, IonRange, IonToggle, IonText, IonCard, IonCardHeader, IonCardTitle, IonCardContent, CommonModule, FormsModule]
+  imports: [IonButton, IonIcon, IonItem, IonLabel, IonSelect, IonSelectOption, IonRange, IonToggle, IonCard, IonCardHeader, IonCardTitle, IonCardContent, CommonModule, FormsModule]
 })
 export class SettingsModalComponent implements OnInit {
 

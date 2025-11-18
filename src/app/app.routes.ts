@@ -37,5 +37,22 @@ export const routes: Routes = [
     path: 'orders',
     loadComponent: () => import('./orders/orders.page').then( m => m.OrdersPage)
   },
+  {
+    path: 'order-tracking',
+    loadComponent: () => import('./order-tracking/order-tracking.page').then( m => m.OrderTrackingPage)
+  },
+  {
+    path: 'addresses',
+    loadComponent: () => import('./addresses/addresses.page').then( m => m.AddressesPage)
+  },
+  {
+    path: 'notifications',
+    loadComponent: () => import('./notifications/notifications.page').then( m => m.NotificationsPage)
+  },
+  {
+    path: 'profile',
+    loadComponent: () => import('./profile/profile.page').then( m => m.ProfilePage)
+  },
+
 
 ];

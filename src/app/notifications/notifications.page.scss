@@ -1,0 +1,32 @@
+.notifications-content {
+  --background: linear-gradient(135deg, #fef7f0 0%, #fdf2e9 50%, #fce8dc 100%);
+  --padding-top: 20px;
+  --padding-bottom: 20px;
+  --padding-start: 16px;
+  --padding-end: 16px;
+}
+
+.notifications-container {
+  padding: 0 1rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.notification-settings {
+  background: linear-gradient(145deg, #ffffff 0%, #fefefe 100%);
+  border-radius: 20px;
+  padding: 1.5rem;
+  box-shadow: 0 8px 32px rgba(139, 69, 19, 0.1), 0 2px 8px rgba(139, 69, 19, 0.08);
+  border: 1px solid rgba(139, 69, 19, 0.08);
+}
+
+.notification-settings h3 {
+  margin: 0 0 1.5rem 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #8B4513;
+}
+
+.back-button {
+  margin-top: 90px;
+}

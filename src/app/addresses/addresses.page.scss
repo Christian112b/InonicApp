@@ -1,0 +1,77 @@
+.addresses-content {
+  --background: linear-gradient(135deg, #fef7f0 0%, #fdf2e9 50%, #fce8dc 100%);
+  --padding-top: 20px;
+  --padding-bottom: 20px;
+  --padding-start: 16px;
+  --padding-end: 16px;
+}
+
+.addresses-container {
+  padding: 0 1rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.addresses-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.address-item {
+  background: linear-gradient(145deg, #ffffff 0%, #fefefe 100%);
+  border-radius: 20px;
+  padding: 1.25rem 1.5rem;
+  box-shadow: 0 8px 32px rgba(139, 69, 19, 0.1), 0 2px 8px rgba(139, 69, 19, 0.08);
+  border: 1px solid rgba(139, 69, 19, 0.08);
+}
+
+.address-header {
+  margin-bottom: 0.75rem;
+  color: #8B4513;
+  font-weight: 600;
+}
+
+.address-details {
+  color: #6c757d;
+  line-height: 1.5;
+}
+
+.loading-state, .empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 2rem;
+  text-align: center;
+}
+
+.loading-state ion-spinner {
+  --color: #8B4513;
+  transform: scale(1.5);
+  filter: drop-shadow(0 2px 4px rgba(139, 69, 19, 0.3));
+}
+
+.loading-state p, .empty-state p {
+  color: #8B4513;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-top: 1.5rem;
+}
+
+.empty-state ion-icon {
+  font-size: 3rem;
+  color: #8B4513;
+  margin-bottom: 1rem;
+}
+
+.empty-state h4 {
+  color: #8B4513;
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin: 1rem 0 0.5rem 0;
+}
+
+.back-button {
+  margin-top: 90px;
+}

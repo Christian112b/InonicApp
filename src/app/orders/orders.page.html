@@ -55,29 +55,6 @@
           </div>
         </div>
 
-        <!-- Order Tracking Section -->
-        <div class="order-tracking" *ngIf="order.showTracking">
-          <div class="tracking-content">
-            <div class="tracking-header" (click)="toggleOrderTracking(order)">
-              <ion-icon name="location-outline" class="tracking-icon"></ion-icon>
-              <h5>Seguimiento del Pedido</h5>
-              <ion-icon name="chevron-up-outline" class="tracking-arrow"></ion-icon>
-            </div>
-            <div class="tracking-details">
-              <div class="tracking-step" *ngFor="let step of getTrackingSteps(order)">
-                <div class="step-icon" [class]="step.iconClass">
-                  <ion-icon [name]="step.icon"></ion-icon>
-                </div>
-                <div class="step-content">
-                  <h6>{{ step.title }}</h6>
-                  <p>{{ step.description }}</p>
-                  <small *ngIf="step.date">{{ step.date }}</small>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
       </div>
     </div>
 

@@ -263,6 +263,10 @@ export class CheckoutModalComponent implements OnInit, OnDestroy {
             error: (err) => console.warn('Could not clear backend cart:', err)
           });
 
+          // Clear orders cache to force refresh when navigating to orders
+          console.log('🗑️ [CHECKOUT] Clearing orders cache after successful payment');
+          localStorage.removeItem('userOrdersCache');
+
           this.checkoutComplete.emit({
             success: true,
             paymentIntent: response.clientSecret,

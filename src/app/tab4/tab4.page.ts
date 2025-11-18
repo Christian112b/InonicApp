@@ -446,6 +446,27 @@ export class Tab4Page implements OnInit {
     this.router.navigate(['/orders']);
   }
 
+  goToAddresses() {
+    this.router.navigate(['/addresses']);
+  }
+
+  goToPayments() {
+    this.router.navigate(['/payments']);
+  }
+
+  goToNotifications() {
+    this.router.navigate(['/notifications']);
+  }
+
+  goToHelp() {
+    // Navigate to FAQ page
+    this.router.navigate(['/faq']);
+  }
+
+  goToProfile() {
+    this.router.navigate(['/profile']);
+  }
+
   async showDevelopmentToast() {
     const toast = await this.toastController.create({
       message: 'Esta funcionalidad está en desarrollo',

@@ -1,0 +1,58 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Seguimiento del Pedido</ion-title>
+    <ion-buttons slot="start">
+      <ion-button fill="clear" (click)="closePage()" class="back-button">
+        ← Atrás
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="tracking-content">
+
+  <div class="tracking-container" style="margin-top: 5%; padding: 1rem;">
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="loading-state">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Cargando seguimiento...</p>
+    </div>
+
+    <!-- Content -->
+    <div *ngIf="!isLoading && order">
+      <div class="order-info-section">
+        <h3>Pedido #{{ order.numero_pedido || order.id_pedido }}</h3>
+        <p class="order-date">{{ order.fecha_pedido | date:'dd/MM/yyyy HH:mm' }}</p>
+        <div class="order-status" [class]="'status-' + order.estado">
+          {{ getStatusText(order.estado) }}
+        </div>
+      </div>
+
+      <div class="tracking-section">
+        <div class="tracking-content">
+          <div class="tracking-details">
+            <div class="tracking-step" *ngFor="let step of getTrackingSteps(order); trackBy: trackByStep">
+              <div class="step-icon" [class]="step.iconClass">
+                <ion-icon [name]="step.icon"></ion-icon>
+              </div>
+              <div class="step-content">
+                <h6>{{ step.title }}</h6>
+                <p>{{ step.description }}</p>
+                <small *ngIf="step.date">{{ step.date }}</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="!isLoading && !order" class="error-state">
+      <ion-icon name="alert-circle-outline"></ion-icon>
+      <h4>Error al cargar el seguimiento</h4>
+      <p>No se pudieron cargar los datos del pedido.</p>
+    </div>
+
+  </div>
+</ion-content>

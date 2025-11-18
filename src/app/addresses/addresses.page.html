@@ -1,0 +1,114 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Mis Direcciones</ion-title>
+    <ion-buttons slot="start">
+      <ion-button fill="clear" (click)="closePage()" class="back-button">
+        ← Atrás
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="addresses-content">
+
+  <div class="addresses-container" style="margin-top: 5%; padding: 1rem;">
+
+    <div class="address-settings">
+      <h3 style="color: #8B4513; margin-bottom: 1.5rem;">Mis Direcciones</h3>
+
+      <div *ngIf="isLoading" class="loading-state">
+        <ion-spinner name="crescent"></ion-spinner>
+        <p>Cargando direcciones...</p>
+      </div>
+
+      <div *ngIf="!isLoading && addresses.length === 0" class="empty-state">
+        <ion-icon name="location-outline" size="large"></ion-icon>
+        <h4>No tienes direcciones guardadas</h4>
+        <p>Agrega tu primera dirección para facilitar tus compras</p>
+      </div>
+
+      <div *ngIf="!isLoading && addresses.length > 0" class="addresses-list">
+        <div class="address-card" *ngFor="let address of addresses">
+          <div class="address-header">
+            <strong>{{ address.alias }}</strong>
+          </div>
+          <div class="address-details">
+            {{ address.calle }}, {{ address.colonia }}<br>
+            {{ address.ciudad }}, {{ address.estado }}<br>
+            CP: {{ address.cp }}
+          </div>
+        </div>
+      </div>
+
+      <ion-button
+        expand="block"
+        fill="outline"
+        (click)="toggleNewAddressForm()"
+        style="margin-top: 2rem;"
+        [disabled]="showNewAddressForm">
+        <ion-icon name="add" slot="start"></ion-icon>
+        Agregar Nueva Dirección
+      </ion-button>
+    </div>
+
+    <!-- New Address Form -->
+    <div *ngIf="showNewAddressForm" class="new-address-form" style="margin-top: 2rem; padding: 1rem; background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(139, 69, 19, 0.08);">
+      <h4 style="color: #8B4513; margin-bottom: 1rem;">Nueva Dirección</h4>
+
+      <div class="form-group">
+        <ion-item lines="none" style="background: #f8f9fa; border-radius: 8px; margin-bottom: 1rem;">
+          <ion-label position="floating">Alias (ej: Casa, Trabajo)</ion-label>
+          <ion-input [(ngModel)]="newAddress.alias" placeholder="Casa, Trabajo, etc."></ion-input>
+        </ion-item>
+
+        <ion-item lines="none" style="background: #f8f9fa; border-radius: 8px; margin-bottom: 1rem;">
+          <ion-label position="floating">Código Postal</ion-label>
+          <ion-input [(ngModel)]="newAddress.postalCode" type="number" maxlength="5" placeholder="12345"></ion-input>
+        </ion-item>
+
+        <ion-item lines="none" style="background: #f8f9fa; border-radius: 8px; margin-bottom: 1rem;">
+          <ion-label position="floating">Calle</ion-label>
+          <ion-input [(ngModel)]="newAddress.street" placeholder="Nombre de la calle y número"></ion-input>
+        </ion-item>
+
+        <ion-item lines="none" style="background: #f8f9fa; border-radius: 8px; margin-bottom: 1rem;">
+          <ion-label position="floating">Colonia</ion-label>
+          <ion-input [(ngModel)]="newAddress.neighborhood" placeholder="Nombre de la colonia"></ion-input>
+        </ion-item>
+
+        <ion-item lines="none" style="background: #f8f9fa; border-radius: 8px; margin-bottom: 1rem;">
+          <ion-label position="floating">Ciudad</ion-label>
+          <ion-input [(ngModel)]="newAddress.city" placeholder="Nombre de la ciudad"></ion-input>
+        </ion-item>
+
+        <ion-item lines="none" style="background: #f8f9fa; border-radius: 8px; margin-bottom: 1rem;">
+          <ion-label position="floating">Estado</ion-label>
+          <ion-input [(ngModel)]="newAddress.state" placeholder="Nombre del estado"></ion-input>
+        </ion-item>
+      </div>
+
+      <div class="form-actions" style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+        <ion-button
+          expand="block"
+          fill="outline"
+          (click)="toggleNewAddressForm()"
+          style="flex: 1;">
+          Cancelar
+        </ion-button>
+
+        <ion-button
+          expand="block"
+          fill="solid"
+          (click)="saveNewAddress()"
+          [disabled]="isSavingAddress"
+          style="flex: 1;">
+          <ion-icon name="checkmark" slot="start" *ngIf="!isSavingAddress"></ion-icon>
+          <ion-spinner name="crescent" *ngIf="isSavingAddress"></ion-spinner>
+          <span *ngIf="!isSavingAddress">Guardar</span>
+          <span *ngIf="isSavingAddress">Guardando...</span>
+        </ion-button>
+      </div>
+    </div>
+
+  </div>
+</ion-content>

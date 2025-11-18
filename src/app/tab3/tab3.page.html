@@ -43,7 +43,7 @@
       <div style="font-size: 64px; color: #ddd; margin-bottom: 16px;">🛒</div>
       <h3 style="margin: 0 0 8px 0; color: #333; font-size: 20px;">Tu carrito está vacío</h3>
       <p style="margin: 0 0 24px 0; font-size: 14px;">Agrega algunos productos para comenzar</p>
-      <ion-button fill="solid" routerLink="/tabs/productos" style="--border-radius: 10px; height: 44px;">
+      <ion-button fill="solid" (click)="goToProducts()" style="--border-radius: 10px; height: 44px;">
         <ion-icon name="storefront-outline" slot="start"></ion-icon>
         Ver Productos
       </ion-button>

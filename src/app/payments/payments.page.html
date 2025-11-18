@@ -1,0 +1,49 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Métodos de Pago</ion-title>
+    <ion-buttons slot="start">
+      <ion-button fill="clear" (click)="closePage()" class="back-button">
+        ← Atrás
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="payments-content">
+
+  <div class="payments-container" style="margin-top: 5%; padding: 1rem;">
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="loading-state">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Cargando métodos de pago...</p>
+    </div>
+
+    <!-- Payment Methods List -->
+    <div *ngIf="!isLoading && paymentMethods.length > 0">
+      <div class="payments-list">
+        <div class="payment-item" *ngFor="let payment of paymentMethods">
+          <div class="payment-header">
+            <ion-icon name="card-outline"></ion-icon>
+            <strong>{{ payment.type }}</strong>
+          </div>
+          <div class="payment-details">
+            **** **** **** {{ payment.last4 }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!isLoading && paymentMethods.length === 0" class="empty-state">
+      <ion-icon name="card-outline"></ion-icon>
+      <h4>No tienes métodos de pago guardados</h4>
+      <p>Agrega una tarjeta para pagos más rápidos</p>
+      <ion-button fill="solid" (click)="addNewPaymentMethod()">
+        <ion-icon name="add" slot="start"></ion-icon>
+        Agregar Tarjeta
+      </ion-button>
+    </div>
+
+  </div>
+</ion-content>
