@@ -1,0 +1,387 @@
+MANUAL TECNICO PARA PROGRAMADORES/DESARROLLADORES
+Aplicación: Tap&Buy - La tienda que te acompaña
+
+PR08-41 Descripción clara de la arquitectura del sistema
+
+La aplicación Tap&Buy es una aplicación móvil híbrida desarrollada utilizando el framework Ionic con Angular. La arquitectura sigue el patrón de diseño de componentes standalone de Angular, con Capacitor para la compilación nativa en plataformas móviles (Android e iOS).
+
+Arquitectura general:
+- Frontend: Angular 20 con Ionic 8 para UI/UX móvil
+- Backend: API RESTful alojada en https://backend-app-x7k2.zeabur.app
+- Base de datos: Gestionada por el backend (MySQL)
+- Autenticación: JWT (JSON Web Tokens)
+- Pagos: Integración con Stripe
+
+La aplicación utiliza lazy loading para rutas, con módulos independientes para cada página. Los servicios manejan la lógica de negocio y comunicación con el backend.
+
+PR08-42 Detalle de los lenguajes, frameworks y dependencias utilizadas
+
+Lenguajes:
+- TypeScript 5.8 (lenguaje principal)
+- JavaScript (para configuración y scripts)
+- SCSS/CSS (estilos)
+- HTML (plantillas)
+
+Frameworks y Librerías principales:
+- Angular 20.0 (framework frontend)
+- Ionic 8.0 (framework UI móvil)
+- Capacitor 7.4 (compilación nativa)
+- Stripe.js 8.3 (procesamiento de pagos)
+
+Dependencias clave:
+- @angular/core, @angular/common, @angular/router, @angular/forms
+- @ionic/angular
+- @capacitor/core, @capacitor/android
+- @stripe/stripe-js
+- ionicons 7.0
+- swiper 12.0 (para carruseles)
+
+
+PR08-43 Diagrama de clases o componentes
+
+Componentes principales:
+- AppComponent: Componente raíz
+- TabsPage: Navegación por pestañas
+- Tab1Page-Tab5Page: Páginas principales
+- Modals: CheckoutModal, StripePayment, SettingsModal, etc.
+- Services: AuthService, CartService
+
+Diagrama simplificado:
+
+AppComponent
+├── TabsPage
+│   ├── Tab1Page (Productos)
+│   ├── Tab2Page (Carrito)
+│   ├── Tab3Page (Perfil)
+│   ├── Tab4Page (Configuración)
+│   └── Tab5Page (Órdenes)
+├── AuthService (manejo de autenticación)
+├── CartService (manejo de carrito)
+└── Modals (Checkout, Payment, Settings)
+
+PR08-44 Descripción de la base de datos (tablas, relaciones, campos)
+
+ANEXAR LA ESTRUCTURA DE LA BASE DE DATOS
+
+PR08-45 Instrucciones de instalación del entorno de desarrollo
+
+Requisitos previos:
+- Node.js 18+
+- npm 9+
+- Android Studio (para Android)
+- Xcode (para iOS, solo macOS)
+- Git
+
+Pasos de instalación:
+
+1. Clonar el repositorio:
+   git clone <url-del-repositorio>
+   cd costanzoApp
+
+2. Instalar dependencias:
+   npm install
+
+3. Instalar Capacitor CLI globalmente:
+   npm install -g @capacitor/cli
+
+4. Para desarrollo web:
+   npm start
+
+5. Para desarrollo móvil Android:
+   npx cap add android
+   npx cap sync android
+   npx cap run android
+
+6. Para desarrollo móvil iOS:
+   npx cap add ios
+   npx cap sync ios
+   npx cap run ios
+
+PR08-46 Estructura del proyecto (carpetas, módulos, funciones)
+
+Estructura principal:
+- src/
+  - app/
+    - components/ (componentes reutilizables)
+    - modals/ (modales: checkout, payment, settings)
+    - pages/ (páginas: tabs, orders, faq, etc.)
+    - services/ (lógica de negocio: auth, cart)
+    - tabs/ (navegación por pestañas)
+  - assets/ (imágenes, iconos)
+  - environments/ (configuración por entorno)
+  - global.scss (estilos globales)
+  - main.ts (punto de entrada)
+
+Módulos principales:
+- AppModule (raíz)
+- Lazy-loaded pages (cada página se carga bajo demanda)
+
+Funciones clave:
+- Autenticación JWT
+- Gestión de carrito (local + backend)
+- Procesamiento de pagos Stripe
+- Gestión de direcciones
+- Sincronización offline/online
+
+PR08-47 Comentarios claros en fragmentos de código
+
+El código incluye comentarios descriptivos en funciones críticas:
+
+En AuthService:
+- saveToken(): Guarda token JWT en localStorage
+- isLoggedIn(): Verifica autenticación y expiración del token
+
+En CartService:
+- syncCartWithBackend(): Sincroniza carrito local con backend
+- getMergedCartItems(): Combina datos locales y del servidor
+
+En StripePaymentComponent:
+- createPaymentMethod(): Crea método de pago seguro con Stripe
+
+Comentarios siguen el estándar JSDoc para funciones públicas.
+
+PR08-48 Procedimiento de conexión con la pasarela de pago
+
+1. Instalar @stripe/stripe-js
+2. Configurar clave pública en environment.ts
+3. Inicializar Stripe en ngOnInit del componente
+4. Crear elementos de Stripe (card element)
+5. Montar elemento en DOM
+6. Crear PaymentMethod con createPaymentMethod()
+7. Enviar paymentMethodId al backend
+8. Backend crea PaymentIntent
+9. Confirmar pago en el cliente
+
+Flujo de pago:
+Cliente -> Stripe Elements -> PaymentMethod -> Backend -> PaymentIntent -> Confirmación
+
+PR08-49 Manejo de variables sensibles y credenciales (seguridad)
+
+Variables sensibles:
+- stripePublishableKey: Clave pública de Stripe (segura para frontend)
+- apiUrl: URL del backend
+
+Almacenamiento:
+- Credenciales en src/environments/environment.ts (desarrollo)
+- environment.prod.ts para producción
+- JWT tokens en localStorage (con expiración)
+- No almacenar claves secretas en frontend
+
+Prácticas de seguridad:
+- Usar HTTPS en producción
+- Validar tokens JWT en cada request
+- No exponer claves privadas
+- Sanitizar inputs del usuario
+
+PR08-50 Documentación de API y endpoints utilizados
+
+Base URL: https://backend-app-x7k2.zeabur.app
+
+Endpoints principales:
+
+POST /validationLogin
+- Descripción: Autenticación de usuario
+- Headers: Content-Type: multipart/form-data
+- Body: email, password
+- Response: { token: string, user: object }
+
+POST /registerUser
+- Descripción: Registro de nuevo usuario
+- Body: name, email, phone, password
+- Response: { success: boolean, message: string }
+
+GET /getItemsCart
+- Descripción: Obtener items del carrito
+- Headers: Authorization: Bearer <token>
+- Response: { ok: boolean, items: CartItem[] }
+
+POST /addCart
+- Descripción: Agregar producto al carrito
+- Body: id_producto
+- Response: { success: boolean }
+
+POST /saveCart
+- Descripción: Guardar carrito completo
+- Body: { items: CartItem[] }
+- Response: { success: boolean }
+
+GET /getAddresses
+- Descripción: Obtener direcciones del usuario
+- Response: { addresses: Address[] }
+
+POST /api/address/add
+- Descripción: Agregar nueva dirección
+- Body: addressData
+- Response: { success: boolean }
+
+POST /create-payment-intent
+- Descripción: Crear intención de pago
+- Body: paymentData
+- Response: { client_secret: string }
+
+PR08-51 Ejemplos de solicitudes y respuestas (JSON/XML)
+
+Ejemplo Login:
+Request:
+POST /validationLogin
+Content-Type: multipart/form-data
+Body: email=user@example.com&password=123456
+
+Response:
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": {
+    "id": 1,
+    "name": "Juan Pérez",
+    "email": "user@example.com"
+  }
+}
+
+Ejemplo Agregar al carrito:
+Request:
+POST /addCart
+Authorization: Bearer <token>
+Content-Type: multipart/form-data
+Body: id_producto=123
+
+Response:
+{
+  "success": true,
+  "message": "Producto agregado al carrito"
+}
+
+Ejemplo Crear PaymentIntent:
+Request:
+POST /create-payment-intent
+Authorization: Bearer <token>
+Content-Type: application/json
+Body: {
+  "amount": 5000,
+  "currency": "mxn",
+  "payment_method_id": "pm_123456789"
+}
+
+Response:
+{
+  "client_secret": "pi_123456789_secret_..."
+}
+
+PR08-52 Guía para actualizar o mantener el sistema
+
+Actualizaciones:
+1. Revisar changelog de Angular/Ionic
+2. Actualizar dependencias: npm update
+3. Probar compatibilidad con Capacitor
+4. Ejecutar tests: npm test
+5. Build de prueba: npm run build
+6. Desplegar en staging primero
+
+Mantenimiento:
+- Monitorear logs del backend
+- Revisar reportes de errores
+- Actualizar dependencias de seguridad
+- Optimizar performance periódicamente
+- Backup de base de datos regular
+
+PR08-53 Descripción del sistema de autenticación de usuarios
+
+Sistema JWT-based:
+1. Usuario ingresa credenciales
+2. Backend valida y retorna JWT
+3. Token almacenado en localStorage
+4. Cada request incluye Authorization header
+5. Backend verifica token en cada endpoint protegido
+6. Token expira después de tiempo configurado
+7. Logout elimina token local
+
+Características:
+- Stateless (no sesiones en servidor)
+- Expiración automática
+- Refresh tokens no implementado (logout manual)
+
+PR08-54 Esquema de control de versiones (Git u otro)
+
+Git Flow:
+- main: Rama de producción
+- develop: Rama de desarrollo
+- feature/*: Ramas para nuevas funcionalidades
+- hotfix/*: Ramas para corrección de bugs en producción
+
+Commits convencionales:
+- feat: nuevas funcionalidades
+- fix: corrección de bugs
+- docs: documentación
+- style: cambios de estilo
+- refactor: refactorización
+- test: tests
+- chore: mantenimiento
+
+PR08-55 Instrucciones para compilar y desplegar la aplicación
+
+Compilación web:
+npm run build --prod
+
+Compilación Android:
+npx cap sync android
+npx cap build android
+
+Compilación iOS:
+npx cap sync ios
+npx cap build ios
+
+Despliegue:
+1. Build web: npm run build --prod
+2. Sync con Capacitor: npx cap sync
+3. Build nativo: npx cap build [platform]
+4. Desplegar APK/IPA según plataforma
+
+PR08-56 Normas de estilo de programación utilizadas
+
+- TypeScript strict mode
+- ESLint con reglas de Angular
+- Nombres en camelCase para variables/funciones
+- PascalCase para clases/componentes
+- Interfaces con prefijo I (opcional)
+- Comentarios JSDoc en funciones públicas
+- Indentación: 2 espacios
+- Líneas no exceder 120 caracteres
+- Imports organizados por Angular, Ionic, terceros, locales
+
+PR08-57 Consideraciones de rendimiento y optimización
+
+Optimizaciones implementadas:
+- Lazy loading de rutas
+- Standalone components (Angular 14+)
+- OnPush change detection donde aplica
+- PreloadAllModules para rutas
+- Imágenes optimizadas en assets
+- Bundle splitting automático
+
+Mejoras de UX:
+- Carrito local para funcionamiento offline
+- Loading states en operaciones async
+- Error handling con mensajes user-friendly
+- Animaciones suaves con Ionic
+
+PR08-58 Mecanismos de manejo de errores o logs
+
+Manejo de errores:
+- Try-catch en operaciones críticas
+- Error boundaries en componentes
+- Validación de formularios
+- Mensajes de error localizados
+
+Logging:
+- console.error para errores
+- console.time para performance monitoring
+- Logs del backend para debugging
+- No logs sensibles en producción
+
+PR08-59 Cumplimiento con buenas prácticas de seguridad móvil
+
+Prácticas implementadas:
+- HTTPS obligatorio en producción
+- JWT para autenticación
+- Validación de inputs
+- No almacenamiento de datos sensibles en localStorage (excepto JWT)
+- Protección contra XSS con sanitización Angular

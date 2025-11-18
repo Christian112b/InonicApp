@@ -1,0 +1,107 @@
+<!-- Settings Modal Overlay -->
+<div class="settings-modal-overlay" *ngIf="isOpen" (click)="close()">
+  <div class="settings-modal" (click)="$event.stopPropagation()">
+
+    <!-- Header -->
+    <div class="modal-header">
+      <h3>Configuración de Recomendaciones</h3>
+      <button class="close-btn" (click)="close()">
+        <ion-icon name="close"></ion-icon>
+      </button>
+    </div>
+
+    <!-- Content -->
+    <div class="modal-content">
+
+      <!-- Recommendations Settings -->
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title>
+            <ion-icon name="bulb-outline"></ion-icon>
+            Recomendaciones Personalizadas
+          </ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+
+          <!-- Enable Recommendations -->
+          <ion-item>
+            <ion-label>Habilitar recomendaciones</ion-label>
+            <ion-toggle [(ngModel)]="preferences.enableRecommendations" slot="end"></ion-toggle>
+          </ion-item>
+
+          <!-- Favorite Categories -->
+          <ion-item>
+            <ion-label position="stacked">Categorías favoritas</ion-label>
+            <ion-select [(ngModel)]="preferences.favoriteCategories" multiple="true" placeholder="Selecciona categorías">
+              <ion-select-option *ngFor="let category of availableCategories" [value]="category">
+                {{ category }}
+              </ion-select-option>
+            </ion-select>
+          </ion-item>
+
+          <!-- Price Range -->
+          <ion-item>
+            <ion-label position="stacked">Rango de precios: {{ getPriceRangeText() }}</ion-label>
+            <ion-range
+              dualKnobs="true"
+              min="10"
+              max="1000"
+              step="10"
+              [(ngModel)]="preferences.priceRange"
+              color="primary">
+              <ion-label slot="start">$10</ion-label>
+              <ion-label slot="end">$1000</ion-label>
+            </ion-range>
+          </ion-item>
+
+        </ion-card-content>
+      </ion-card>
+
+      <!-- Notifications Settings -->
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title>
+            <ion-icon name="notifications-outline"></ion-icon>
+            Notificaciones
+          </ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+
+          <ion-item>
+            <ion-label>Recibir notificaciones de ofertas</ion-label>
+            <ion-toggle [(ngModel)]="preferences.enableNotifications" slot="end"></ion-toggle>
+          </ion-item>
+
+        </ion-card-content>
+      </ion-card>
+
+      <!-- Info Card -->
+      <ion-card class="info-card">
+        <ion-card-content>
+          <div class="info-content">
+            <ion-icon name="information-circle-outline"></ion-icon>
+            <div>
+              <h4>¿Cómo funcionan las recomendaciones?</h4>
+              <p>Analizamos tus compras, categorías favoritas y rango de precios para sugerirte productos que te puedan interesar.</p>
+            </div>
+          </div>
+        </ion-card-content>
+      </ion-card>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="modal-footer">
+      <ion-button fill="outline" (click)="resetPreferences()">
+        <ion-icon name="refresh-outline" slot="start"></ion-icon>
+        Restablecer
+      </ion-button>
+
+      <ion-button fill="solid" (click)="savePreferences()">
+        <ion-icon name="checkmark-outline" slot="start"></ion-icon>
+        Guardar Preferencias
+      </ion-button>
+    </div>
+
+  </div>
+</div>

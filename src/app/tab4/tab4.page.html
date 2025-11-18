@@ -70,7 +70,7 @@
         </ion-button>
 
 
-        <ion-button expand="block" fill="outline" class="settings-btn" (click)="showDevelopmentToast()">
+        <ion-button expand="block" fill="outline" class="settings-btn" (click)="settingsModal.open()">
           <ion-icon name="settings-outline" slot="start"></ion-icon>
           Configuración
         </ion-button>
@@ -267,4 +267,8 @@
       </div>
     </div>
   </div>
+
+  <!-- Settings Modal -->
+  <app-settings-modal #settingsModal></app-settings-modal>
+
 </ion-content>

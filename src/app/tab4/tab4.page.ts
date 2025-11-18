@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonContent, IonHeader, IonTitle, IonToolbar, IonIcon, IonButton, IonInput, IonCheckbox, IonLabel, IonSpinner } from '@ionic/angular/standalone';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AlertController, ToastController } from '@ionic/angular';
 import { Router } from '@angular/router';
+import { SettingsModalComponent } from '../modals/settings-modal/settings-modal.component';
 import { environment } from '../../environments/environment';
 
 // Environment configuration
@@ -31,9 +32,11 @@ interface RegisterData {
   templateUrl: './tab4.page.html',
   styleUrls: ['./tab4.page.scss'],
   standalone: true,
-  imports: [IonContent, IonHeader, IonTitle, IonToolbar, IonIcon, IonButton, IonInput, IonCheckbox, IonLabel, IonSpinner, CommonModule, FormsModule]
+  imports: [IonContent, IonHeader, IonTitle, IonToolbar, IonIcon, IonButton, IonInput, IonCheckbox, IonLabel, IonSpinner, CommonModule, FormsModule, SettingsModalComponent]
 })
 export class Tab4Page implements OnInit {
+  @ViewChild('settingsModal') settingsModal!: SettingsModalComponent;
+
   // Auth state
   isLoggedIn: boolean = false;
   userName: string = '';
@@ -439,8 +442,8 @@ export class Tab4Page implements OnInit {
   }
 
   goToOrders() {
-    // Navigate to tab5 (orders page)
-    this.router.navigate(['/tabs/mas']);
+    // Navigate to orders page
+    this.router.navigate(['/orders']);
   }
 
   async showDevelopmentToast() {

@@ -15,7 +15,8 @@ const API_BASE_URL = 'https://backend-app-x7k2.zeabur.app'; // Production URL
 interface CartItem {
   id: number;
   name: string;
-  image: string;
+  image?: string;
+  imagen_base64?: string;
   price: number;
   quantity: number;
 }
@@ -93,6 +94,7 @@ export class Tab3Page implements OnInit, OnDestroy, ViewWillEnter {
     if (name.includes('menta') || name.includes('blanca')) return 'snow';
     return 'cube';
   }
+
 
   removeFromCart(productId: number) {
     this.cartItems = this.cartItems.filter(item => item.id !== productId);
@@ -312,6 +314,7 @@ export class Tab3Page implements OnInit, OnDestroy, ViewWillEnter {
       this.updateCartUI();
     }
   }
+
 
   private async showToast(message: string, type: 'success' | 'error' | 'warning' = 'success') {
     const toast = await this.toastController.create({

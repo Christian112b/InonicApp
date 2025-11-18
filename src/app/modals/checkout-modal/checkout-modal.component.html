@@ -26,8 +26,6 @@
         <h3>Resumen del Pedido</h3>
         <div class="cart-items-summary">
           <div *ngFor="let item of cartItems" class="summary-item">
-            <img *ngIf="item.image" [src]="item.image" [alt]="item.name" class="item-image">
-            <div *ngIf="!item.image" class="item-placeholder">📦</div>
             <div class="item-details">
               <h4>{{ item.name }}</h4>
               <p>{{ item.quantity }} × ${{ item.price.toFixed(2) }}</p>

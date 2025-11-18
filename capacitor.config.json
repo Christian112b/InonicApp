@@ -2,5 +2,16 @@
   "appId": "com.costanzo.costanzoApp",
   "appName": "costanzoApp",
   "webDir": "www",
-  "bundledWebRuntime": false
+  "bundledWebRuntime": false,
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 3000,
+      "backgroundColor": "#ffffffff"
+    }
+  },
+  "android": {
+    "buildOptions": {
+      "releaseType": "APK"
+    }
+  }
 }

@@ -1,0 +1,85 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Mis Pedidos</ion-title>
+    <ion-buttons slot="start">
+      <ion-button fill="clear" (click)="closePage()" class="back-button">
+        ← Atrás
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="orders-content">
+
+  <div class="orders-container" style="margin-top: 5%; padding: 1rem;">
+
+    <div *ngIf="ordersLoading" class="loading-state">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Cargando pedidos...</p>
+    </div>
+
+    <div *ngIf="!ordersLoading && userOrders.length === 0" class="empty-state">
+      <ion-icon name="cart-outline"></ion-icon>
+      <h4>No tienes pedidos aún</h4>
+      <p>Tus pedidos aparecerán aquí cuando realices compras.</p>
+    </div>
+
+    <div *ngIf="!ordersLoading && userOrders.length > 0">
+      <div class="order-item" *ngFor="let order of userOrders; trackBy: trackByOrderId">
+        <div class="order-header">
+          <div class="order-info">
+            <h4>Pedido #{{ order.numero_pedido || order.id_pedido }}</h4>
+            <p class="order-date">{{ order.fecha_pedido | date:'dd/MM/yyyy HH:mm' }}</p>
+          </div>
+          <div class="order-status" [class]="'status-' + order.estado">
+            {{ getStatusText(order.estado) }}
+          </div>
+        </div>
+
+        <div class="order-items">
+          <div class="order-item-summary" *ngFor="let item of order.items">
+            <span>{{ item.nombre }}</span>
+            <span>x{{ item.cantidad }}</span>
+          </div>
+        </div>
+
+        <div class="order-footer">
+          <div class="order-total">
+            <strong>Total: ${{ (+order.total).toFixed(2) }}</strong>
+          </div>
+          <div class="order-actions">
+            <ion-button fill="outline" size="small" color="primary" (click)="toggleOrderTracking(order)">
+              <ion-icon name="location-outline" slot="start"></ion-icon>
+              Ver Seguimiento
+            </ion-button>
+          </div>
+        </div>
+
+        <!-- Order Tracking Section -->
+        <div class="order-tracking" *ngIf="order.showTracking">
+          <div class="tracking-content">
+            <div class="tracking-header" (click)="toggleOrderTracking(order)">
+              <ion-icon name="location-outline" class="tracking-icon"></ion-icon>
+              <h5>Seguimiento del Pedido</h5>
+              <ion-icon name="chevron-up-outline" class="tracking-arrow"></ion-icon>
+            </div>
+            <div class="tracking-details">
+              <div class="tracking-step" *ngFor="let step of getTrackingSteps(order)">
+                <div class="step-icon" [class]="step.iconClass">
+                  <ion-icon [name]="step.icon"></ion-icon>
+                </div>
+                <div class="step-content">
+                  <h6>{{ step.title }}</h6>
+                  <p>{{ step.description }}</p>
+                  <small *ngIf="step.date">{{ step.date }}</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</ion-content>
