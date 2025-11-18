@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter, ElementRef, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
-import { IonButton, IonIcon } from '@ionic/angular/standalone';
+import { IonIcon } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
 import { loadStripe, Stripe, StripeElements, StripeCardElement } from '@stripe/stripe-js';
 import { environment } from '../../../environments/environment';
@@ -8,7 +8,7 @@ import { environment } from '../../../environments/environment';
   selector: 'app-stripe-payment',
   templateUrl: './stripe-payment.component.html',
   styleUrls: ['./stripe-payment.component.scss'],
-  imports: [IonButton, IonIcon, CommonModule]
+  imports: [IonIcon, CommonModule]
 })
 export class StripePaymentComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() amount: number = 0; // Amount in cents

@@ -1,105 +1,55 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>Más</ion-title>
+    <ion-title>Mis Pedidos</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="mas-content">
+<ion-content class="orders-content">
 
-  <div class="mas-container" style="margin-top: 11%;">
-    <div class="mas-section">
-      <h2 class="section-title">Información Legal</h2>
+  <div class="orders-container" style="margin-top: 5%; padding: 1rem;">
 
-      <div class="mas-options">
-        <div class="option-card" (click)="openPrivacyPolicy()">
-          <div class="option-icon">
-            <ion-icon name="shield-checkmark-outline"></ion-icon>
+    <div *ngIf="ordersLoading" class="loading-state">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Cargando pedidos...</p>
+    </div>
+
+    <div *ngIf="!ordersLoading && userOrders.length === 0" class="empty-state">
+      <ion-icon name="cart-outline"></ion-icon>
+      <h4>No tienes pedidos aún</h4>
+      <p>Tus pedidos aparecerán aquí cuando realices compras.</p>
+    </div>
+
+    <div *ngIf="!ordersLoading && userOrders.length > 0">
+      <div class="order-item" *ngFor="let order of userOrders">
+        <div class="order-header">
+          <div class="order-info">
+            <h4>Pedido #{{ order.numero_pedido || order.id_pedido }}</h4>
+            <p class="order-date">{{ order.fecha_pedido | date:'dd/MM/yyyy HH:mm' }}</p>
           </div>
-          <div class="option-content">
-            <h3>Política de Privacidad</h3>
-            <p>Conoce cómo manejamos tus datos personales</p>
+          <div class="order-status" [class]="'status-' + order.estado">
+            {{ getStatusText(order.estado) }}
           </div>
-          <ion-icon name="chevron-forward-outline" class="option-arrow"></ion-icon>
         </div>
 
-        <div class="option-card" (click)="openReturnsPolicy()">
-          <div class="option-icon">
-            <ion-icon name="refresh-outline"></ion-icon>
+        <div class="order-items">
+          <div class="order-item-summary" *ngFor="let item of order.items">
+            <span>{{ item.nombre }}</span>
+            <span>x{{ item.cantidad }}</span>
           </div>
-          <div class="option-content">
-            <h3>Políticas de Devolución</h3>
-            <p>Información sobre entregas, reembolsos y devoluciones</p>
-          </div>
-          <ion-icon name="chevron-forward-outline" class="option-arrow"></ion-icon>
         </div>
 
-        <div class="option-card" (click)="openTermsOfService()">
-          <div class="option-icon">
-            <ion-icon name="document-text-outline"></ion-icon>
+        <div class="order-footer">
+          <div class="order-total">
+            <strong>Total: ${{ (+order.total).toFixed(2) }}</strong>
           </div>
-          <div class="option-content">
-            <h3>Términos de Servicio</h3>
-            <p>Condiciones generales de uso de la aplicación</p>
+          <div class="order-actions" *ngIf="order.estado === 'pendiente'">
+            <ion-button fill="outline" size="small" color="danger" (click)="cancelOrder(order.id_pedido)">
+              Cancelar
+            </ion-button>
           </div>
-          <ion-icon name="chevron-forward-outline" class="option-arrow"></ion-icon>
         </div>
       </div>
     </div>
 
-    <div class="mas-section">
-      <h2 class="section-title">Soporte</h2>
-
-      <div class="mas-options">
-        <div class="option-card" (click)="openContact()">
-          <div class="option-icon">
-            <ion-icon name="call-outline"></ion-icon>
-          </div>
-          <div class="option-content">
-            <h3>Contactanos</h3>
-            <p>¿Necesitas ayuda? Estamos aquí para ti</p>
-          </div>
-          <ion-icon name="chevron-forward-outline" class="option-arrow"></ion-icon>
-        </div>
-
-        <div class="option-card" (click)="openFAQ()">
-          <div class="option-icon">
-            <ion-icon name="help-circle-outline"></ion-icon>
-          </div>
-          <div class="option-content">
-            <h3>Preguntas Frecuentes</h3>
-            <p>Respuestas a las dudas más comunes</p>
-          </div>
-          <ion-icon name="chevron-forward-outline" class="option-arrow"></ion-icon>
-        </div>
-      </div>
-    </div>
-
-    <div class="mas-section">
-      <h2 class="section-title">Acerca de</h2>
-
-      <div class="about-card">
-        <div class="about-logo">
-          <img src="assets/img/costanzo.png" alt="Costanzo Logo">
-        </div>
-        <div class="about-info">
-          <h3>Costanzo Chocolates Artesanales</h3>
-          <p>Desde 1933, creando momentos dulces con pasión y tradición artesanal.</p>
-          <div class="about-stats">
-            <div class="stat">
-              <span class="stat-number">90+</span>
-              <span class="stat-label">Años</span>
-            </div>
-            <div class="stat">
-              <span class="stat-number">100%</span>
-              <span class="stat-label">Artesanal</span>
-            </div>
-            <div class="stat">
-              <span class="stat-number">∞</span>
-              <span class="stat-label">Pasión</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
 </ion-content>

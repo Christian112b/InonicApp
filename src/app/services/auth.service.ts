@@ -95,7 +95,6 @@ export class AuthService {
 
   checkAndRefreshAuth(): void {
     if (this.isTokenExpired()) {
-      console.log('Token expired, clearing auth data');
       this.logout();
       // Optionally redirect to login or show message
     }

@@ -112,6 +112,7 @@ export class CartService {
   }
 
   getCartItems() {
+    // Send JWT headers and session cookies for cart operations
     return this.http.get(`${this.apiUrl}/getItemsCart`, {
       headers: this.authService.getAuthHeaders(),
       withCredentials: true
@@ -136,7 +137,6 @@ export class CartService {
         },
         error: (error) => {
           // Backend error, use local cart
-          console.log('Backend cart unavailable, using local cart');
           observer.next(this.getLocalCartItems());
           observer.complete();
         }
@@ -177,13 +177,13 @@ export class CartService {
 
     // Check if token is expired before making request
     if (this.authService.isTokenExpired()) {
-      console.log('Token expired, cannot sync cart with backend');
       // Don't logout here, just don't sync
       return throwError(() => new Error('Token expired - cart saved locally'));
     }
 
     const formData = new FormData();
     formData.append('id_producto', productId.toString());
+    // Send JWT headers and session cookies for cart operations
     return this.http.post(`${this.apiUrl}/addCart`, formData, {
       headers: this.authService.getAuthHeaders(),
       withCredentials: true
@@ -191,6 +191,7 @@ export class CartService {
   }
 
   saveCart(cartItems: any[]) {
+    // Send JWT headers and session cookies for cart operations
     return this.http.post(`${this.apiUrl}/saveCart`,
       { items: cartItems },
       {
@@ -208,19 +209,9 @@ export class CartService {
   }
 
   getAddresses() {
-    const token = localStorage.getItem('jwt_token');
-    console.log('getAddresses - Direct localStorage check:', token);
-
-    if (!token) {
-      console.log('No JWT token found for getAddresses');
-      return this.http.get(`${this.apiUrl}/getAddresses`, {
-        withCredentials: true
-      });
-    }
-
-    console.log('Using JWT auth for getAddresses');
+    // Send JWT headers and session cookies for cart operations
     return this.http.get(`${this.apiUrl}/getAddresses`, {
-      headers: { 'Authorization': `Bearer ${token}` },
+      headers: this.authService.getAuthHeaders(),
       withCredentials: true
     });
   }

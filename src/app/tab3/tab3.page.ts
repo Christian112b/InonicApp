@@ -1,9 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonIcon, IonSpinner, IonButton, IonRouterLink } from '@ionic/angular/standalone';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonIcon, IonSpinner, IonButton, IonRouterLink, ViewWillEnter } from '@ionic/angular/standalone';
 import { CheckoutModalComponent } from '../modals/checkout-modal/checkout-modal.component';
 import { Router, NavigationEnd } from '@angular/router';
-import { addIcons } from 'ionicons';
-import { cube, gift, restaurant, leaf, star, snow, cart, addCircle, trash } from 'ionicons/icons';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { ToastController } from '@ionic/angular';
@@ -12,7 +10,7 @@ import { filter } from 'rxjs/operators';
 
 // Environment configuration
 // const API_BASE_URL = 'http://localhost:5000'; // Localhost URL for development
-const API_BASE_URL = 'https://backend-app-x7k2.zeabur.app/'; // Production URL
+const API_BASE_URL = 'https://backend-app-x7k2.zeabur.app'; // Production URL
 
 interface CartItem {
   id: number;
@@ -28,7 +26,7 @@ interface CartItem {
   styleUrls: ['tab3.page.scss'],
   imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonIcon, IonButton, IonSpinner, IonRouterLink, CommonModule, CheckoutModalComponent],
 })
-export class Tab3Page implements OnInit, OnDestroy {
+export class Tab3Page implements OnInit, OnDestroy, ViewWillEnter {
   private routerSubscription: any;
   public cartItems: CartItem[] = [];
   public cartTotal: number = 0;
@@ -38,56 +36,34 @@ export class Tab3Page implements OnInit, OnDestroy {
   public hasError: boolean = false;
 
   constructor(private http: HttpClient, private toastController: ToastController, private router: Router, private cartService: CartService) {
-    addIcons({
-      cube, gift, restaurant, leaf, star, snow, cart, addCircle, trash,
-      'cart-outline': cart,
-      'log-in-outline': 'log-in',
-      'storefront-outline': 'storefront',
-      'image-outline': 'image',
-      'remove': 'remove',
-      'add': 'add',
-      'card-outline': 'card'
-    });
   }
 
   ngOnInit() {
     this.checkAuthStatus();
 
-    // Load cart from backend if logged in (no localStorage fallback)
-    if (this.isLoggedIn) {
-      this.updateCartUI();
-    }
-
     // Listen for navigation events to save cart when leaving
     this.routerSubscription = this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe((event: NavigationEnd) => {
-        // Save cart when navigating away from cart tab
+        // Just save to local storage when navigating away from cart tab
         if (this.isLoggedIn && this.cartItems.length > 0) {
-          console.log('🚶‍♂️ User navigating away from cart, saving...');
-          this.persistCartToBackend().catch((error) => {
-            console.error('Error saving cart on navigation:', error);
-          });
+          this.saveCartToStorage();
         }
       });
 
     // Listen for cart refresh events from tab bar
     window.addEventListener('refreshCartData', () => {
       if (this.isLoggedIn) {
-        // Save current cart state before refreshing
-        this.persistCartToBackend().finally(() => {
-          this.updateCartUI();
-        });
+        // Just reload from local storage
+        this.loadCartFromStorage();
       }
     });
 
     // Listen for cart updates from other tabs
     window.addEventListener('cartUpdated', () => {
       if (this.isLoggedIn) {
-        // Save current cart state before updating
-        this.persistCartToBackend().finally(() => {
-          this.updateCartUI();
-        });
+        // Just reload from local storage
+        this.loadCartFromStorage();
       }
     });
 
@@ -98,6 +74,13 @@ export class Tab3Page implements OnInit, OnDestroy {
         this.updateCartUI();
       }
     });
+  }
+
+  ionViewWillEnter() {
+    // Load cart from backend every time the tab is entered
+    if (this.isLoggedIn) {
+      this.updateCartUI();
+    }
   }
 
   getProductIcon(productName: string): string {
@@ -138,38 +121,28 @@ export class Tab3Page implements OnInit, OnDestroy {
   }
 
   saveCartToStorage() {
-    // Since we have backend sync, we don't need to store full cart data locally
-    // Just store minimal cart state for offline functionality
+    // Save complete cart data to localStorage
     try {
-      const minimalCart = this.cartItems.map(item => ({
-        id: item.id,
-        quantity: item.quantity
-      }));
-      localStorage.setItem('costanzoCart', JSON.stringify(minimalCart));
+      localStorage.setItem('costanzoCart', JSON.stringify(this.cartItems));
     } catch (error) {
-      console.warn('Could not save cart to localStorage, continuing with backend sync only');
-      // Don't throw error - backend sync is the primary storage
+      console.warn('Could not save cart to localStorage');
     }
   }
 
   loadCartFromStorage() {
-    // Since we prioritize backend data, localStorage is just a fallback
+    // Load complete cart data from localStorage
     try {
       const savedCart = localStorage.getItem('costanzoCart');
       if (savedCart) {
-        const minimalCart = JSON.parse(savedCart);
-        // Convert minimal cart back to full format (without images/prices)
-        this.cartItems = minimalCart.map((item: any) => ({
-          id: item.id,
-          name: `Producto ${item.id}`, // Placeholder name
-          image: null, // Will be updated from backend
-          price: 0, // Will be updated from backend
-          quantity: item.quantity
-        }));
+        const cartData = JSON.parse(savedCart);
+        // Load cart items with complete data - no dummy data creation
+        this.cartItems = cartData.filter((item: any) =>
+          item.id && item.name && item.quantity && typeof item.quantity === 'number'
+        );
         this.updateCartTotals();
       }
     } catch (error) {
-      console.warn('Could not load cart from localStorage, will use backend data');
+      console.warn('Could not load cart from localStorage');
       this.cartItems = [];
     }
   }
@@ -186,8 +159,6 @@ export class Tab3Page implements OnInit, OnDestroy {
       return Promise.resolve({ ok: true }); // No need to save if not logged in or cart is empty
     }
 
-    console.log('💾 Auto-saving cart to backend...');
-
     // Convert cart items to the format expected by the backend
     const cartData = this.cartItems.map(item => ({
       id: item.id,
@@ -198,7 +169,7 @@ export class Tab3Page implements OnInit, OnDestroy {
     return this.cartService.saveCart(cartData).toPromise()
       .then((data: any) => {
         if (data.ok) {
-          console.log('✅ Cart saved successfully to backend');
+          console.log('✅ Cart saved successfully');
         } else {
           console.error('❌ Error saving cart to backend:', data);
         }
@@ -214,17 +185,14 @@ export class Tab3Page implements OnInit, OnDestroy {
   updateCartUI() {
     this.isLoadingCart = true;
 
-    // Load cart from backend (now uses JWT authentication)
+    // Load cart from backend using JWT authentication
     const token = localStorage.getItem('jwt_token');
     let headers = {};
     if (token) {
       headers = { 'Authorization': `Bearer ${token}` };
     }
-    console.log('Loading cart - token:', token);
-
     this.http.get(`${API_BASE_URL}/getItemsCart`, { headers, withCredentials: true }).subscribe({
       next: (data: any) => {
-        console.log('📦 Respuesta del carrito:', data);
         if (data.ok) {
           const items = (data.items || []).map((item: any) => {
             // Check if image already has data URL prefix
@@ -247,7 +215,6 @@ export class Tab3Page implements OnInit, OnDestroy {
           });
 
 
-          console.log('✅ Items procesados:', items.length, 'items');
           this.cartItems = items;
           this.updateCartTotals();
           this.saveCartToStorage();
@@ -278,23 +245,11 @@ export class Tab3Page implements OnInit, OnDestroy {
       return;
     }
 
-    // Save cart to backend before proceeding to checkout
-    console.log('💾 Saving cart before checkout...');
-    this.persistCartToBackend().then(() => {
-      console.log('✅ Cart saved, opening checkout modal...');
+    // Just save to local storage before proceeding to checkout
+    this.saveCartToStorage();
 
-      // Open checkout modal
-      this.showCheckoutModal = true;
-
-      // Debug: Confirm modal state after opening
-      setTimeout(() => {
-        console.log('Modal showCheckoutModal state:', this.showCheckoutModal);
-      }, 100);
-    }).catch((error) => {
-      console.error('❌ Error saving cart before checkout:', error);
-      // Still proceed to checkout even if save fails
-      this.showCheckoutModal = true;
-    });
+    // Open checkout modal
+    this.showCheckoutModal = true;
   }
 
   onCheckoutComplete(result: any) {
@@ -323,12 +278,9 @@ export class Tab3Page implements OnInit, OnDestroy {
       this.routerSubscription.unsubscribe();
     }
 
-    // Final cart save when component is destroyed
+    // Final cart save to local storage when component is destroyed
     if (this.isLoggedIn && this.cartItems.length > 0) {
-      console.log('💾 Final cart save on component destroy...');
-      this.persistCartToBackend().catch((error) => {
-        console.error('Error saving cart on destroy:', error);
-      });
+      this.saveCartToStorage();
     }
   }
 
@@ -336,7 +288,6 @@ export class Tab3Page implements OnInit, OnDestroy {
     const token = localStorage.getItem('jwt_token');
     const userData = localStorage.getItem('userData');
     this.isLoggedIn = !!(token && userData);
-    console.log('checkAuthStatus - token:', token, 'userData:', userData, 'isLoggedIn:', this.isLoggedIn);
   }
 
 

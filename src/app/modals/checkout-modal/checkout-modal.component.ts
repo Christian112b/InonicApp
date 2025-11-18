@@ -327,7 +327,6 @@ export class CheckoutModalComponent implements OnInit, OnDestroy {
   }
 
   close() {
-    console.log('🛒 Closing checkout modal');
     this.closeModal.emit();
   }
 }

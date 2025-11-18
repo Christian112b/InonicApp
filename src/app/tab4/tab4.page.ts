@@ -2,11 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonContent, IonHeader, IonTitle, IonToolbar, IonIcon, IonButton, IonInput, IonCheckbox, IonLabel, IonSpinner } from '@ionic/angular/standalone';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AlertController, ToastController } from '@ionic/angular';
+import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
-import { addIcons } from 'ionicons';
-import { personCircleOutline, logInOutline, personAddOutline, cartOutline, heartOutline, starOutline, locationOutline, cardOutline, notificationsOutline, helpCircleOutline, personOutline, receiptOutline, settingsOutline, logOutOutline, close, mailOutline, lockClosedOutline, eyeOutline, eyeOffOutline, callOutline } from 'ionicons/icons';
 
 // Environment configuration
 // const API_BASE_URL = 'http://localhost:5000'; // Localhost URL for development
@@ -20,6 +19,7 @@ interface LoginData {
 
 interface RegisterData {
   name: string;
+  apellido: string;
   email: string;
   phone: string;
   password: string;
@@ -42,6 +42,7 @@ export class Tab4Page implements OnInit {
   // Modal states
   showLoginModal: boolean = false;
   showRegisterModal: boolean = false;
+  showOrdersModal: boolean = false;
 
   // Form data
   loginData: LoginData = {
@@ -52,6 +53,7 @@ export class Tab4Page implements OnInit {
 
   registerData: RegisterData = {
     name: '',
+    apellido: '',
     email: '',
     phone: '',
     password: '',
@@ -61,38 +63,19 @@ export class Tab4Page implements OnInit {
   // UI states
   isLoading: boolean = false;
   isRegisterLoading: boolean = false;
+  ordersLoading: boolean = false;
   showPassword: boolean = false;
   showRegisterPassword: boolean = false;
   showConfirmPassword: boolean = false;
   loginSuccess: boolean = false;
+  userOrders: any[] = [];
 
   constructor(
     private http: HttpClient,
     private alertController: AlertController,
-    private toastController: ToastController
+    private toastController: ToastController,
+    private router: Router
   ) {
-    addIcons({
-      personCircleOutline,
-      logInOutline,
-      personAddOutline,
-      cartOutline,
-      heartOutline,
-      starOutline,
-      locationOutline,
-      cardOutline,
-      notificationsOutline,
-      helpCircleOutline,
-      personOutline,
-      receiptOutline,
-      settingsOutline,
-      logOutOutline,
-      close,
-      mailOutline,
-      lockClosedOutline,
-      eyeOutline,
-      eyeOffOutline,
-      callOutline
-    });
   }
 
   ngOnInit() {
@@ -159,6 +142,16 @@ export class Tab4Page implements OnInit {
     this.resetRegisterForm();
   }
 
+  openOrdersModal() {
+    this.showOrdersModal = true;
+    this.loadUserOrders();
+  }
+
+  closeOrdersModal() {
+    this.showOrdersModal = false;
+    this.userOrders = [];
+  }
+
   // Password visibility toggles
   togglePasswordVisibility() {
     this.showPassword = !this.showPassword;
@@ -185,6 +178,7 @@ export class Tab4Page implements OnInit {
   private resetRegisterForm() {
     this.registerData = {
       name: '',
+      apellido: '',
       email: '',
       phone: '',
       password: '',
@@ -213,6 +207,7 @@ export class Tab4Page implements OnInit {
       if (response.token) {
         // Login successful
         const userData = {
+          id: response.user?.id_usuario,
           name: response.user?.name || 'Usuario',
           email: response.user?.email || this.loginData.email
         };
@@ -233,6 +228,9 @@ export class Tab4Page implements OnInit {
         this.isLoggedIn = true;
         this.userName = userData.name;
         this.userEmail = userData.email;
+
+        // Fetch order count
+        this.fetchOrderCount();
 
         // Emit auth changed event for other components
         const authEvent = new CustomEvent('authChanged');
@@ -273,9 +271,37 @@ export class Tab4Page implements OnInit {
       return;
     }
 
-    // Basic password validation (backend will do more thorough validation)
+    // Phone validation
+    const phoneRegex = /^\+?\d{10,15}$/;
+    const cleanPhone = this.registerData.phone.replace(/[\s\-\(\)]/g, '');
+    if (!phoneRegex.test(cleanPhone)) {
+      this.showToast('Formato de teléfono inválido', 'warning');
+      return;
+    }
+
+    // Password validation to match backend requirements
     if (this.registerData.password.length < 8) {
       this.showToast('La contraseña debe tener al menos 8 caracteres', 'warning');
+      return;
+    }
+
+    if (!/[A-Z]/.test(this.registerData.password)) {
+      this.showToast('La contraseña debe contener al menos una letra mayúscula', 'warning');
+      return;
+    }
+
+    if (!/[a-z]/.test(this.registerData.password)) {
+      this.showToast('La contraseña debe contener al menos una letra minúscula', 'warning');
+      return;
+    }
+
+    if (!/\d/.test(this.registerData.password)) {
+      this.showToast('La contraseña debe contener al menos un número', 'warning');
+      return;
+    }
+
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(this.registerData.password)) {
+      this.showToast('La contraseña debe contener al menos un carácter especial', 'warning');
       return;
     }
 
@@ -320,6 +346,7 @@ export class Tab4Page implements OnInit {
       // Create FormData to match Flask's request.form
       const formData = new FormData();
       formData.append('name', this.registerData.name);
+      formData.append('apellido', this.registerData.apellido);
       formData.append('email', this.registerData.email);
       formData.append('phone', this.registerData.phone);
       formData.append('password', this.registerData.password);
@@ -329,13 +356,14 @@ export class Tab4Page implements OnInit {
       if (response.status === 200) {
         // Registration successful
         const userData = {
-          name: this.registerData.name,
-          email: this.registerData.email
+          id: response.user?.id_usuario,
+          name: response.user?.name || this.registerData.name,
+          email: response.user?.email || this.registerData.email
         };
 
         // Store auth data if token provided
         if (response.token) {
-          localStorage.setItem('authToken', response.token);
+          localStorage.setItem('jwt_token', response.token);
         }
         localStorage.setItem('userData', JSON.stringify(userData));
 
@@ -410,6 +438,11 @@ export class Tab4Page implements OnInit {
     this.showToast('Sesión cerrada exitosamente', 'success');
   }
 
+  goToOrders() {
+    // Navigate to tab5 (orders page)
+    this.router.navigate(['/tabs/mas']);
+  }
+
   async showDevelopmentToast() {
     const toast = await this.toastController.create({
       message: 'Esta funcionalidad está en desarrollo',
@@ -427,8 +460,39 @@ export class Tab4Page implements OnInit {
   }
 
   getOrderCount(): number {
-    // TODO: Get from API or local storage
-    return 0;
+    // Get from local storage or API
+    const cachedCount = localStorage.getItem('userOrderCount');
+    if (cachedCount) {
+      return parseInt(cachedCount, 10);
+    }
+    // If no cache, fetch from API
+    this.fetchOrderCount();
+    return 0; // Return 0 initially, will update when API responds
+  }
+
+  private fetchOrderCount() {
+    if (!this.isLoggedIn || !this.userEmail) return;
+
+    const token = localStorage.getItem('jwt_token');
+    if (!token) return;
+
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+
+    this.http.get(`${API_BASE_URL}/user-orders`, { headers }).subscribe({
+      next: (response: any) => {
+        if (response.success && response.orders) {
+          const count = response.orders.length;
+          localStorage.setItem('userOrderCount', count.toString());
+          // Trigger change detection
+          this.ngOnInit();
+        }
+      },
+      error: (error) => {
+        console.error('Error fetching order count:', error);
+      }
+    });
   }
 
   getFavoritesCount(): number {
@@ -439,6 +503,102 @@ export class Tab4Page implements OnInit {
   getRating(): string {
     // TODO: Get from API or calculate from reviews
     return '5.0';
+  }
+
+  private loadUserOrders() {
+    if (!this.isLoggedIn || !this.userEmail) return;
+
+    const token = localStorage.getItem('jwt_token');
+    if (!token) return;
+
+    this.ordersLoading = true;
+    const userData = localStorage.getItem('userData');
+    if (!userData) {
+      this.ordersLoading = false;
+      return;
+    }
+
+    const user = JSON.parse(userData);
+    const userId = user.id;
+
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+
+    this.http.get(`${API_BASE_URL}/user-orders`, { headers }).subscribe({
+      next: (response: any) => {
+        if (response.success) {
+          this.userOrders = response.orders || [];
+        } else {
+          this.userOrders = [];
+        }
+        this.ordersLoading = false;
+      },
+      error: (error) => {
+        console.error('Error loading orders:', error);
+        this.userOrders = [];
+        this.ordersLoading = false;
+        this.showToast('Error al cargar pedidos', 'error');
+      }
+    });
+  }
+
+  getStatusText(status: string): string {
+    const statusMap: { [key: string]: string } = {
+      'pendiente': 'Pendiente',
+      'procesando': 'Procesando',
+      'enviado': 'Enviado',
+      'entregado': 'Entregado',
+      'cancelado': 'Cancelado'
+    };
+    return statusMap[status] || status;
+  }
+
+  async cancelOrder(orderId: number) {
+    const alert = await this.alertController.create({
+      header: 'Cancelar Pedido',
+      message: '¿Estás seguro de que quieres cancelar este pedido?',
+      buttons: [
+        {
+          text: 'No',
+          role: 'cancel'
+        },
+        {
+          text: 'Sí, Cancelar',
+          role: 'destructive',
+          handler: () => {
+            this.performOrderCancellation(orderId);
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  private performOrderCancellation(orderId: number) {
+    const token = localStorage.getItem('jwt_token');
+    if (!token) return;
+
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    });
+
+    this.http.put(`${API_BASE_URL}/update-order/${orderId}`, { status: 'cancelado' }, { headers }).subscribe({
+      next: (response: any) => {
+        if (response.success) {
+          this.showToast('Pedido cancelado exitosamente', 'success');
+          this.loadUserOrders(); // Reload orders
+        } else {
+          this.showToast('Error al cancelar pedido', 'error');
+        }
+      },
+      error: (error) => {
+        console.error('Error canceling order:', error);
+        this.showToast('Error al cancelar pedido', 'error');
+      }
+    });
   }
 
   private async showToast(message: string, type: 'success' | 'error' | 'warning' = 'success') {

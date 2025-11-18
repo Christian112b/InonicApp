@@ -1,7 +1,5 @@
 import { Component, AfterViewInit, OnDestroy } from '@angular/core';
 import { IonHeader, IonToolbar, IonTitle, IonContent, IonIcon, IonSpinner, IonButton } from '@ionic/angular/standalone';
-import { addIcons } from 'ionicons';
-import { cube, gift, restaurant, leaf, star, snow, cart } from 'ionicons/icons';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { ToastController } from '@ionic/angular';
@@ -39,9 +37,9 @@ export class Tab1Page implements AfterViewInit, OnDestroy {
   public hasError = false;
   public errorMessage = '';
   public slideImages: string[] = [
-    'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDQwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRjVGNUU2Ii8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IiM4QjQ1MTMiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkNhZsOpcyAyWDE8L3RleHQ+Cjwvc3ZnPg==',
+    'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDQwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRjVGNUU2Ii8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IiM4QjQ1MTMiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkR1bGNlcyAyWDE8L3RleHQ+Cjwvc3ZnPg==',
     'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDQwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRkZGRkZGIi8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IiNEREI3NjMiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkR1bGNlcyBBcnRlc2FuYWxlczwvdGV4dD4KPC9zdmc+',
-    'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDQwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRjVGNUU2Ii8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IiM2NTQzMjEiIHRleHQtYW5jaG9yPSJtaWRkbGUiPk1lbWJyZXNpYSBQcmVtaXVtPC90ZXh0Pgo8L3N2Zz4='
+    'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDQwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRjVGNUU2Ii8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IiMyMjhCMjIiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkVudOKDrW8gR3JhdGlzPC90ZXh0Pgo8L3N2Zz4='
   ];
 
   slideOpts = {
@@ -64,7 +62,6 @@ export class Tab1Page implements AfterViewInit, OnDestroy {
   };
 
   constructor(private http: HttpClient, private toastController: ToastController) {
-    addIcons({ cube, gift, restaurant, leaf, star, snow, cart });
     this.loadFavoriteProducts();
   }
 
@@ -184,7 +181,6 @@ export class Tab1Page implements AfterViewInit, OnDestroy {
         const products = JSON.parse(cachedProducts);
         // Get first 6 products as favorites (you can modify this logic)
         this.favoriteProducts = products.slice(0, 6);
-        console.log('Productos cargados desde cache:', this.favoriteProducts);
         this.isLoadingProducts = false;
         return;
       } catch (error) {
@@ -198,13 +194,9 @@ export class Tab1Page implements AfterViewInit, OnDestroy {
 
     // Load products from API
     const apiUrl = `${API_BASE_URL}/getProducts`;
-    console.log('🌐 API URL (tab1):', apiUrl);
-    console.log('🔧 Environment API URL (tab1):', API_BASE_URL);
 
     this.http.get<{productos: Product[], categorias: string[]}>(apiUrl).subscribe({
       next: (response) => {
-        console.log('✅ Respuesta completa de la API (tab1):', response);
-        console.log('📦 Productos recibidos (tab1):', response.productos?.length || 0);
         // Cache the products and categories
         localStorage.setItem('cachedProducts', JSON.stringify(response.productos));
         localStorage.setItem('cachedCategories', JSON.stringify(response.categorias));
@@ -234,7 +226,6 @@ export class Tab1Page implements AfterViewInit, OnDestroy {
   }
 
   retryLoadProducts() {
-    console.log('Retrying to load products...');
     this.loadFavoriteProducts();
   }
 

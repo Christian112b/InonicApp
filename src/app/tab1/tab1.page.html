@@ -26,7 +26,7 @@
    </div>
 
    <!-- Content (only show when loaded and no error) -->
-   <div *ngIf="!isLoadingProducts && !hasError" style="margin-top: 11%;">
+   <div *ngIf="!isLoadingProducts && !hasError" style="margin-top: 15%;">
 
    <!-- Promotional Slider -->
    <div class="promo-slider">
@@ -34,7 +34,7 @@
       <div class="slide active" [style.background-image]="getSlideBackground(0)" [style.background-size]="'cover'" [style.background-position]="'center'">
         <div class="slide-overlay" style="background: linear-gradient(135deg, rgba(139, 69, 19, 0.7), rgba(160, 82, 45, 0.8));"></div>
         <div class="slide-content">
-          <h2>¡2x1 en Cafés!</h2>
+          <h2>¡2x1 en Dulces!</h2>
           <p>Todos los días de la semana</p>
         </div>
       </div>
@@ -48,10 +48,10 @@
       </div>
 
       <div class="slide" [style.background-image]="getSlideBackground(2)" [style.background-size]="'cover'" [style.background-position]="'center'">
-        <div class="slide-overlay" style="background: linear-gradient(135deg, rgba(101, 67, 33, 0.7), rgba(139, 69, 19, 0.8));"></div>
+        <div class="slide-overlay" style="background: linear-gradient(135deg, rgba(34, 139, 34, 0.7), rgba(50, 205, 50, 0.8));"></div>
         <div class="slide-content">
-          <h2>Membresía Premium</h2>
-          <p>Acumula puntos y ahorra</p>
+          <h2>Envío Gratis</h2>
+          <p>En pedidos mayores a $100</p>
         </div>
       </div>
 

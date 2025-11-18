@@ -1,8 +1,6 @@
 import { Component, EnvironmentInjector, inject } from '@angular/core';
 import { IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
-import { addIcons } from 'ionicons';
-import { home, storefront, cart, person, reorderFour } from 'ionicons/icons';
 
 @Component({
   selector: 'app-tabs',
@@ -14,7 +12,6 @@ export class TabsPage {
   public environmentInjector = inject(EnvironmentInjector);
 
   constructor() {
-    addIcons({ home, storefront, cart, person, reorderFour });
   }
 
   openCartFromTab() {

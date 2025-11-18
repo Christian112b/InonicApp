@@ -1,56 +1,140 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonHeader, IonTitle, IonToolbar, IonIcon } from '@ionic/angular/standalone';
-import { Router } from '@angular/router';
-import { ModalController, ToastController } from '@ionic/angular';
-import { addIcons } from 'ionicons';
-import { shieldCheckmarkOutline, refreshOutline, documentTextOutline, callOutline, helpCircleOutline, chevronForwardOutline } from 'ionicons/icons';
+import { IonContent, IonHeader, IonTitle, IonToolbar, IonIcon, IonButton, IonSpinner } from '@ionic/angular/standalone';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { AlertController, ToastController, ViewWillEnter } from '@ionic/angular';
+import { environment } from '../../environments/environment';
+
+const API_BASE_URL = environment.apiUrl;
 
 @Component({
   selector: 'app-tab5',
   templateUrl: './tab5.page.html',
   styleUrls: ['./tab5.page.scss'],
   standalone: true,
-  imports: [IonContent, IonHeader, IonTitle, IonToolbar, IonIcon, CommonModule, FormsModule],
-  providers: [ModalController, ToastController]
+  imports: [IonContent, IonHeader, IonTitle, IonToolbar, IonIcon, IonButton, IonSpinner, CommonModule, FormsModule]
 })
-export class Tab5Page implements OnInit {
+export class Tab5Page implements OnInit, ViewWillEnter {
 
-  constructor(private router: Router, private modalController: ModalController, private toastController: ToastController) {
-    addIcons({
-      shieldCheckmarkOutline,
-      refreshOutline,
-      documentTextOutline,
-      callOutline,
-      helpCircleOutline,
-      chevronForwardOutline
+  ordersLoading: boolean = false;
+  userOrders: any[] = [];
+
+  constructor(
+    private http: HttpClient,
+    private alertController: AlertController,
+    private toastController: ToastController
+  ) {}
+
+  ngOnInit() {
+    // Initial load
+  }
+
+  ionViewWillEnter() {
+    this.loadUserOrders();
+  }
+
+  private loadUserOrders() {
+    const token = localStorage.getItem('jwt_token');
+    if (!token) {
+      this.showToast('Debes iniciar sesión para ver tus pedidos', 'warning');
+      return;
+    }
+
+    this.ordersLoading = true;
+    const userData = localStorage.getItem('userData');
+    if (!userData) {
+      this.ordersLoading = false;
+      return;
+    }
+
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+
+    this.http.get(`${API_BASE_URL}/user-orders`, { headers }).subscribe({
+      next: (response: any) => {
+        if (response.success) {
+          this.userOrders = response.orders || [];
+        } else {
+          this.userOrders = [];
+        }
+        this.ordersLoading = false;
+      },
+      error: (error) => {
+        console.error('Error loading orders:', error);
+        this.userOrders = [];
+        this.ordersLoading = false;
+        this.showToast('Error al cargar pedidos', 'error');
+      }
     });
   }
 
-  ngOnInit() {
+  getStatusText(status: string): string {
+    const statusMap: { [key: string]: string } = {
+      'pendiente': 'Pendiente',
+      'procesando': 'Procesando',
+      'enviado': 'Enviado',
+      'entregado': 'Entregado',
+      'cancelado': 'Cancelado'
+    };
+    return statusMap[status] || status;
   }
 
-  async openPrivacyPolicy() {
-    await this.router.navigate(['/privacy-policy']);
+  async cancelOrder(orderId: number) {
+    const alert = await this.alertController.create({
+      header: 'Cancelar Pedido',
+      message: '¿Estás seguro de que quieres cancelar este pedido?',
+      buttons: [
+        {
+          text: 'No',
+          role: 'cancel'
+        },
+        {
+          text: 'Sí, Cancelar',
+          role: 'destructive',
+          handler: () => {
+            this.performOrderCancellation(orderId);
+          }
+        }
+      ]
+    });
+
+    await alert.present();
   }
 
+  private performOrderCancellation(orderId: number) {
+    const token = localStorage.getItem('jwt_token');
+    if (!token) return;
 
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    });
 
-  async openReturnsPolicy() {
-    await this.router.navigate(['/returns-policy']);
+    this.http.put(`${API_BASE_URL}/update-order/${orderId}`, { status: 'cancelado' }, { headers }).subscribe({
+      next: (response: any) => {
+        if (response.success) {
+          this.showToast('Pedido cancelado exitosamente', 'success');
+          this.loadUserOrders(); // Reload orders
+        } else {
+          this.showToast('Error al cancelar pedido', 'error');
+        }
+      },
+      error: (error) => {
+        console.error('Error canceling order:', error);
+        this.showToast('Error al cancelar pedido', 'error');
+      }
+    });
   }
 
-  async openTermsOfService() {
-    await this.router.navigate(['/terms-of-service']);
+  private async showToast(message: string, type: 'success' | 'error' | 'warning' = 'success') {
+    const toast = await this.toastController.create({
+      message: message,
+      duration: 3000,
+      position: 'top',
+      cssClass: `toast-${type}`
+    });
+    await toast.present();
   }
-
-  async openContact() {
-    await this.router.navigate(['/contact']);
-  }
-
-  async openFAQ() {
-    await this.router.navigate(['/faq']);
-  }
-
 }

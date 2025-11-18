@@ -1,14 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonIcon, IonButtons, IonSpinner } from '@ionic/angular/standalone';
-import { addIcons } from 'ionicons';
-import { cube, gift, restaurant, leaf, star, snow, cart, addCircle } from 'ionicons/icons';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { ToastController } from '@ionic/angular';
 import { environment } from '../../environments/environment';
 
 // Environment configuration
-const API_BASE_URL = 'https://backend-app-x7k2.zeabur.app/'; // Force HTTPS production URL for testing
+const API_BASE_URL = 'https://backend-app-x7k2.zeabur.app'; // Force HTTPS production URL for testing
 // const API_BASE_URL = environment.apiUrl; // Original environment-based URL
 
 interface CartItem {
@@ -62,7 +60,6 @@ export class Tab2Page implements OnInit {
   public animatingQuantityId: number | null = null;
 
   constructor(private http: HttpClient, private toastController: ToastController) {
-    addIcons({ cube, gift, restaurant, leaf, star, snow, cart, addCircle });
   }
 
   ngOnInit() {
@@ -99,8 +96,6 @@ export class Tab2Page implements OnInit {
         this.connectionStatus = '✅ Datos cargados desde caché';
         this.connectionStatusColor = '#28a745';
         this.hasConnectionError = false;
-        console.log('🗂️ Fuente de datos: CACHÉ LOCAL');
-        console.log('📦 Total productos desde caché:', this.allProducts.length);
         return;
       } catch (error) {
         console.warn('Error parsing cached products, fetching from API:', error);
@@ -115,21 +110,13 @@ export class Tab2Page implements OnInit {
     this.isLoading = true;
     this.hasConnectionError = false;
     const apiUrl = `${API_BASE_URL}/getProducts`;
-    console.log('🌐 API URL being used:', apiUrl);
-    console.log('🔧 Environment API URL:', API_BASE_URL);
 
     // Test basic connectivity first
-    console.log('🔍 Testing basic connectivity to server...');
     this.connectionStatus = '🔍 Probando conexión...';
     this.connectionStatusColor = '#17a2b8'; // Blue
 
     this.http.get<{productos: Product[], categorias: string[]}>(apiUrl).subscribe({
       next: (response) => {
-        console.log('✅ Respuesta completa de la API:', response);
-        console.log('📦 Productos recibidos:', response.productos?.length || 0);
-        console.log('🏷️ Categorías recibidas:', response.categorias?.length || 0);
-        console.log('🗂️ Fuente de datos: API (no caché)');
-        console.log('📦 Total productos desde API:', response.productos?.length || 0);
         this.isLoading = false;
         this.hasConnectionError = false;
         this.connectionStatus = '✅ Conectado - Datos cargados';
@@ -138,7 +125,6 @@ export class Tab2Page implements OnInit {
         this.categories = response.categorias;
 
         // Cache the products and categories
-        console.log('💾 Guardando productos en caché local');
         localStorage.setItem('cachedProducts', JSON.stringify(response.productos));
         localStorage.setItem('cachedCategories', JSON.stringify(response.categorias));
 
@@ -173,12 +159,10 @@ export class Tab2Page implements OnInit {
         this.connectionStatusColor = '#dc3545'; // Red
         this.showToast('Error al cargar productos desde el servidor. Mostrando datos de respaldo.', 'error');
         // Show fallback data with error indication
-        console.log('⚠️ Using fallback data due to connection error');
         this.isLoading = false;
         this.hasConnectionError = true;
         this.connectionStatus = 'Usando datos locales (sin conexión)';
         this.connectionStatusColor = '#ffc107'; // Yellow
-        console.log('🗂️ Fuente de datos: DATOS DE RESPALDO (fallback)');
 
         this.allProducts = [
           {
@@ -443,12 +427,10 @@ export class Tab2Page implements OnInit {
 
   proceedToCheckout() {
     // TODO: Implement checkout process
-    // console.log('Proceeding to checkout with items:', this.cartItems);
     alert('Funcionalidad de checkout próximamente disponible');
   }
 
   retryConnection() {
-    console.log('🔄 Retrying connection...');
     this.loadProducts();
   }
 
@@ -462,7 +444,6 @@ export class Tab2Page implements OnInit {
       minute: '2-digit',
       second: '2-digit'
     });
-    console.log('📅 Last update time:', this.lastUpdateTime);
   }
 
   private async showToast(message: string, type: 'success' | 'error' | 'warning' = 'success') {

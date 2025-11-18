@@ -33,37 +33,7 @@
     <!-- Logged In State -->
     <div class="account-section" *ngIf="isLoggedIn">
       <div class="account-header">
-        <h2>{{ userName || 'Usuario' }}</h2>
-      </div>
-
-      <div class="account-stats">
-        <div class="stat-item">
-          <div class="stat-icon-bg">
-            <ion-icon name="cart-outline"></ion-icon>
-          </div>
-          <div class="stat-info">
-            <span class="stat-number">{{ getOrderCount() }}</span>
-            <span class="stat-label">Pedidos</span>
-          </div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-icon-bg">
-            <ion-icon name="heart-outline"></ion-icon>
-          </div>
-          <div class="stat-info">
-            <span class="stat-number">{{ getFavoritesCount() }}</span>
-            <span class="stat-label">Favoritos</span>
-          </div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-icon-bg">
-            <ion-icon name="star-outline"></ion-icon>
-          </div>
-          <div class="stat-info">
-            <span class="stat-number">{{ getRating() }}</span>
-            <span class="stat-label">Calificación</span>
-          </div>
-        </div>
+        <h2>{{ userName || 'Cliente' }}</h2>
       </div>
 
       <div class="account-quick-actions">
@@ -94,15 +64,11 @@
           Mi Perfil
         </ion-button>
 
-        <ion-button expand="block" fill="outline" class="orders-btn" (click)="showDevelopmentToast()">
+        <ion-button expand="block" fill="outline" class="orders-btn" (click)="goToOrders()">
           <ion-icon name="receipt-outline" slot="start"></ion-icon>
           Mis Pedidos
         </ion-button>
 
-        <ion-button expand="block" fill="outline" class="favorites-btn" (click)="showDevelopmentToast()">
-          <ion-icon name="heart-outline" slot="start"></ion-icon>
-          Favoritos
-        </ion-button>
 
         <ion-button expand="block" fill="outline" class="settings-btn" (click)="showDevelopmentToast()">
           <ion-icon name="settings-outline" slot="start"></ion-icon>
@@ -116,6 +82,7 @@
       </div>
     </div>
   </div>
+
 
   <!-- Login Modal -->
   <div class="modal-overlay" *ngIf="showLoginModal">
@@ -199,14 +166,28 @@
         <form class="register-form" (ngSubmit)="register()" #registerForm="ngForm">
           <div class="form-group">
             <label for="registerName">
-              <ion-icon name="person-outline"></ion-icon> Nombre completo
+              <ion-icon name="person-outline"></ion-icon> Nombre
             </label>
             <ion-input
               type="text"
               id="registerName"
               [(ngModel)]="registerData.name"
               name="name"
-              placeholder="Ingresa tu nombre completo"
+              placeholder="Ingresa tu nombre"
+              required>
+            </ion-input>
+          </div>
+
+          <div class="form-group">
+            <label for="registerApellido">
+              <ion-icon name="person-outline"></ion-icon> Apellido
+            </label>
+            <ion-input
+              type="text"
+              id="registerApellido"
+              [(ngModel)]="registerData.apellido"
+              name="apellido"
+              placeholder="Ingresa tu apellido"
               required>
             </ion-input>
           </div>
